@@ -24,8 +24,8 @@ def search():
 def setup_db():
     try:
         flask.g.db = lib.db.get_connection(app)
-    except mysql.connector.errors.ProgrammingError as exc:
-        if exc.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
+    except (mysql.connector.errors.ProgrammingError, KeyError) as exc:
+        if type(exc) == KeyError or exc.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
             if not os.path.exists(CONF_PATH):
                 if flask.request.endpoint in ["install", "static"]:
                     return
