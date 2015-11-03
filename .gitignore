@@ -1,0 +1,6 @@
+.idea
+config.cfg
+*.iml
+__pycache__
+images
+downloads

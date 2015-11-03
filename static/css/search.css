@@ -1,0 +1,30 @@
+input[type=checkbox] {
+	vertical-align: top;
+}
+
+#btn-submit {
+	margin-top: 20px;
+}
+
+.category {
+	border: 1px solid grey;
+    border-radius: 3px;
+}
+  
+.category * {
+	padding: 5px;
+}
+
+.category-title {
+  	color: white;
+    font-size: 120%;
+  	text-align: center;
+  
+	background-color: #006dcc;
+  	
+  	border-bottom: 1px solid grey;
+}
+
+.category-content {
+	
+}
