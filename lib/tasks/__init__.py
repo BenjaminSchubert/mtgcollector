@@ -20,9 +20,11 @@ class Downloader(threading.Thread):
         self.download_folder = os.path.join(app.static_folder, "images")
 
     def run(self):
+        entry = self.queue.get()
         with self.db.db_manager(self.app) as conn:
             while True:
-                self.download_image(self.queue.get(), conn)
+                self.download_image(entry, conn)
+                entry = self.queue.get()
 
     def download_image(self, card_id: int, connection):
         url = lib.db.get_image_url(card_id, connection=connection)

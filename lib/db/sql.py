@@ -14,7 +14,7 @@ create_table_edition = \
     """
 
 
-create_table_metacards = \
+create_table_metacard = \
     """
     CREATE TABLE metacard (
         name VARCHAR(150) PRIMARY KEY,
@@ -46,13 +46,15 @@ create_table_cards = \
         version TINYINT NOT NULL,
         artist VARCHAR(150) NOT NULL,
         flavor TEXT,
+        price FLOAT,
+
         FOREIGN KEY (name) REFERENCES metacard(name),
         FOREIGN KEY (edition) REFERENCES edition(code),
         UNIQUE (multiverseid, number)
     )
     """
 
-create_table_tournaments = \
+create_table_tournament = \
     """
     CREATE TABLE tournament (
         name VARCHAR(150) PRIMARY KEY
@@ -63,11 +65,60 @@ create_table_card_legal_in_tournament = \
     """
     CREATE TABLE card_legal_in_tournament (
         card_name VARCHAR(150) NOT NULL,
-        FOREIGN KEY (card_name) REFERENCES metacard(name),
         tournament_name VARCHAR(150) NOT NULL,
-        FOREIGN KEY (tournament_name) REFERENCES tournament(name),
         type SET('Restricted', 'Legal') NOT NULL,
+
+        FOREIGN KEY (card_name) REFERENCES metacard(name),
+        FOREIGN KEY (tournament_name) REFERENCES tournament(name),
         UNIQUE (card_name, tournament_name)
+    )
+    """
+
+create_table_user = \
+    """
+    CREATE TABLE user (
+        user_id INT PRIMARY KEY AUTO_INCREMENT,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    )
+    """
+
+create_table_card_in_collection = \
+    """
+    CREATE TABLE card_in_collection (
+        user_id INT NOT NULL,
+        card_id INT NOT NULL,
+        num_normal INT NOT NULL DEFAULT 0,
+        num_foil INT NOT NULL DEFAULT 0,
+
+        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+        FOREIGN KEY (card_id) REFERENCES card(card_id),
+        UNIQUE(user_id, card_id)
+    )
+    """
+
+create_table_deck = \
+    """
+    CREATE TABLE deck (
+        deck_id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        deck_name VARCHAR(255) NOT NULL,
+
+        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+    )
+    """
+
+create_table_card_in_deck = \
+    """
+    CREATE TABLE card_in_deck(
+        deck_id INT NOT NULL,
+        card_name VARCHAR(150) NOT NULL,
+        number SMALLINT NOT NULL DEFAULT 1,
+
+        FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
+        FOREIGN KEY (card_name) REFERENCES metacard(name),
+        UNIQUE(deck_id, card_name)
     )
     """
 

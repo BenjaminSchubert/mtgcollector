@@ -16,12 +16,20 @@ def setup_tables(connection) -> bool:
     cursor.execute(lib.db.sql.create_table_edition)
 
     # cards
-    cursor.execute(lib.db.sql.create_table_metacards)
+    cursor.execute(lib.db.sql.create_table_metacard)
     cursor.execute(lib.db.sql.create_table_cards)
 
     # tournaments
-    cursor.execute(lib.db.sql.create_table_tournaments)
+    cursor.execute(lib.db.sql.create_table_tournament)
     cursor.execute(lib.db.sql.create_table_card_legal_in_tournament)
+
+    # users
+    cursor.execute(lib.db.sql.create_table_user)
+
+    # collections
+    cursor.execute(lib.db.sql.create_table_card_in_collection)
+    cursor.execute(lib.db.sql.create_table_deck)
+    cursor.execute(lib.db.sql.create_table_card_in_deck)
 
     # constraints
     for constraint in lib.db.sql.metacard_constraints:
