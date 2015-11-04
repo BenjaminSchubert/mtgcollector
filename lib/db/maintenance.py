@@ -38,11 +38,11 @@ class MaintenanceDB:
     def setup_db(self):
         conn = mysql.connector.connect(
             user=self.app.config["DATABASE_USER"], password=self.app.config["DATABASE_PASSWORD"],
-            host=self.app.config["DATABASE_HOST"], raise_on_warnings=True
+            host=self.app.config["DATABASE_HOST"], port=self.app.config["DATABASE_PORT"], raise_on_warnings=True
         )
         try:
             cursor = conn.cursor()
-            cursor.execute("CREATE DATABASE mtgcollector CHARACTER SET utf8")
+            cursor.execute("CREATE DATABASE %(database_name)s CHARACTER SET utf8", self.app.config["DATABASE_NAME"])
             conn.commit()
         except:
             raise

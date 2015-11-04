@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MTG-Collector</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
 	{% block head %}{% endblock %}
 </head>
@@ -26,10 +26,10 @@
 		</div>
 	</nav>
 
-	<div id="main-content" class="jumbotron text-center">
+	<div id="content" class="container">
+        <div class="row">
 		{% block body %}{% endblock %}
-	</div>	
-		
+        </div>
 	</div>
 </body>
 </html>

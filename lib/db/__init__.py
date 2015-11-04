@@ -23,7 +23,7 @@ def __execute(command, connection=None, **kwargs):
 def get_connection(app):
     return mysql.connector.connect(
         user=app.config["DATABASE_USER"], password=app.config["DATABASE_PASSWORD"],
-        host=app.config["DATABASE_HOST"], database=app.config["DATABASE_NAME"],
+        host=app.config["DATABASE_HOST"], database=app.config["DATABASE_NAME"], port=app.config["DATABASE_PORT"],
         raise_on_warnings=True
     )
 

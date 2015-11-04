@@ -1,0 +1,38 @@
+{% macro render_field(field, label_visible=true, autofocus=false) -%}
+{% if field.type != "HiddenField" and field.type != "CSRFTokenField" and label_visible%}
+    <div class="form-group{% if field.errors %} has-error{% endif %}" {{ kwargs.pop('class_', '') }}>
+        <label for="{{ field.id }}" class="control-label col-sm-3">{{ field.label.text }}</label>
+        <div class="col-sm-9">
+            {{ field( autofocus=autofocus, class_="form-control", **kwargs) }}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <p class="help-block">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{%- endmacro %}
+
+
+{%  macro render_form(form, action="post", action_url=".", action_text="Submit", _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
+
+<form method="{{ action }}" action="{{ action_url }}" class="{{  _class }}">
+    {{ form.hidden_tag() }}
+    {% set autofocus=true %}
+    {% for field in form %}
+        {% if field.type == "BooleanField" %}
+            {{ render_checkbox_field(field) }}
+        {% elif  field.type == "RadioField"%}
+            {{ render_radio_field(field) }}
+        {% else %}
+            {{ render_field(field, autofocus=autofocus) }}
+        {% endif %}
+        {% if autofocus and field.type != "CSRFTokenField" %}
+            {% set autofocus=false %}
+        {% endif %}
+    {% endfor %}
+    <button type="submit" id="{{ submit_id }}" class="{{ btn_class }} pull-right">{{ action_text }}</button>
+</form>
+
+{%- endmacro %}

@@ -1,23 +1,8 @@
 {% extends "layout.html" %}
+{% from "macros.html" import render_form %}
 {% block body %}
-    <form method="post" action="{{ url_for('install') }}" role="form">
-        <div class="form-group">
-            <label for="database_host">Host</label>
-            <input type="text" class="form-control" name="database_host" placeholder="Database Host">
-        </div>
-        <div class="form-group">
-            <label for="database_name">Name</label>
-            <input type="text" class="form-control" name="database_name" placeholder="Database Name">
-        </div>
-        <div class="form-group">
-            <label for="database_user">User</label>
-            <input type="text" class="form-control" name="database_user" placeholder="Database User">
-        </div>
-
-        <div class="form-group">
-            <label for="database_password">Password</label>
-            <input type="password" class="form-control" name="database_password" placeholder="Password">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-    </form>
+    <div class="col-md-4 col-md-offset-4">
+        <h3 class="text-center">First time installation</h3>
+        {{ render_form(form, _class="form-horizontal", action_url=url_for("install")) }}
+    </div>
 {% endblock %}
