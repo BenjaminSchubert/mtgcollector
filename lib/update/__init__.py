@@ -67,7 +67,11 @@ class CardUpdater:
                 current_version = match.group(1)
 
         if current_version < latest_remote_version:
-            self.__download_latest_version(latest_remote_version)
-            return True
+            try:
+                self.__download_latest_version(latest_remote_version)
+            except requests.exceptions.ConnectionError:
+                return False
+            else:
+                return True
 
         return False
