@@ -42,16 +42,13 @@ class MaintenanceDB:
         )
         try:
             cursor = conn.cursor()
-            cursor.execute("CREATE DATABASE %(database_name)s CHARACTER SET utf8", self.app.config["DATABASE_NAME"])
+            cursor.execute("CREATE DATABASE {} CHARACTER SET utf8".format(self.app.config["DATABASE_NAME"]))
             conn.commit()
         except:
             raise
         else:
             with self.DBManager(self.app) as connection:
                 lib.db.populate.setup_tables(connection)
-            card_updater = lib.update.CardUpdater(self.app)
-            card_updater.check_update()
-            self.__update(card_updater)
         finally:
             conn.close()
 
@@ -63,5 +60,6 @@ class MaintenanceDB:
         except mysql.connector.errors.ProgrammingError as exc:
             if exc.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
                 self.setup_db()
+                self.__update(card_updater)
             else:
                 raise
