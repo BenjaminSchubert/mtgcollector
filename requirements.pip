@@ -1,4 +1,5 @@
 requests
 flask
 mysql-connector-python
-flask-wtforms
+flask-WTF
+flask-login

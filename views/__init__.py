@@ -8,6 +8,7 @@ import mysql.connector.errorcode
 from mtgcollector import app, CONF_PATH, lib
 import views.conf
 import views.api
+import views.auth
 
 
 @app.route("/")

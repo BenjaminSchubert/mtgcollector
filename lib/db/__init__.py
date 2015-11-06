@@ -8,11 +8,21 @@ import mysql.connector.errors
 import mysql.connector.errorcode
 
 import lib.db.populate
+from lib.models import User
 
 mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
 
 
-def __execute(command, connection=None, **kwargs):
+def __insert(command, connection=None, **kwargs):
+    if connection is None:
+        connection = getattr(flask.g, "db")
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(command, kwargs)
+    connection.commit()
+    return cursor.lastrowid
+
+
+def __fetch(command, connection=None, **kwargs):
     if connection is None:
         connection = getattr(flask.g, "db")
     cursor = connection.cursor(dictionary=True)
@@ -44,7 +54,7 @@ def get_image_path(app, card_id: int):
 
 
 def get_multiverseid(card_id, **kwargs):
-    cards = __execute(
+    cards = __fetch(
         """
         SELECT multiverseid FROM card WHERE
         card_id=%(card_id)s
@@ -56,3 +66,51 @@ def get_multiverseid(card_id, **kwargs):
         return cards[0]["multiverseid"]
     else:
         return None
+
+
+def get_user(username):
+    data = __fetch(
+        """
+        SELECT * FROM user WHERE username = %(username)s or email = %(username)s
+        """,
+        username=username
+    )
+    return User(**data[0])
+
+
+def get_user_by_id(user_id):
+    data = __fetch(
+        """
+        SELECT * FROM user WHERE user_id = %(user_id)s
+        """,
+        user_id=user_id
+    )
+    return User(**data[0])
+
+def get_users(limit=None):
+    return __fetch(
+        """
+        SELECT username, email FROM user LIMIT %(limit)s
+        """,
+        limit=limit
+    )
+
+
+def create_user(username, email, password):
+    return __insert(
+        """
+        INSERT INTO user (username, email, password) VALUES (%(username)s, %(email)s, %(password)s)
+        """,
+        username=username, email=email, password=password
+    )
+
+
+def set_admin(user_id):
+    return __insert(
+        """
+        UPDATE user
+        SET is_admin = TRUE
+        WHERE user_id = %(user_id)s
+        """,
+        user_id=user_id
+    )

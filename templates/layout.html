@@ -21,6 +21,13 @@
 					<li>
 						<a href="{{ url_for('index') }}">Collection</a>
 					</li>
+                    <li>
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('login') }}">Login</a>
+                        {% else %}
+                            <a href="{{ url_for('logout') }}">Logout</a>
+                        {% endif %}
+                    </li>
 				</ul>
 			</div>
 		</div>
