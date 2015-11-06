@@ -12,7 +12,11 @@ class Model(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def table_creation_command(cls):
         """ Defines the sql command used to create the table for the model """
-        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def table_constraints(cls) -> Iterable[str]:
+        """ List of constraints to apply on the table """
 
     def __eq__(self, other):
         for current, other in zip(vars(self).values(), vars(other).values()):
@@ -44,6 +48,14 @@ class Model(metaclass=abc.ABCMeta):
             connection = getattr(flask.g, "db")
         cursor = connection.cursor()
         cursor.execute(cls.table_creation_command())
+
+    @classmethod
+    def create_table_constraints(cls, connection=None):
+        if connection is None:
+            connection = getattr(flask.g, "db")
+        cursor = connection.cursor()
+        for constraint in cls.table_constraints:
+            cursor.execute(constraint)
 
 
 def info(self, ignored: Iterable[str]=list(), **kwargs):

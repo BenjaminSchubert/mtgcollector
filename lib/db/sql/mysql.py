@@ -17,3 +17,21 @@ class MySQL:
             is_admin BOOLEAN NOT NULL DEFAULT FALSE
         )
         """
+
+    user_constraints = [
+        """
+        CREATE TRIGGER `user_cant_have_username_same_as_other_email` BEFORE INSERT ON `user`
+        FOR EACH ROW
+        BEGIN
+            IF(
+                EXISTS(SELECT user_id FROM user WHERE email = NEW.username)
+            OR
+                EXISTS(SELECT user_id FROM user WHERE username = NEW.email)
+            )
+            THEN
+                SIGNAL SQLSTATE '23000' SET MESSAGE_TEXT = \
+                "A user cannot have a username the same as another user's email";
+            END IF;
+        END
+        """
+    ]

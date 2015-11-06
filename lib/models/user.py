@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+from typing import Iterable
 
 from lib.models import Model
 from lib.db import sql_commands as sql
@@ -26,6 +27,11 @@ class User(Model):
     def table_creation_command(cls) -> str:
         """ The command to create the user table """
         return sql.create_table_user
+
+    @classmethod
+    def table_constraints(cls) -> Iterable[str]:
+        """ list of constraints on table user """
+        return sql.user_constraints
 
     @property
     def is_authenticated(self) -> bool:
@@ -128,7 +134,6 @@ class User(Model):
         Sets the user identified by user_id to be an admin if admin is True (default)
         Else remove the right of being admin to the user
 
-        :param user_id: the id identifying the user
         :param admin: whether to turn the user as admin or remove him the rights to be
         """
         self.__is_admin = admin
