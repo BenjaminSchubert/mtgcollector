@@ -1,9 +1,49 @@
 # -*- coding: utf-8 -*-
+import abc
+import flask
 from typing import NamedTuple
 from typing import Iterable
 import datetime
 import typing
-from flask.ext import login
+
+
+class Model(metaclass=abc.ABCMeta):
+    @classmethod
+    @abc.abstractmethod
+    def table_creation_command(cls):
+        """ Defines the sql command used to create the table for the model """
+        pass
+
+    def __eq__(self, other):
+        for current, other in zip(vars(self).values(), vars(other).values()):
+            if current != other:
+                return False
+
+        return True
+
+    @classmethod
+    def insert(cls, command, connection=None, **kwargs):
+        if connection is None:
+            connection = getattr(flask.g, "db")
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(command, kwargs)
+        connection.commit()
+        return cursor.lastrowid
+
+    @classmethod
+    def get(cls, command, connection=None, **kwargs):
+        if connection is None:
+            connection = getattr(flask.g, "db")
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(command, kwargs)
+        return cursor.fetchall()
+
+    @classmethod
+    def create_table(cls, connection=None):
+        if connection is None:
+            connection = getattr(flask.g, "db")
+        cursor = connection.cursor()
+        cursor.execute(cls.table_creation_command())
 
 
 def info(self, ignored: Iterable[str]=list(), **kwargs):
@@ -39,27 +79,3 @@ class Card(NamedTuple("Card",
                       ])
            ):
     info = info
-
-
-class User(login.UserMixin):
-    def __init__(self, user_id, username, email, password, is_admin):
-        self.__user_id = user_id
-        self.username = username
-        self.email = email
-        self.__password = password
-        self.__is_admin = is_admin
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return True
-
-    def get_id(self):
-        return self.__user_id
-
-    def check_password(self, password):
-        return self.__password == password

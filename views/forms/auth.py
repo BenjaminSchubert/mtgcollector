@@ -6,6 +6,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
 import lib.db
+import lib.models.user
 from mtgcollector import login_manager
 
 
@@ -27,7 +28,7 @@ class LoginForm(Form):
         if not super().validate():
             return False
 
-        user = lib.db.get_user(self.username.data)
+        user = lib.models.user.User.get_user_by_name_or_mail(self.username.data)
 
         if user is None:
             self.username.errors.append("Unkown username")
@@ -43,4 +44,7 @@ class LoginForm(Form):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return lib.db.get_user_by_id(user_id)
+    try:
+        return lib.models.user.User.get_user_by_id(user_id)
+    except AttributeError:
+        return None

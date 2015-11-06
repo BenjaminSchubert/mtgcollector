@@ -74,16 +74,7 @@ create_table_card_legal_in_tournament = \
     )
     """
 
-create_table_user = \
-    """
-    CREATE TABLE user (
-        user_id INT PRIMARY KEY AUTO_INCREMENT,
-        username VARCHAR(255) NOT NULL UNIQUE,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        is_admin BOOLEAN NOT NULL DEFAULT FALSE
-    )
-    """
+
 
 create_table_card_in_collection = \
     """

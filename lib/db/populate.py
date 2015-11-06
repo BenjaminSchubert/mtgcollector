@@ -3,6 +3,7 @@ import typing
 
 import lib.db.sql
 import lib.models
+import lib.db.sql.mysql
 
 
 def setup_tables(connection) -> bool:
@@ -24,7 +25,7 @@ def setup_tables(connection) -> bool:
     cursor.execute(lib.db.sql.create_table_card_legal_in_tournament)
 
     # users
-    cursor.execute(lib.db.sql.create_table_user)
+    cursor.execute(lib.db.sql.mysql.MySQL.create_table_user)
 
     # collections
     cursor.execute(lib.db.sql.create_table_card_in_collection)

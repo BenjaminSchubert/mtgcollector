@@ -6,7 +6,7 @@ from views.forms.auth import LoginForm
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return flask.redirect(flask.url_for("index"))
 
     form = LoginForm()
