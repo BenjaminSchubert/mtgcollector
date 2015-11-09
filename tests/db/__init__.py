@@ -2,5 +2,5 @@
 # -*- coding: utf-8
 
 """
-Test module for the Models
+Test module for the database
 """

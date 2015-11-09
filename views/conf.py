@@ -13,7 +13,7 @@ import lib.db.maintenance
 import views.forms.install
 import views.forms.auth
 from mtgcollector import app, CONF_PATH
-import lib.models.user
+import lib.models
 
 
 def validate_conf(form):
@@ -76,8 +76,8 @@ def get_user_form():
     form = views.forms.auth.RegisterForm()
 
     if form.validate_on_submit():
-        user_id = lib.models.user.User.create_user(form.username.data, form.email.data, form.password.data)
-        lib.models.user.User.set_admin(user_id)
+        user_id = lib.models.User(username=form.username.data, email=form.email.data, password=form.password.data).create()
+        lib.models.User.set_admin(user_id)
         return redirect(url_for("parameters"))
 
     return render_template('form.html', form=form, title="Admin Creation")
@@ -88,7 +88,7 @@ def install():
     # No db connection, it is not already setup
     if not os.path.exists(CONF_PATH):
         return get_database_form()
-    elif getattr(flask.g, "db") and not lib.models.user.User.get_users(limit=1):
+    elif getattr(flask.g, "db") and not lib.models.User.get_users(limit=1):
         return get_user_form()
     else:
         return redirect(url_for("parameters"))

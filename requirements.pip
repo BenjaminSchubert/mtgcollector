@@ -3,3 +3,5 @@ flask
 mysql-connector-python
 flask-WTF
 flask-login
+selenium
+responses

@@ -6,7 +6,8 @@ import mysql.connector.errorcode
 
 import lib
 import lib.db
-import lib.update.parser
+import lib.models
+from lib.parser import JSonCardParser
 
 
 class MaintenanceDB:
@@ -28,12 +29,12 @@ class MaintenanceDB:
     def db_manager(self, app):
         return self.DBManager(app)
 
-    def __update(self, card_updater):
-        cards = lib.update.parser.load_file(card_updater.latest_version())
+    def __update(self, card_parser):
         with self.DBManager(self.app) as connection:
-            lib.db.populate.add_editions(connection, lib.update.parser.get_editions(cards))
-            lib.db.populate.add_tournaments(connection, lib.update.parser.get_tournaments(cards))
-            lib.db.populate.add_metacards(connection, lib.update.parser.get_metacards(cards))
+            lib.models.Edition.bulk_insert(card_parser.editions, connection=connection)
+            lib.models.Tournament.bulk_insert(card_parser.tournaments, connection=connection)
+            lib.models.Metacard.bulk_insert(card_parser.metacards, connection=connection)
+            lib.models.Card.bulk_insert(card_parser.cards, connection=connection)
 
     def setup_db(self):
         conn = mysql.connector.connect(
@@ -42,24 +43,26 @@ class MaintenanceDB:
         )
         try:
             cursor = conn.cursor()
-            cursor.execute("CREATE DATABASE {} CHARACTER SET utf8".format(self.app.config["DATABASE_NAME"]))
+            cursor.execute("CREATE DATABASE IF NOT EXISTS {} CHARACTER SET utf8".format(self.app.config["DATABASE_NAME"]))
             conn.commit()
         except:
             raise
         else:
             with self.DBManager(self.app) as connection:
-                lib.db.populate.setup_tables(connection)
+                for model in lib.get_subclasses(lib.models.Model):
+                    model.create_table(connection=connection)
+                    model.add_constraints(connection=connection)
         finally:
             conn.close()
 
-    def update(self, ) -> None:
-        card_updater = lib.update.CardUpdater(self.app)
-        card_updater.check_update()
+    def update(self) -> None:
+        card_parser = JSonCardParser(self.app)
+        card_parser.check_update()
         try:
-            self.__update(card_updater)
+            self.__update(card_parser)
         except mysql.connector.errors.ProgrammingError as exc:
             if exc.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
                 self.setup_db()
-                self.__update(card_updater)
+                self.__update(card_parser)
             else:
                 raise

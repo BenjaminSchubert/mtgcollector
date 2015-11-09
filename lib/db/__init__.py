@@ -7,12 +7,12 @@ import mysql.connector.conversion
 import mysql.connector.errors
 import mysql.connector.errorcode
 
+
+from lib.db.sql.mysql import MySQL as sql_commands
 import lib.db.populate
-from lib.db.sql.mysql import MySQL
 
 mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
-
-sql_commands = MySQL
+mysql.connector.conversion.MySQLConverter._set_to_mysql = lambda self, value: ",".join(value).encode()
 
 
 def __insert(command, connection=None, **kwargs):

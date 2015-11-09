@@ -18,6 +18,7 @@ class Downloader(threading.Thread):
         self.app = app
         self.queue = app.download
         self.download_folder = os.path.join(app.static_folder, "images")
+        self.setDaemon(True)
 
     def run(self):
         entry = self.queue.get()
@@ -47,6 +48,7 @@ class DBUpdater(threading.Thread):
         self.db = lib.db.maintenance.MaintenanceDB(app)
         self.event = threading.Event()
         app.update_db = self.event
+        self.setDaemon(True)
 
     def run(self):
         while True:
