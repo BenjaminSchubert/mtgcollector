@@ -17,9 +17,14 @@ def _validate_host(form, field):
             raise ValidationError("The ip address is not valid or the hostname cannot be resolved")
 
 
+def _validate_port(form, field):
+    if field.data is not None and not 0 < field.data < 65535:
+        raise ValidationError("The port value should be between 0 and 65535")
+
+
 class InstallationForm(Form):
     host = StringField("Host", [DataRequired(), _validate_host])
+    port = IntegerField("Port", [_validate_port], default=3306)
     database = StringField("Name", [DataRequired()])
     username = StringField("Username", [DataRequired()])
-    password = PasswordField("Password", [DataRequired()])
-    port = IntegerField("Port", default=3306)
+    password = PasswordField("Password")

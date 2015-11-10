@@ -16,6 +16,9 @@ import tempfile
 import unittest
 from typing import Iterable
 
+import shutil
+
+import mtgcollector
 from mtgcollector import setup_app
 
 download_file_resources = os.path.join(os.path.dirname(__file__), "resources", "AllSets-x.json.zip")
@@ -193,14 +196,20 @@ class LiveServerTestCase(unittest.TestCase):
 
         def run(self):
             """ Creates flask app and setups it before launching it """
-            app = flask.Flask(__name__, static_folder=self.directory)
-            app.config.from_object(TestCaseWithDB)
-            setup_app(app)
-            app.run(debug=True, port=TestCaseWithDB.DATABASE_PORT)
+            os.environ["MTG_COLLECTOR_CONFIG"] = os.path.join(self.directory, "config.cfg")
+            mtgcollector.app.static_folder = self.directory
+            mtgcollector.app.config.from_object(TestCaseWithDB)
+            setup_app(mtgcollector.app)
+            mtgcollector.app.run(debug=True, port=TestCaseWithDB.SERVER_PORT, use_reloader=False)
 
     def setUp(self):
         """ Starts a server before each test. In another temporary directory to completely isolate tests """
         self.directory = tempfile.TemporaryDirectory()
+
+        # copy all assets to the temporary directory
+        for _dir in os.listdir(mtgcollector.app.static_folder):
+            shutil.copytree(os.path.join(mtgcollector.app.static_folder, _dir), os.path.join(self.directory.name, _dir))
+
         self._process = self.LiveServer(self.directory.name)
         self._process.start()
 

@@ -5,7 +5,7 @@ import flask
 import mysql.connector.errors
 import mysql.connector.errorcode
 
-from mtgcollector import app, CONF_PATH, lib
+from mtgcollector import app, lib
 import views.conf
 import views.api
 import views.auth
@@ -27,13 +27,10 @@ def setup_db():
         flask.g.db = lib.db.get_connection(app)
     except (mysql.connector.errors.ProgrammingError, KeyError) as exc:
         if type(exc) == KeyError or exc.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-            if not os.path.exists(CONF_PATH):
-                if flask.request.endpoint in ["install", "static"]:
-                    return
-                else:
-                    return flask.redirect(flask.url_for("install"))
-            else:
+            if flask.request.endpoint in ["install", "static"]:
                 return
+            else:
+                return flask.redirect(flask.url_for("install"))
 
 
 # noinspection PyUnusedLocal

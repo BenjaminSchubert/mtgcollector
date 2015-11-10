@@ -12,7 +12,8 @@ import lib.db
 import lib.db.maintenance
 import views.forms.install
 import views.forms.auth
-from mtgcollector import app, CONF_PATH
+from lib.conf import update_conf
+from mtgcollector import app
 import lib.models
 
 
@@ -34,20 +35,12 @@ def validate_conf(form):
             raise werkzeug.routing.ValidationError()
     except mysql.connector.errors.ProgrammingError as exc:
         if exc.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-            form.username.errors.append("Could not connect with these credentials. Are they correct ?")
+            form.password.errors.append("Could not connect with these credentials. Are they correct ?")
             raise werkzeug.routing.ValidationError()
     finally:
         for value in app.config.copy().keys():
             if value.startswith("DATABASE"):
                 app.config.pop(value)
-
-
-def update_conf(**kwargs):
-    with open(CONF_PATH, "a") as _f:
-        for key, value in kwargs.items():
-            _f.write("{} = '{}'\n".format(key, value))
-
-    app.config.from_pyfile(CONF_PATH)
 
 
 def get_database_form():
@@ -86,7 +79,7 @@ def get_user_form():
 @app.route("/install", methods=['GET', 'POST'])
 def install():
     # No db connection, it is not already setup
-    if not os.path.exists(CONF_PATH):
+    if not getattr(flask.g, "db", None):
         return get_database_form()
     elif getattr(flask.g, "db") and not lib.models.User.get_users(limit=1):
         return get_user_form()
