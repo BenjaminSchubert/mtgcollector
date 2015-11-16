@@ -45,7 +45,6 @@ def validate_conf(form):
 
 def get_database_form():
     form = views.forms.install.InstallationForm()
-
     if form.validate_on_submit():
         try:
             validate_conf(form)
@@ -62,7 +61,7 @@ def get_database_form():
         app.update_db.set()
         return redirect(url_for("install"))
 
-    return render_template('form.html', form=form, action_url=flask.url_for("install"))
+    return render_template('form.html', form=form, action=flask.url_for("install"))
 
 
 def get_user_form():

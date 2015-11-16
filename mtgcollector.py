@@ -4,7 +4,7 @@
 """
 MTGCollector : an application to easily handle your Magic The Gathering collection !
 """
-
+import os
 import random
 import hashlib
 from flask import Flask
@@ -26,7 +26,8 @@ def setup_app(_app):
         with open(_app.config["CONFIG_PATH"], "w") as _file:
             _file.write("SECRET_KEY = '{}'".format(_app.secret_key))
 
-    flask_wtf.csrf.CsrfProtect(_app)
+    csrf.init_app(_app)
+    login_manager.init_app(_app)
     lib.tasks.Downloader(_app).start()
     lib.tasks.DBUpdater(_app).start()
 
@@ -34,7 +35,7 @@ def setup_app(_app):
 app = Flask(__name__)
 
 login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
+csrf = flask_wtf.CsrfProtect()
 
 from views import *
 

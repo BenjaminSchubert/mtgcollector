@@ -15,10 +15,12 @@
 {%- endmacro %}
 
 
-{%  macro render_form(form, action="post", action_url=".", action_text="Submit", _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
+{%  macro render_form(form, method="post", action=".", action_text="Submit", _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
 
-<form method="{{ action }}" action="{{ action_url }}" class="{{  _class }}">
-    {{ form.hidden_tag() }}
+<form method="{{ method }}" action="{{ action }}" class="{{  _class }}">
+    {% if method != "get" %}
+        {{ form.hidden_tag() }}
+    {% endif %}
     {% set autofocus=true %}
     {% for field in form %}
         {% if field.type == "BooleanField" %}

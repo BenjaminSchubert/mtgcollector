@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 
 import lib.db
 import lib.models
-from mtgcollector import app
+from mtgcollector import app, login_manager
 
 
 class RegisterForm(Form):
@@ -42,7 +42,7 @@ class LoginForm(Form):
         return True
 
 
-@app.login_manager.user_loader
+@login_manager.user_loader
 def load_user(user_id):
     try:
         return lib.models.User.get_user_by_id(user_id)

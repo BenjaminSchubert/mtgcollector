@@ -65,8 +65,8 @@ class MySQL:
             subtypes VARCHAR(80),
             supertypes SET('Legendary', 'Snow', 'World', 'Basic', 'Ongoing'),
             manaCost VARCHAR(50),
-            power VARCHAR(8),
-            toughness VARCHAR(8),
+            power VARCHAR(4),
+            toughness VARCHAR(4),
             colors SET('Red', 'Green', 'White', 'Blue', 'Black'),
             cmc FLOAT NOT NULL,
             orig_text TEXT
@@ -82,6 +82,17 @@ class MySQL:
         )
         """
 
+    get_metacards_ids = \
+        """
+        SELECT
+            card.card_id
+        FROM metacard
+        INNER JOIN card ON card.name = metacard.name
+        WHERE {selection}
+        GROUP BY metacard.name
+        ORDER BY {order}
+        """
+
     # card
     create_table_cards = \
         """
@@ -95,7 +106,7 @@ class MySQL:
             version TINYINT NOT NULL,
             artist VARCHAR(150) NOT NULL,
             flavor TEXT,
-            price FLOAT,
+            price DECIMAL(7,2),
 
             FOREIGN KEY (name) REFERENCES metacard(name),
             FOREIGN KEY (edition) REFERENCES edition(code),
@@ -128,6 +139,11 @@ class MySQL:
         """
         INSERT INTO edition (code, releaseDate, name, type, block)
         VALUES (%(code)s, %(releaseDate)s, %(name)s, %(type)s, %(block)s)
+        """
+
+    get_editions_name_id = \
+        """
+        SELECT code, name FROM edition ORDER BY name
         """
 
     # tournament

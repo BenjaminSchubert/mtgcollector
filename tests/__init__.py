@@ -198,7 +198,6 @@ class LiveServerTestCase(unittest.TestCase):
             """ Creates flask app and setups it before launching it """
             os.environ["MTG_COLLECTOR_CONFIG"] = os.path.join(self.directory, "config.cfg")
             mtgcollector.app.static_folder = self.directory
-            mtgcollector.app.config.from_object(TestCaseWithDB)
             setup_app(mtgcollector.app)
             mtgcollector.app.run(debug=True, port=TestCaseWithDB.SERVER_PORT, use_reloader=False)
 

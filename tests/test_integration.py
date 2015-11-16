@@ -16,7 +16,7 @@ from tests.forms import InstallForm, AdminForm
 class IntegrationTest(LiveServerTestCase):
     def tearDown(self):
         """ Cleans up everything at the end of each test """
-        #self.browser.close()
+        self.browser.close()
         conn = mysql.connector.connect(
             user=DBConnectionMixin.DATABASE_USER, password=DBConnectionMixin.DATABASE_PASSWORD,
             host=DBConnectionMixin.DATABASE_HOST, port=DBConnectionMixin.DATABASE_PORT

@@ -11,10 +11,10 @@ $(document).ready(function () {
 // sets default image to tag 'img' and  fetches the url of the real image based on the 'div' id.
 // Once the url is fetched, sets the'src' attribute to the 'img' tag.
 function loadImagesInViewport() {
-    $("#cards > div").withinviewport().each(function () {
-        $(this).children('img').attr('src', defaultImgPath);
-        $.get(imgPath + $(this).attr('id'), function(res) {
-            $(this).children('img').attr('src', res);
-        });
+    $("#cards").find("> div").withinviewport().each(function () {
+        //$(this).children('img').attr('src', defaultImgPath);
+        //$.get(imgPath + $(this).attr('id'), function() {
+            $(this).children('img').attr('src', imgPath + $(this).attr('id'));
+        //});
     });
 }

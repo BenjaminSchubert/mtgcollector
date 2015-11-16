@@ -194,6 +194,25 @@ class Metacard(Model):
         """ The command used to insert a metacard in the database """
         return sql.insert_metacard
 
+    @classmethod
+    def get_ids_where(cls, card_name="", card_type="", order_by="metacard.name"):
+        def add_to_parameters(params, value):
+            if params == "":
+                params += value
+            else:
+                params += " AND " + value
+            return params
+
+        query_parameters = ""
+        kwargs = dict()
+
+        if card_name:
+            query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
+            kwargs["name"] = "%" + card_name + "%"
+
+        query = sql.get_metacards_ids.format(selection=query_parameters, order=order_by)
+        return [value["card_id"] for value in cls.get(query, **kwargs)]
+
     @property
     def as_database_object(self) -> dict:
         """ A dictionary view of the metacard """

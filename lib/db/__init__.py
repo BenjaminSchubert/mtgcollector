@@ -47,6 +47,7 @@ def get_image_url(card_id, **kwargs):
     else:
         # TODO : handle this case
         print("WE GOT A PROBLEM")
+        flask.abort(404)
 
 
 def get_image_path(app, card_id: int):

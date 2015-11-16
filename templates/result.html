@@ -1,7 +1,23 @@
-{% block result %}
-    <div id="cards">
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/result.css') }}" />
+{% endblock %}
+
+
+{% block body %}
+    <div id="cards" class="row">
         {% for card in cards %}
-            <div id="{{ card.id }}"><img></div>
+            <div id="{{ card }}" class="col-md-2 col-sm-3 col-xs-4">
+                <img onerror="if (this.src != '/api/images/default.png') this.src = '/api/images/default.png';">
+            </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script type="text/javascript" src="/static/js/withinviewport.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.withinviewport.js"></script>
+    <script type="text/javascript" src="/static/js/result.js"></script>
 {% endblock %}
