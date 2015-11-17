@@ -80,12 +80,15 @@ class MySQL:
             %(name)s, %(types)s, %(subtypes)s, %(supertypes)s, %(manaCost)s, %(power)s, %(toughness)s, %(colors)s,
              %(cmc)s, %(text)s
         )
+        ON DUPLICATE KEY UPDATE
+            name=VALUES(name), types=VALUES(types), subtypes=VALUES(subtypes), supertypes=VALUES(supertypes),
+            manaCost=VALUES(manaCost), power=VALUES(power), toughness=VALUES(toughness), colors=VALUES(colors),
+            cmc=VALUES(cmc), orig_text=VALUES(orig_text)
         """
 
     get_metacards_ids = \
         """
-        SELECT
-            card.card_id
+        SELECT card.card_id
         FROM metacard
         INNER JOIN card ON card.name = metacard.name
         WHERE {selection}
@@ -110,7 +113,7 @@ class MySQL:
 
             FOREIGN KEY (name) REFERENCES metacard(name),
             FOREIGN KEY (edition) REFERENCES edition(code),
-            UNIQUE (multiverseid, number)
+            UNIQUE (multiverseid, edition, number, version)
         )
         """
 
@@ -118,6 +121,9 @@ class MySQL:
         """
         INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
         VALUES (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
+        ON DUPLICATE KEY UPDATE
+            name=VALUES(name), number=VALUES(number), version=VALUES(version), rarity=VALUES(version),
+            edition=VALUES(edition), artist=VALUES(artist), flavor=VALUES(flavor)
         """
 
     # edition
@@ -139,6 +145,8 @@ class MySQL:
         """
         INSERT INTO edition (code, releaseDate, name, type, block)
         VALUES (%(code)s, %(releaseDate)s, %(name)s, %(type)s, %(block)s)
+        ON DUPLICATE KEY UPDATE
+            releaseDate=VALUES(releaseDate), name=VALUES(name), type=VALUES(type), block=VALUES(block)
         """
 
     get_editions_name_id = \
@@ -158,4 +166,5 @@ class MySQL:
         """
         INSERT INTO tournament (name)
         VALUES (%(name)s)
+        ON DUPLICATE KEY UPDATE name=VALUES(name)
         """

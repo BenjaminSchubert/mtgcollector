@@ -36,7 +36,7 @@ class JSonCardParser:
         self.__app = app
         self.__editions = set()  # type: typing.Set[Edition]
         self.__metacards = set()  # type: typing.Set[Metacard]
-        self.__cards = list()  # type: typing.Set[Card] TODO : fix this to set
+        self.__cards = set()  # type: typing.Set[Card]
         self.__tournaments = set()  # type: typing.Set[Tournament]
         self.__json = None  # type: CardList
         self.__pending_update = False  # type: bool
@@ -116,7 +116,7 @@ class JSonCardParser:
                 if counter == -1:
                     version = 0
 
-                self.__cards.append(Card(
+                self.__cards.add(Card(
                     name=metacard.get("name"),
                     multiverseid=metacard.get("multiverseid"),
                     rarity=metacard.get("rarity"),
@@ -128,9 +128,10 @@ class JSonCardParser:
                 ))
 
                 for legality in metacard.get("legalities", []):
-                    self.__tournaments.add(Tournament(
-                        legality["format"]
-                    ))
+                    if not legality["format"].endswith("Block"):
+                        self.__tournaments.add(Tournament(
+                            legality["format"]
+                        ))
 
     def __download_latest_version(self, version: str) -> str:
         request = requests.get(self.json_download_file_path(), stream=True)

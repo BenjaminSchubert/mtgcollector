@@ -210,6 +210,10 @@ class Metacard(Model):
             query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
             kwargs["name"] = "%" + card_name + "%"
 
+        if card_type:
+            query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
+            kwargs["type"] = "%" + card_type + "%"
+
         query = sql.get_metacards_ids.format(selection=query_parameters, order=order_by)
         return [value["card_id"] for value in cls.get(query, **kwargs)]
 
@@ -279,8 +283,7 @@ class Card(Model):
     @property
     def primary_key(self):
         """ This is a value allowing to uniquely identify an instance of Card """
-        # TODO we have to implement this
-        return None
+        return self.__name, self.__edition, self.__number, self.__version
 
 
 class Tournament(Model):

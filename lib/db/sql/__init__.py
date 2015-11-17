@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
-
-
 create_table_card_legal_in_tournament = \
     """
     CREATE TABLE card_legal_in_tournament (

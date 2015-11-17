@@ -170,15 +170,15 @@ class DownloadProxy(responses.RequestsMock, metaclass=abc.ABCMeta):
     By default, it will only catch calls to mtgjson version and download file paths
     """
     # noinspection PyUnresolvedReferences
-    def __init__(self, parser):
+    def __init__(self, parser, download_file=download_file_resources, version="3.3.3"):
         super().__init__()
         self.add(
                 responses.GET, parser.last_version_check_path(), status=200,
-                body='{{"version":"{}"}}'.format("3.3.3"), content_type="application/json"
+                body='{{"version":"{}"}}'.format(version), content_type="application/json"
         )
         self.add(
                 responses.GET, parser.json_download_file_path(), status=200, content_type="application/zip",
-                body=open(download_file_resources, "rb").read()
+                body=open(download_file, "rb").read()
             )
 
 

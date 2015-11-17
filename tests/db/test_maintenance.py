@@ -12,7 +12,7 @@ from flask import Flask
 
 from lib.db.maintenance import MaintenanceDB
 from lib.parser import JSonCardParser
-from tests import DBConnectionMixin, DownloadProxy
+from tests import DBConnectionMixin, DownloadProxy, download_file_resources
 
 
 class TestMaintenanceDB(unittest.TestCase):
@@ -42,4 +42,12 @@ class TestMaintenanceDB(unittest.TestCase):
     def test_update_empty_db(self):
         """ Try loading the test data in the database """
         with DownloadProxy(JSonCardParser(self.app)):
+            self.maintenance.update()
+
+    def test_create_and_update_database(self):
+        """ Try loading old data then adding new one in the database """
+        with DownloadProxy(JSonCardParser(self.app), download_file_resources.replace("json.zip", "json-old.zip")):
+            self.maintenance.update()
+
+        with DownloadProxy(JSonCardParser(self.app), version="3.3.4"):
             self.maintenance.update()
