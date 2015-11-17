@@ -9,7 +9,7 @@
     <div id="cards" class="row">
         {% for card in cards %}
             <div id="{{ card }}" class="col-md-2 col-sm-3 col-xs-4">
-                <img onerror="if (this.src != '/api/images/default.png') this.src = '/api/images/default.png';">
+                <img>
             </div>
         {% endfor %}
     </div>

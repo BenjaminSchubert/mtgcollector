@@ -4,8 +4,9 @@ var defaultImgPath = imgPath + "default.png";
 
 var loadedIDs = []; // contains ids of elements which are currently in view port
 
-withinviewport.defaults.top = -700;
-withinviewport.defaults.bottom = -700;
+var preLoadMargin = -1000;
+withinviewport.defaults.top = preLoadMargin;
+withinviewport.defaults.bottom = preLoadMargin;
 
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
@@ -13,15 +14,27 @@ withinviewport.defaults.bottom = -700;
 $.fn.scrollStopped = function(callback) {
     $(this).scroll(function (ev) {
         clearTimeout($(this).data('scrollTimeout'));
-        $(this).data('scrollTimeout', setTimeout(callback.bind(this), 250, ev));
+        $(this).data('scrollTimeout', setTimeout(callback.bind(this), 100, ev));
     });
 };
 
 
 $(document).ready(function () {
     $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
+    resizeDivHeights();
     loadImagesInViewport();
 });
+
+
+// Resizes all div to image size
+function resizeDivHeights() {
+    $('#cards').find('> div').height(findImageHeight());
+}
+
+
+function findImageHeight() {
+    return $('#cards').find('> div').first().width() * 310 / 223;
+}
 
 // Unloads each div of #cards not in viewport.
 // For those which are :
@@ -67,9 +80,7 @@ function unloadNotInViewPort() {
 
         if (notInVP) {
             $('#' + id).removeClass('loaded');
-
-            // TODO don't set default image but empty div at the size of a card
-            $('#' + id).children('img').attr('src', defaultImgPath);
+            $('#' + id).children('img').attr('src', '');
 
             loadedIDs.splice(i, 1);
         }
