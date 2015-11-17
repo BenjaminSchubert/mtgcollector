@@ -4,10 +4,6 @@ var defaultImgPath = imgPath + "default.png";
 
 var loadedIDs = []; // contains ids of elements which are currently in view port
 
-var preLoadMargin = -1000;
-withinviewport.defaults.top = preLoadMargin;
-withinviewport.defaults.bottom = preLoadMargin;
-
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
 // Scroll stop detection is based on a timer of 250ms long.
@@ -18,12 +14,29 @@ $.fn.scrollStopped = function(callback) {
     });
 };
 
-
+// Executed at loading
 $(document).ready(function () {
     $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
-    resizeDivHeights();
-    loadImagesInViewport();
+    $(window).resize(initView);
+
+    initView();
 });
+
+
+// Resize divs heights at the right size and loads images
+function initView() {
+    resizeDivHeights();
+    setPreloadMargin($(window).height());
+    loadImagesInViewport();
+    setPreloadMargin(3 * $(window).height());
+}
+
+
+// Allows loading of cards in a margin of nPixels before the top and after the bottom of viewport
+function setPreloadMargin(nPixels) {
+    withinviewport.defaults.top = -nPixels;
+    withinviewport.defaults.bottom = -nPixels;
+}
 
 
 // Resizes all div to image size
