@@ -91,7 +91,7 @@ class JSonCardParser:
 
             for metacard in edition.get("cards"):
                 if metacard.get("types") is None and "token" in metacard.get("name"):
-                    metacard["types"] = ["token"]
+                    metacard["types"] = ["Token"]
 
                 self.__metacards.add(Metacard(
                     name=metacard.get("name"),

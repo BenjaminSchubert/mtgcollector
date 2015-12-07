@@ -5,7 +5,7 @@ class MySQL:
     get_users = """ SELECT * FROM user ORDER BY username """
     get_users_with_limit = """ SELECT * FROM user ORDER BY username LIMIT %(limit)s """
     get_user_by_id = """ SELECT * FROM user WHERE user_id = %(user_id)s """
-    select_user = """ SELECT * FROM user WHERE username = %(identifier)s or email = %(identifier)s """
+    select_user = """ SELECT * FROM user WHERE username = %(identifier)s OR email = %(identifier)s """
 
     create_table_user = \
         """
@@ -60,7 +60,7 @@ class MySQL:
             types SET (
                 'Land', 'Creature', 'Sorcery', 'Instant', 'Artifact', 'Planeswalker', 'Enchantment', 'Tribal', 'Scheme',
                 'Eaturecray', 'Enchant', 'Vanguard', 'Plane', 'Scariest', "You\'ll", 'Ever', 'See', 'Conspiracy',
-                'Phenomenon', 'Player', 'token'
+                'Phenomenon', 'Player', 'Token'
             ) NOT NULL,
             subtypes VARCHAR(80),
             supertypes SET('Legendary', 'Snow', 'World', 'Basic', 'Ongoing'),
@@ -111,8 +111,8 @@ class MySQL:
             flavor TEXT,
             price DECIMAL(7,2),
 
-            FOREIGN KEY (name) REFERENCES metacard(name),
-            FOREIGN KEY (edition) REFERENCES edition(code),
+            FOREIGN KEY (name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE RESTRICT,
+            FOREIGN KEY (edition) REFERENCES edition(code) ON DELETE RESTRICT ON UPDATE RESTRICT,
             UNIQUE (multiverseid, edition, number, version)
         )
         """
@@ -131,7 +131,7 @@ class MySQL:
         """
         CREATE TABLE edition (
             code VARCHAR(8) PRIMARY KEY NOT NULL,
-            releaseDate date NOT NULL,
+            releaseDate DATE NOT NULL,
             name VARCHAR(255) UNIQUE NOT NULL,
             type ENUM (
                 'core', 'expansion', 'duel deck', 'commander', 'promo', 'box', 'un', 'reprint', 'from the vault',

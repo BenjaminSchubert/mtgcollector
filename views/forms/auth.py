@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 
 import lib.db
 import lib.models
-from mtgcollector import app, login_manager
+from mtgcollector import login_manager
 
 
 class RegisterForm(Form):

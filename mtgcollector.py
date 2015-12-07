@@ -37,6 +37,7 @@ app = Flask(__name__)
 login_manager = flask_login.LoginManager()
 csrf = flask_wtf.CsrfProtect()
 
+
 from views import *
 
 if __name__ == '__main__':

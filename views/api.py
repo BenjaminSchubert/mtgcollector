@@ -3,7 +3,7 @@ import os
 import requests
 
 import mtgcollector
-from flask import redirect, url_for, send_from_directory
+from flask import redirect, send_from_directory
 
 default_card_url = "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&type=card&name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
 

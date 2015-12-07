@@ -7,7 +7,7 @@ from flask_login import current_user
 
 from lib.forms.search import SearchForm
 from lib.models import Metacard
-from mtgcollector import app, lib, csrf
+from mtgcollector import app, lib
 import views.conf
 import views.api
 import views.auth

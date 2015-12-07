@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 
 import flask
 import mysql.connector
