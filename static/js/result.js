@@ -20,6 +20,9 @@ $(document).ready(function () {
     $(window).resize(initView);
 
     initView();
+    closeCardInfos();
+    $('#cards > div').click(openCardInfos);
+    $('#card-infos-closebutton').click(closeCardInfos);
 });
 
 
@@ -99,4 +102,27 @@ function unloadNotInViewPort() {
         }
     }
 
+}
+
+function closeCardInfos() {
+    $('#card-infos').hide();
+}
+
+// Opens the infos panel of the card clicked.
+function openCardInfos() {
+    var curId = $(this).attr('id');
+    var cardInfos = $('#card-infos');
+
+    if (cardInfos.is(':hidden')) {
+        cardInfos.show();
+    }
+
+    //$('#card-infos-content').text(curId);
+
+    fetchCardInfos(curId);
+}
+
+// Fetches infos for card whose id is 'id'
+function fetchCardInfos(id) {
+    // TODO
 }
