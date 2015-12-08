@@ -1,3 +1,7 @@
+#cards {
+    padding-top : 20px;
+}
+
 #cards > div > img {
     width: 100%;
 }
@@ -18,15 +22,9 @@
     height: 100%;
 
     position: fixed;
-    top: 0;
     right: 0;
 
-    background-color: #4cae4c;
-}
+    background-color: #a09ea2;
 
-#card-infos-closebutton {
-    width: 30px;
-    height: 20px;
-
-    background-color: orangered;
+    border-left: 1px solid black;
 }

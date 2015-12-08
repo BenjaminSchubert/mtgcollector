@@ -6,21 +6,18 @@
 
 
 {% block body %}
-    <div id="cards" class="row">
-        {% for card in cards %}
-            <div id="{{ card }}" class="col-md-2 col-sm-3 col-xs-4">
-                <img>
-            </div>
-        {% endfor %}
+    <div class="col-md-8">
+        <div id="cards" class="row">
+            {% for card in cards %}
+                <div id="{{ card }}" class="col-md-2 col-sm-3 col-xs-4">
+                    <img>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <div id="card-infos">
-        <div id="card-infos-closebutton">
+    <div id="card-infos" class="col-md-4">
 
-        </div>
-        <div id="card-infos-content">
-
-        </div>
     </div>
 {% endblock %}
 

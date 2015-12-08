@@ -4,6 +4,9 @@ var defaultImgPath = imgPath + "default.png";
 
 var loadedIDs = []; // contains ids of elements which are currently in view port
 
+var cardInfoLocked = false;
+var lastCardClickedId;
+
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
 // Scroll stop detection is based on a timer of 250ms long.
@@ -20,9 +23,14 @@ $(document).ready(function () {
     $(window).resize(initView);
 
     initView();
-    closeCardInfos();
-    $('#cards > div').click(openCardInfos);
-    $('#card-infos-closebutton').click(closeCardInfos);
+
+    $('#cards > div').click(lockCardInfos);
+
+    $('#cards > div').hover(function () {
+        if (!cardInfoLocked) {
+            displayCardInfos($(this));
+        }
+    });
 });
 
 
@@ -104,20 +112,33 @@ function unloadNotInViewPort() {
 
 }
 
-function closeCardInfos() {
-    $('#card-infos').hide();
+
+function lockCardInfos() {
+
+    var currentId = $(this).attr('id');
+
+    // lock if no card is clicked
+    if (!cardInfoLocked) {
+        cardInfoLocked = true;
+        lastCardClickedId = currentId;
+    } else {
+
+        // unlock if click on same card, otherwise display the current card info
+        if (lastCardClickedId === currentId) {
+            cardInfoLocked = false;
+        } else {
+            lastCardClickedId = currentId;
+            displayCardInfos($(this));
+        }
+    }
 }
 
 // Opens the infos panel of the card clicked.
-function openCardInfos() {
-    var curId = $(this).attr('id');
+function displayCardInfos(cardDiv) {
+    var curId = cardDiv.attr('id');
     var cardInfos = $('#card-infos');
 
-    if (cardInfos.is(':hidden')) {
-        cardInfos.show();
-    }
-
-    //$('#card-infos-content').text(curId);
+    cardInfos.text(curId);
 
     fetchCardInfos(curId);
 }
