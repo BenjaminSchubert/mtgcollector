@@ -10,9 +10,9 @@
     margin-bottom: 3%;
 }
 
-#cards > div:hover {
-    border: 3px solid dodgerblue;
-    border-radius: 5px;
+#cards > div > img:hover {
+    border: 4px solid dodgerblue;
+    border-radius: 10px;
 
     cursor: pointer;
 }

@@ -24,11 +24,13 @@ $(document).ready(function () {
 
     initView();
 
+    // click on card image
     $('#cards > div').click(lockCardInfos);
 
-    $('#cards > div').hover(function () {
+    // hover on card image
+    $('#cards > div > img').hover(function () {
         if (!cardInfoLocked) {
-            displayCardInfos($(this));
+            displayCardInfos($(this).parent());
         }
     });
 });
@@ -131,6 +133,10 @@ function lockCardInfos() {
             displayCardInfos($(this));
         }
     }
+}
+
+function hoverCardAction() {
+
 }
 
 // Opens the infos panel of the card clicked.
