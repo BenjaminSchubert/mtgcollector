@@ -24,7 +24,15 @@
     position: fixed;
     right: 0;
 
+    padding: 20px;
+
     background-color: #a09ea2;
 
     border-left: 1px solid black;
+}
+
+#card-infos > img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }

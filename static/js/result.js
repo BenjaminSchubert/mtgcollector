@@ -1,11 +1,22 @@
-
+// paths
 var imgPath = "/api/images/";
+var infoPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
 
-var loadedIDs = []; // contains ids of elements which are currently in view port
+// contains ids of elements which are currently in view port
+var loadedIds = [];
 
-var cardInfoLocked = false;
-var lastCardClickedId;
+// contains info relative to infos locked when image clicked.
+// 'locked' is if there is a locked image and 'lastId' is the id of the last card locked.
+var lockInfoCard = {
+    locked: false,
+    lastId: null
+};
+
+// contains as keys the ids of the cards whoses infos are already fetched and as values the infos as json.
+var infosFetched = {};
+
+
 
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
@@ -24,12 +35,12 @@ $(document).ready(function () {
 
     initView();
 
-    // click on card image
+    // what to do when clicking on card image
     $('#cards > div').click(lockCardInfos);
 
-    // hover on card image
+    // what to do when hovering on card image
     $('#cards > div > img').hover(function () {
-        if (!cardInfoLocked) {
+        if (!lockInfoCard.locked) {
             displayCardInfos($(this).parent());
         }
     });
@@ -73,7 +84,7 @@ function loadImagesInViewport() {
 
         if (!curDiv.hasClass('loaded')) {
 
-            loadedIDs.push(curDiv.attr('id'));
+            loadedIds.push(curDiv.attr('id'));
             curDiv.addClass('loaded');
 
             curDiv.children('img').attr('src', defaultImgPath);
@@ -100,43 +111,40 @@ function loadImagesInViewport() {
 // "Unloads" the cards which are not in view port anymore by changing the 'src' attr of the img tag to "".
 function unloadNotInViewPort() {
 
-    for (var i = loadedIDs.length-1; i >= 0; i--) {
-        var id = loadedIDs[i];
+    for (var i = loadedIds.length-1; i >= 0; i--) {
+        var id = loadedIds[i];
         var notInVP = !$('#' + id).is(':within-viewport');
 
         if (notInVP) {
             $('#' + id).removeClass('loaded');
             $('#' + id).children('img').attr('src', '');
 
-            loadedIDs.splice(i, 1);
+            loadedIds.splice(i, 1);
         }
     }
 
 }
 
-
+// Locks the infos displayed on the card clicked (hovering on images does not display infos of other cards).
+// If a card was already locked and the one clicked at this moment is the same, unlock it, else lock the current one.
 function lockCardInfos() {
 
     var currentId = $(this).attr('id');
 
     // lock if no card is clicked
-    if (!cardInfoLocked) {
-        cardInfoLocked = true;
-        lastCardClickedId = currentId;
+    if (!lockInfoCard.locked) {
+        lockInfoCard.locked = true;
+        lockInfoCard.lastId = currentId;
     } else {
 
         // unlock if click on same card, otherwise display the current card info
-        if (lastCardClickedId === currentId) {
-            cardInfoLocked = false;
+        if (lockInfoCard.lastId === currentId) {
+            lockInfoCard.locked = false;
         } else {
-            lastCardClickedId = currentId;
+            lockInfoCard.lastId = currentId;
             displayCardInfos($(this));
         }
     }
-}
-
-function hoverCardAction() {
-
 }
 
 // Opens the infos panel of the card clicked.
@@ -144,12 +152,22 @@ function displayCardInfos(cardDiv) {
     var curId = cardDiv.attr('id');
     var cardInfos = $('#card-infos');
 
-    cardInfos.text(curId);
+    cardInfos.children('img').attr('src', imgPath + curId);
+    cardInfos.children('div').text(curId);
 
     fetchCardInfos(curId);
 }
 
-// Fetches infos for card whose id is 'id'
+// If the infos for the card whose id is 'id' are not yet fetched, fetches them.
 function fetchCardInfos(id) {
-    // TODO
+
+    /*$.get(infoPath + id, function (data) {
+        console.log("data retreived : " + data);
+        return data;
+    });*/
+
+    if (infosFetched[id] === undefined) {
+        console.log("adding " + id);
+        infosFetched[id] = "{test: 42}";
+    }
 }
