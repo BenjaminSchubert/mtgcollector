@@ -8,6 +8,8 @@ from flask_login import current_user
 from lib.forms.search import SearchForm
 from lib.models import Metacard
 from mtgcollector import app, lib
+import lib.db.maintenance
+
 import views.conf
 import views.api
 import views.auth
@@ -17,7 +19,7 @@ import views.auth
 def index():
     if current_user.is_authenticated:
         return flask.render_template("collection.html")
-    return flask.render_template("index.html")
+    return flask.render_template("search.html")
 
 
 @app.route("/search")
@@ -42,8 +44,15 @@ def setup_db():
                 else:
                     return flask.redirect(flask.url_for("install"))
         else:
-            # TODO logging would be good
-            raise ConnectionError("No connection to the mysql server")
+            # TODO first check if we can connect and create the database
+            db = lib.db.maintenance.MaintenanceDB(app)
+            db.setup_db()
+            app.update_db.set()
+
+            if flask.request.endpoint != 'install':
+                return flask.redirect(flask.url_for("install"))
+
+            # TODO then if not successful redirect to the setup page asking for correct values
 
 
 # noinspection PyUnusedLocal

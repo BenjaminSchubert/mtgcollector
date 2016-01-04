@@ -18,48 +18,14 @@ class MySQL:
         )
         """
 
-    user_constraints = [
-        """
-        CREATE TRIGGER `user_cant_have_username_same_as_other_email` BEFORE INSERT ON `user`
-        FOR EACH ROW
-        BEGIN
-            IF(
-                EXISTS(SELECT user_id FROM user WHERE email = NEW.username)
-            OR
-                EXISTS(SELECT user_id FROM user WHERE username = NEW.email)
-            )
-            THEN
-                SIGNAL SQLSTATE '23000' SET MESSAGE_TEXT = \
-                "A user cannot have a username the same as another user's email";
-            END IF;
-        END
-        """
-    ]
-
     # metacard
-    metacard_constraints = [
-        """
-        CREATE TRIGGER `power_not_null_on_creature` BEFORE INSERT ON `metacard`
-        FOR EACH ROW
-        BEGIN
-            IF (
-                (FIND_IN_SET('Creature', NEW.types) = 1 AND FIND_IN_SET('enchant', NEW.types) = 0)
-                AND (NEW.power IS NULL or NEW.toughness IS NULL)
-                AND FIND_IN_SET('The', NEW.subtypes) = 0)
-            THEN
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error : the power of a creature cannot be NULL';
-            END IF;
-        END
-        """
-    ]
-
     create_table_metacard = \
         """
         CREATE TABLE metacard (
             name VARCHAR(150) PRIMARY KEY,
             types SET (
                 'Land', 'Creature', 'Sorcery', 'Instant', 'Artifact', 'Planeswalker', 'Enchantment', 'Tribal', 'Scheme',
-                'Eaturecray', 'Enchant', 'Vanguard', 'Plane', 'Scariest', "You\'ll", 'Ever', 'See', 'Conspiracy',
+                'Eaturecray', 'Enchant', 'Vanguard', 'Plane', 'Scariest', 'You\\'ll', 'Ever', 'See', 'Conspiracy',
                 'Phenomenon', 'Player', 'Token'
             ) NOT NULL,
             subtypes VARCHAR(80),
@@ -75,15 +41,11 @@ class MySQL:
 
     insert_metacard = \
         """
-        INSERT INTO metacard (name, types, subtypes, supertypes, manaCost, power, toughness, colors, cmc, orig_text)
+        REPLACE INTO metacard (name, types, subtypes, supertypes, manaCost, power, toughness, colors, cmc, orig_text)
         VALUES (
             %(name)s, %(types)s, %(subtypes)s, %(supertypes)s, %(manaCost)s, %(power)s, %(toughness)s, %(colors)s,
              %(cmc)s, %(text)s
         )
-        ON DUPLICATE KEY UPDATE
-            name=VALUES(name), types=VALUES(types), subtypes=VALUES(subtypes), supertypes=VALUES(supertypes),
-            manaCost=VALUES(manaCost), power=VALUES(power), toughness=VALUES(toughness), colors=VALUES(colors),
-            cmc=VALUES(cmc), orig_text=VALUES(orig_text)
         """
 
     get_metacards_ids = \
@@ -119,11 +81,36 @@ class MySQL:
 
     insert_card = \
         """
-        INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
+        REPLACE INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
         VALUES (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
-        ON DUPLICATE KEY UPDATE
-            name=VALUES(name), number=VALUES(number), version=VALUES(version), rarity=VALUES(version),
-            edition=VALUES(edition), artist=VALUES(artist), flavor=VALUES(flavor)
+        """
+
+    get_card = \
+        """
+        SELECT
+            multiverseid,
+            metacard.name as name,
+            edition.name as edition,
+            rarity,
+            number,
+            supertypes,
+            types,
+            subtypes,
+            manaCost,
+            power,
+            toughness,
+            colors,
+            cmc,
+            orig_text,
+            artist,
+            flavor,
+            price
+        FROM metacard
+            INNER JOIN card
+                ON metacard.name = card.name
+            INNER JOIN edition
+                ON card.edition = edition.code
+        WHERE card_id = %(card_id)s;
         """
 
     # edition

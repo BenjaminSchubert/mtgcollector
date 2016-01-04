@@ -14,6 +14,9 @@ import lib.tasks
 import flask_wtf.csrf
 import flask_login
 
+from lib.json import CustomJSONEncoder
+from lib.models import User
+
 
 def setup_app(_app):
     app.config["CONFIG_PATH"] = os.environ.get("MTG_COLLECTOR_CONFIG", os.path.join(_app.root_path, "config.cfg"))
@@ -31,11 +34,18 @@ def setup_app(_app):
     lib.tasks.Downloader(_app).start()
     lib.tasks.DBUpdater(_app).start()
 
+    _app.json_encoder = CustomJSONEncoder
+
 
 app = Flask(__name__)
 
 login_manager = flask_login.LoginManager()
 csrf = flask_wtf.CsrfProtect()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get_user_by_id(user_id)
 
 
 from views import *

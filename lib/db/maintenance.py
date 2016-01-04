@@ -51,11 +51,11 @@ class MaintenanceDB:
             with self.DBManager(self.app) as connection:
                 for model in lib.get_subclasses(lib.models.Model):
                     model.create_table(connection=connection)
-                    model.add_constraints(connection=connection)
         finally:
             conn.close()
 
     def update(self) -> None:
+        self.app.logger.info("Starting database update")
         card_parser = JSonCardParser(self.app)
         card_parser.check_update()
         try:
@@ -66,3 +66,5 @@ class MaintenanceDB:
                 self.__update(card_parser)
             else:
                 raise
+        else:
+            self.app.logger.info("Finished database update")

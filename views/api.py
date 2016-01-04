@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
+
+import flask
 import requests
 
 import mtgcollector
 from flask import redirect, send_from_directory
+
+from lib import models
 
 default_card_url = "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&type=card&name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
 
@@ -37,3 +41,12 @@ def get_default_image():
                     _file_.write(chunk)
 
     return send_from_directory(os.path.join(mtgcollector.app.static_folder, "images"), "default.png")
+
+
+@mtgcollector.app.route("/api/cards/<card_id>")
+def get_card_info(card_id):
+    card = models.Card.get(card_id)
+    if len(card) != 1:
+        # TODO
+        raise Exception("FIXME")
+    return flask.jsonify(**card[0])

@@ -69,5 +69,3 @@ def get_multiverseid(card_id, **kwargs):
         return cards[0]["multiverseid"]
     else:
         return None
-
-

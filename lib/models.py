@@ -38,11 +38,6 @@ class Model(metaclass=abc.ABCMeta):
         """ This is a value that can uniquely identify any object (primary key) """
 
     @classmethod
-    def table_constraints(cls) -> typing.Iterable[str]:
-        """ List of constraints to apply on the table """
-        return []
-
-    @classmethod
     def bulk_insert(cls, models: typing.Iterable, connection=None) -> None:
         """
         Inserts many models into the database
@@ -57,7 +52,7 @@ class Model(metaclass=abc.ABCMeta):
         connection.commit()
 
     @classmethod
-    def get(cls, command: str, connection=None, **kwargs) -> typing.List:
+    def _get(cls, command: str, connection=None, **kwargs) -> typing.List:
         """
         Retrieves data from the database
 
@@ -77,16 +72,6 @@ class Model(metaclass=abc.ABCMeta):
         :param connection: the database connection to use. If None, will use flask.g.db
         """
         cls.__execute(cls.table_creation_command(), connection)
-
-    @classmethod
-    def add_constraints(cls, connection=None) -> None:
-        """
-        Creates the various table constraints to add
-
-        :param connection: the database connection to use. If None, will use flask.g.db
-        """
-        for constraint in cls.table_constraints():
-            cls.__execute(constraint, connection)
 
     def save(self, connection=None):
         """
@@ -185,11 +170,6 @@ class Metacard(Model):
         return sql.create_table_metacard
 
     @classmethod
-    def table_constraints(cls) -> typing.Iterable[str]:
-        """ List of constraints on table metacard"""
-        return sql.metacard_constraints
-
-    @classmethod
     def insertion_command(cls) -> str:
         """ The command used to insert a metacard in the database """
         return sql.insert_metacard
@@ -215,7 +195,7 @@ class Metacard(Model):
             kwargs["type"] = "%" + card_type + "%"
 
         query = sql.get_metacards_ids.format(selection=query_parameters, order=order_by)
-        return [value["card_id"] for value in cls.get(query, **kwargs)]
+        return [value["card_id"] for value in cls._get(query, **kwargs)]
 
     @property
     def as_database_object(self) -> dict:
@@ -285,6 +265,10 @@ class Card(Model):
         """ This is a value allowing to uniquely identify an instance of Card """
         return self.__name, self.__edition, self.__number, self.__version
 
+    @classmethod
+    def get(cls, card_id):
+        return cls._get(sql.get_card, card_id=card_id)
+
 
 class Tournament(Model):
     """
@@ -346,11 +330,6 @@ class User(Model):
         return sql.create_table_user
 
     @classmethod
-    def table_constraints(cls) -> typing.Iterable[str]:
-        """ list of constraints on table user """
-        return sql.user_constraints
-
-    @classmethod
     def get_user_by_name_or_mail(cls, identifier: str):
         """
         Checks for a user having the given identifier as name or email and returns it
@@ -358,8 +337,14 @@ class User(Model):
         :param identifier: the identifier for email or username
         :return: User instance for the given user or None
         """
-        data = cls.get(sql.select_user, identifier=identifier)
-        return User(**data[0]) or None
+        data = cls._get(sql.select_user, identifier=identifier)
+        if len(data) == 1:
+            return User(**data[0])
+        elif len(data) == 0:
+            return None
+        else:
+            # TODO we can make this better
+            raise Exception("got multiple users . {}".format(data))
 
     @classmethod
     def get_user_by_id(cls, user_id: int):
@@ -369,7 +354,7 @@ class User(Model):
         :param user_id: the wanted user id
         :return: User instance or None
         """
-        data = cls.get(sql.get_user_by_id, user_id=user_id)
+        data = cls._get(sql.get_user_by_id, user_id=user_id)
         if len(data):
             return User(**data[0])
 
@@ -382,9 +367,9 @@ class User(Model):
         :return: list of User
         """
         if limit is not None:
-            users = cls.get(sql.get_users_with_limit, limit=limit)
+            users = cls._get(sql.get_users_with_limit, limit=limit)
         else:
-            users = cls.get(sql.get_users)
+            users = cls._get(sql.get_users)
         return [User(**data) for data in users]
 
     @staticmethod

@@ -5,8 +5,8 @@ create_table_card_legal_in_tournament = \
         tournament_name VARCHAR(150) NOT NULL,
         type SET('Restricted', 'Legal') NOT NULL,
 
-        FOREIGN KEY (card_name) REFERENCES metacard(name),
-        FOREIGN KEY (tournament_name) REFERENCES tournament(name),
+        FOREIGN KEY (card_name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE RESTRICT,
+        FOREIGN KEY (tournament_name) REFERENCES tournament(name) ON DELETE RESTRICT ON UPDATE RESTRICT ,
         UNIQUE (card_name, tournament_name)
     )
     """
@@ -20,9 +20,10 @@ create_table_card_in_collection = \
         num_normal INT NOT NULL DEFAULT 0,
         num_foil INT NOT NULL DEFAULT 0,
 
-        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
-        FOREIGN KEY (card_id) REFERENCES card(card_id),
-        UNIQUE(user_id, card_id)
+        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE RESTRICT,
+        FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+        PRIMARY KEY (user_id, card_id)
     )
     """
 
@@ -33,7 +34,7 @@ create_table_deck = \
         user_id INT NOT NULL,
         deck_name VARCHAR(255) NOT NULL,
 
-        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     )
     """
 
@@ -44,8 +45,8 @@ create_table_card_in_deck = \
         card_name VARCHAR(150) NOT NULL,
         number SMALLINT NOT NULL DEFAULT 1,
 
-        FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
-        FOREIGN KEY (card_name) REFERENCES metacard(name),
+        FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (card_name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE CASCADE,
         UNIQUE(deck_id, card_name)
     )
     """
