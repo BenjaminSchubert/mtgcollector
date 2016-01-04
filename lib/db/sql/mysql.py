@@ -104,7 +104,12 @@ class MySQL:
             orig_text,
             artist,
             flavor,
-            price
+            price,
+            (
+                SELECT COUNT(*)
+                    FROM card
+                    WHERE card.name = metacard.name
+            ) AS versions
         FROM metacard
             INNER JOIN card
                 ON metacard.name = card.name
