@@ -153,21 +153,41 @@ function displayCardInfos(cardDiv) {
     var cardInfos = $('#card-infos');
 
     cardInfos.children('img').attr('src', imgPath + curId);
-    cardInfos.children('div').text(curId);
 
-    fetchCardInfos(curId);
+    var infos = fetchCardInfos(curId);
+    cardInfos.children('h2').text(infos["name"]);
+
+    createInfos(infos);
 }
 
 // If the infos for the card whose id is 'id' are not yet fetched, fetches them.
 function fetchCardInfos(id) {
 
-    /*$.get(infoPath + id, function (data) {
-        console.log("data retreived : " + data);
-        return data;
-    });*/
-
     if (infosFetched[id] === undefined) {
-        console.log("adding " + id);
-        infosFetched[id] = "{test: 42}";
+        // fetch infos
+        $.get(infoPath + id, function (data) {
+            infosFetched[id] = data;
+        });
     }
+
+    return infosFetched[id];
+}
+
+function createInfos(infos) {
+    $('#card-infos > div').empty();
+    createInfoField(infos, "artist");
+    createInfoField(infos, "cmc", "Converted Mana Cost");
+    createInfoField(infos, "number", "Card Number");
+    createInfoField(infos, "artist");
+}
+
+function createInfosField(infos, key, name) {
+    var parent = $('#card-infos > div');
+
+    parent.append($("<label>" + name.charAt(0).toUpperCase() + name.substr(1, name.length) + "</label>"));
+    parent.append($("<div>" + infos[key] + "</div>"));
+}
+
+function createInfoField(infos, key) {
+    createInfosField(infos, key, key);
 }
