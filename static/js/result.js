@@ -150,24 +150,66 @@ function lockCardInfos() {
 // Opens the infos panel of the card clicked.
 function displayCardInfos(cardDiv) {
     var curId = cardDiv.attr('id');
-    var cardInfos = $('#card-infos');
-
-    cardInfos.children('img').attr('src', imgPath + curId);
-    cardInfos.children('div').text(curId);
-
+    $('#card-infos').children('img').attr('src', imgPath + curId);
     fetchCardInfos(curId);
 }
 
 // If the infos for the card whose id is 'id' are not yet fetched, fetches them.
 function fetchCardInfos(id) {
 
-    /*$.get(infoPath + id, function (data) {
-        console.log("data retreived : " + data);
-        return data;
-    });*/
-
     if (infosFetched[id] === undefined) {
-        console.log("adding " + id);
-        infosFetched[id] = "{test: 42}";
+
+        // loading
+        $('#card-infos > h2').text("Loading...");
+        $('#card-infos > div').text("Loading...");
+
+        // fetch infos
+        $.get(infoPath + id, function (data) {
+            infosFetched[id] = data;
+            createInfos(infosFetched[id]);
+        });
+    } else {
+        createInfos(infosFetched[id]);
+    }
+}
+
+function createInfos(infos) {
+    $('#card-infos > h2').text(infos["name"]);
+    $('#card-infos > div').empty();
+    createInfosField(infos, "artist", "Artist");
+    createInfosField(infos, "cmc", "Converted Mana Cost");
+    createInfosFieldArray(infos, "types", "Types");
+    createInfosField(infos, "number", "Card Number");
+    createInfosField(infos, "orig_text", "Card Text");
+    createInfosField(infos, "flavor", "Flavor Text");
+}
+
+function createInfosField(infos, key, name) {
+    // if value at 'key' is set and a key 'key' exists, create the elements
+    if (infos[key] !== null && infos[key] !== undefined) {
+
+        var newInfo = $('<div></div>');
+        newInfo.append("<label>" + name + "</label>");
+        newInfo.append(("<div>" + infos[key] + "</div>").replace(/\n/g, '<br>'));
+
+        $('#card-infos > div').append(newInfo);
+    }
+}
+
+function createInfosFieldArray(infos, key, name) {
+    // if value at 'key' is set and a key 'key' exists, create the elements
+    if (infos[key] !== null && infos[key] !== undefined) {
+
+        var newInfo = $('<div></div>');
+        newInfo.append("<label>" + name + "</label>");
+
+        var value = infos[key][0];
+        for (var i = 1; i < infos[key].length; ++i) {
+            value += ", " + infos[key][i];
+        }
+
+        newInfo.append(("<div>" + value + "</div>").replace(/\n/g, '<br>'));
+
+        $('#card-infos > div').append(newInfo);
     }
 }
