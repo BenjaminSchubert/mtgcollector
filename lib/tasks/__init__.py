@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import queue
+import tempfile
 import threading
 
 import flask
@@ -13,12 +14,13 @@ import lib.db.maintenance
 class Downloader(threading.Thread):
     def __init__(self, app: flask.Flask):
         super().__init__()
-        app.download = queue.Queue()
+        app.downloader = self
         self.db = lib.db.maintenance.MaintenanceDB(app)
         self.app = app
-        self.queue = app.download
+        self.queue = queue.Queue()
         self.download_folder = os.path.join(app.static_folder, "images")
         self.setDaemon(True)
+        self.rename_lock = threading.Lock()
 
     def run(self):
         entry = self.queue.get()
@@ -36,10 +38,18 @@ class Downloader(threading.Thread):
 
         file_path = lib.db.get_image_path(self.app, card_id)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, "wb") as _file_:
-            for chunk in request.iter_content(chunk_size=1024):
-                if chunk:  # this is to filter out keepalive chunks
-                    _file_.write(chunk)
+        temp_fd, path_name = tempfile.mkstemp(suffix=".tmp", prefix=file_path, dir=os.path.dirname(file_path))
+        temp_file = os.fdopen(temp_fd, "wb")
+        for chunk in request.iter_content(chunk_size=1024):
+            if chunk:  # this is to filter out keepalive chunks
+                temp_file.write(chunk)
+        temp_file.close()
+
+        with self.rename_lock:
+            if not os.path.exists(file_path):
+                os.rename(path_name, file_path)
+            else:
+                os.remove(path_name)
 
 
 class DBUpdater(threading.Thread):

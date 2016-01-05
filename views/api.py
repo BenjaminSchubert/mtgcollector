@@ -16,8 +16,7 @@ default_card_url = "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&t
 def get_image(card_id):
     filename = mtgcollector.lib.db.get_image_path(mtgcollector.app, card_id)
     if not os.path.exists(os.path.join(mtgcollector.app.static_folder, filename)):
-        mtgcollector.app.download.put(card_id)
-        return redirect(mtgcollector.lib.db.get_image_url(card_id))
+        mtgcollector.app.downloader.download_image(card_id, getattr(flask.g, "db"))
 
     return send_from_directory(
         os.path.join(mtgcollector.app.static_folder, os.path.dirname(filename)),
