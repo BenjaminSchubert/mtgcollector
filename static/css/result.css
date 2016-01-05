@@ -17,7 +17,7 @@
     cursor: pointer;
 }
 
-#card-infos {
+#card-details {
     width: 33%;
     height: 100%;
 
@@ -26,17 +26,17 @@
 
     padding: 20px;
 
-    background-color: #a09ea2;
+    background-color: #E0DDC5;
 
     border-left: 1px solid black;
 }
 
-#card-infos > h2 {
+#card-details > h2 {
     text-align: center;
     margin-bottom: 15px;
 }
 
-#card-infos > img {
+#card-details > img {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -45,10 +45,11 @@
     height: 40%;
 }
 
-#cards-infos > div > label {
-    width: 130px;
+#card-details > div {
+    overflow: auto;
 }
 
-#cards-infos > div > label {
-    width: 130px;
+#card-details-fields > div {
+    margin-top: 2px;
+    margin-bottom: 2px;
 }

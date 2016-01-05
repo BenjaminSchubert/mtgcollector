@@ -1,20 +1,20 @@
 // paths
 var imgPath = "/api/images/";
-var infoPath = "/api/cards/";
+var detailsPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
 
 // contains ids of elements which are currently in view port
 var loadedIds = [];
 
-// contains info relative to infos locked when image clicked.
+// Contains info relative to image locked when image clicked.
 // 'locked' is if there is a locked image and 'lastId' is the id of the last card locked.
-var lockInfoCard = {
+var lockInfo = {
     locked: false,
     lastId: null
 };
 
-// contains as keys the ids of the cards whoses infos are already fetched and as values the infos as json.
-var infosFetched = {};
+// Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
+var detailsFetched = {};
 
 
 
@@ -36,12 +36,12 @@ $(document).ready(function () {
     initView();
 
     // what to do when clicking on card image
-    $('#cards > div').click(lockCardInfos);
+    $('#cards > div').click(lockCardDetails);
 
     // what to do when hovering on card image
     $('#cards > div > img').hover(function () {
-        if (!lockInfoCard.locked) {
-            displayCardInfos($(this).parent());
+        if (!lockInfo.locked) {
+            displayCardDetails($(this).parent());
         }
     });
 });
@@ -70,7 +70,7 @@ function resizeDivHeights() {
 
 
 function findImageHeight() {
-    return $('#cards').find('> div').first().width() * 310 / 223;
+    return $('#cards').find('> div').first().width() * 310 / 223; // 310 : card height, 223 : card width
 }
 
 // Unloads each div of #cards not in viewport.
@@ -117,7 +117,7 @@ function unloadNotInViewPort() {
 
         if (notInVP) {
             $('#' + id).removeClass('loaded');
-            $('#' + id).children('img').attr('src', '');
+            $('#' + id + ' > img').attr('src', '');
 
             loadedIds.splice(i, 1);
         }
@@ -125,91 +125,100 @@ function unloadNotInViewPort() {
 
 }
 
-// Locks the infos displayed on the card clicked (hovering on images does not display infos of other cards).
+// Locks the details displayed on the card clicked (so hovering on images does not display details of other cards).
 // If a card was already locked and the one clicked at this moment is the same, unlock it, else lock the current one.
-function lockCardInfos() {
+function lockCardDetails() {
 
     var currentId = $(this).attr('id');
 
     // lock if no card is clicked
-    if (!lockInfoCard.locked) {
-        lockInfoCard.locked = true;
-        lockInfoCard.lastId = currentId;
+    if (!lockInfo.locked) {
+        lockInfo.locked = true;
+        lockInfo.lastId = currentId;
     } else {
 
-        // unlock if click on same card, otherwise display the current card info
-        if (lockInfoCard.lastId === currentId) {
-            lockInfoCard.locked = false;
+        // unlock if click on same card, otherwise display the current card details
+        if (lockInfo.lastId === currentId) {
+            lockInfo.locked = false;
         } else {
-            lockInfoCard.lastId = currentId;
-            displayCardInfos($(this));
+            lockInfo.lastId = currentId;
+            displayCardDetails($(this));
         }
     }
 }
 
-// Opens the infos panel of the card clicked.
-function displayCardInfos(cardDiv) {
+// Opens the details panel of the card clicked.
+function displayCardDetails(cardDiv) {
     var curId = cardDiv.attr('id');
-    $('#card-infos').children('img').attr('src', imgPath + curId);
-    fetchCardInfos(curId);
+    $('#card-details > img').attr('src', imgPath + curId);
+    fetchCardDetails(curId);
 }
 
-// If the infos for the card whose id is 'id' are not yet fetched, fetches them.
-function fetchCardInfos(id) {
+// If the details for the card whose id is 'id' are not yet fetched, fetches them.
+function fetchCardDetails(id) {
 
-    if (infosFetched[id] === undefined) {
+    if (detailsFetched[id] === undefined) {
 
         // loading
-        $('#card-infos > h2').text("Loading...");
-        $('#card-infos > div').text("Loading...");
+        $('#card-details > h2').text("Loading...");
+        $('#card-details > div').text("Loading...");
 
-        // fetch infos
-        $.get(infoPath + id, function (data) {
-            infosFetched[id] = data;
-            createInfos(infosFetched[id]);
+        // fetch details
+        $.get(detailsPath + id, function (data) {
+            detailsFetched[id] = data;
+            createDetails(detailsFetched[id]);
         });
     } else {
-        createInfos(infosFetched[id]);
+        createDetails(detailsFetched[id]);
     }
 }
 
-function createInfos(infos) {
-    $('#card-infos > h2').text(infos["name"]);
-    $('#card-infos > div').empty();
-    createInfosField(infos, "artist", "Artist");
-    createInfosField(infos, "cmc", "Converted Mana Cost");
-    createInfosFieldArray(infos, "types", "Types");
-    createInfosField(infos, "number", "Card Number");
-    createInfosField(infos, "orig_text", "Card Text");
-    createInfosField(infos, "flavor", "Flavor Text");
-}
+function createDetails(details) {
+    $('#card-details > h2').text(details["name"]);
+    $('#card-details > div').empty();
 
-function createInfosField(infos, key, name) {
-    // if value at 'key' is set and a key 'key' exists, create the elements
-    if (infos[key] !== null && infos[key] !== undefined) {
-
-        var newInfo = $('<div></div>');
-        newInfo.append("<label>" + name + "</label>");
-        newInfo.append(("<div>" + infos[key] + "</div>").replace(/\n/g, '<br>'));
-
-        $('#card-infos > div').append(newInfo);
+    if (details["types"][0] !== "Land") {
+        createDetailsField(details, "manaCost", "Mana Cost", createStringFromValue);
+        createDetailsField(details, "cmc", "Converted Mana Cost", createStringFromValue);
     }
+    createDetailsField(details, "types", "Types", createStringFromArrayValue);
+    createDetailsField(details, "orig_text", "Card Text", createStringFromValue);
+    createDetailsField(details, "flavor", "Flavor Text", createStringFromValue);
+    createDetailsField(details, "edition", "Edition", createStringFromValue);
+    createDetailsField(details, "rarity", "Rarity", createStringFromValue);
+    createDetailsField(details, "number", "Card Number", createStringFromValue);
+    createDetailsField(details, "artist", "Artist", createStringFromValue);
 }
 
-function createInfosFieldArray(infos, key, name) {
-    // if value at 'key' is set and a key 'key' exists, create the elements
-    if (infos[key] !== null && infos[key] !== undefined) {
+// Create a string from a value (in json). The resulting string has the \n replaced by <br>.
+function createStringFromValue(details, key) {
+    return ("" + details[key]).replace(/\n/g, '<br>');
+}
 
-        var newInfo = $('<div></div>');
-        newInfo.append("<label>" + name + "</label>");
-
-        var value = infos[key][0];
-        for (var i = 1; i < infos[key].length; ++i) {
-            value += ", " + infos[key][i];
+// Create a string from a value (in json) which is an array. The resulting string has the \n replaced by <br>.
+function createStringFromArrayValue(details, key) {
+    var res = "";
+    if (details[key].length > 0) {
+        res = details[key][0];
+        for (var i = 1; i < details[key].length; ++i) {
+            res += ", " + details[key][i];
         }
-
-        newInfo.append(("<div>" + value + "</div>").replace(/\n/g, '<br>'));
-
-        $('#card-infos > div').append(newInfo);
     }
+    return res.replace(/\n/g, '<br>');
+}
+
+function createDetailsField(details, key, name, createStringFunction) {
+    // if value at 'key' is set and a key 'key' exists, create the elements
+    if (details[key] !== null && details[key] !== undefined) {
+
+        var newDetail = $('<div class="row"></div>');
+        newDetail.append('<label class="col-md-4">' + name + '</label>');
+        newDetail.append('<div class="col-md-8">' + createStringFunction(details, key) + '</div>');
+
+        $('#card-details > div').append(newDetail);
+    }
+}
+
+function insertImagesInText(text) {
+    
 }
