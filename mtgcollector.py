@@ -4,6 +4,8 @@
 """
 MTGCollector : an application to easily handle your Magic The Gathering collection !
 """
+
+
 import os
 import random
 import hashlib

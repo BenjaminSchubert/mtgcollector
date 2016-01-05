@@ -10,6 +10,7 @@ import mysql.connector.errors
 import unittest
 from typing import Iterable
 
+import lib.exceptions
 from tests import TestCaseWithDB
 from lib.models import User
 
@@ -21,7 +22,7 @@ class TestUser(TestCaseWithDB, unittest.TestCase):
     @classmethod
     def table_creation_commands(cls) -> Iterable[str]:
         """ commands to execute to setup the database for our tests """
-        return [User.table_creation_command(), *User.table_constraints()]
+        return [User.table_creation_command()]
 
     @classmethod
     def tables_to_truncate(cls) -> Iterable[str]:
@@ -48,8 +49,9 @@ class TestUser(TestCaseWithDB, unittest.TestCase):
 
     def test_get_user_by_name_or_mail(self):
         """ Checks user retrieval from the database """
-        user_one = self.user1.get_user_by_name_or_mail(self.name1)
-        user_two = self.user1.get_user_by_name_or_mail(self.email1)
+        user_one = User.get_user_by_name_or_mail(self.name1)
+        user_two = User.get_user_by_name_or_mail(self.email1)
+
         self.assertEqual(user_one, user_two)
         self.assertEqual(user_one, self.user1)
 
@@ -83,23 +85,23 @@ class TestUser(TestCaseWithDB, unittest.TestCase):
 
     def test_no_same_username(self):
         """ Checks that two users with the same username cannot be created """
-        with self.assertRaises(mysql.connector.errors.IntegrityError):
+        with self.assertRaises(lib.exceptions.IntegrityException):
             User("goatsy", "impersonator@goatsy.com", "1234").create()
 
     def test_no_same_emails(self):
         """ Checks that two users with the same email cannot be created """
-        with self.assertRaises(mysql.connector.errors.IntegrityError):
+        with self.assertRaises(lib.exceptions.IntegrityException):
             User("goat", "goatsy@tdd.com", "no").create()
 
     def test_no_email_and_username_same_on_two_users(self):
         """
         Checks that a username cannot be the same as the email as another user. This is a requirement for our login
         """
-        with self.assertRaises(mysql.connector.errors.IntegrityError):
+        with self.assertRaises(lib.exceptions.IntegrityException):
             User("goatsy@tdd.com", "goat@tsy.com", "hello").create()
 
         User("goat@tsy.com", "tdd@goat.com", "hello").create()
-        with self.assertRaises(mysql.connector.errors.IntegrityError):
+        with self.assertRaises(lib.exceptions.IntegrityException):
             User("goat", "goat@tsy.com", "no").create()
 
     def test_user_can_have_same_name_and_email(self):

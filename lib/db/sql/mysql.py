@@ -41,11 +41,15 @@ class MySQL:
 
     insert_metacard = \
         """
-        REPLACE INTO metacard (name, types, subtypes, supertypes, manaCost, power, toughness, colors, cmc, orig_text)
+        INSERT INTO metacard (name, types, subtypes, supertypes, manaCost, power, toughness, colors, cmc, orig_text)
         VALUES (
             %(name)s, %(types)s, %(subtypes)s, %(supertypes)s, %(manaCost)s, %(power)s, %(toughness)s, %(colors)s,
              %(cmc)s, %(text)s
         )
+        ON DUPLICATE KEY UPDATE
+            name=VALUES(name), types=VALUES(types), subtypes=VALUES(subtypes), supertypes=VALUES(supertypes),
+            manaCost=VALUES(manaCost), power=VALUES(power), toughness=VALUES(toughness), colors=VALUES(colors),
+            cmc=VALUES(cmc), orig_text=VALUES(orig_text)
         """
 
     get_metacards_ids = \
@@ -81,8 +85,11 @@ class MySQL:
 
     insert_card = \
         """
-        REPLACE INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
+        INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
         VALUES (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
+        ON DUPLICATE KEY UPDATE
+            name=VALUES(name), number=VALUES(number), version=VALUES(version), rarity=VALUES(version),
+            edition=VALUES(edition), artist=VALUES(artist), flavor=VALUES(flavor)
         """
 
     get_card = \

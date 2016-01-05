@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import timeit
+
 import flask
 import mysql.connector
 import mysql.connector.errors

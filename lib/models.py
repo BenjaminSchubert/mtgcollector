@@ -10,6 +10,7 @@ import flask
 import datetime
 import typing
 
+from lib.exceptions import IntegrityException
 from lib.db import sql_commands as sql
 
 
@@ -38,17 +39,22 @@ class Model(metaclass=abc.ABCMeta):
         """ This is a value that can uniquely identify any object (primary key) """
 
     @classmethod
-    def bulk_insert(cls, models: typing.Iterable, connection=None) -> None:
+    def bulk_insert(cls, models: typing.List, connection=None) -> None:
         """
         Inserts many models into the database
 
         :param models: list of models to insert. They have to be all of the same type
         :param connection: the database connection to use. If None, will use flask.g.db
         """
+        chunk_size = 2500  # magic number for the size of the query. This works, no idea why
         if connection is None:
             connection = getattr(flask.g, "db")
         cursor = connection.cursor()
-        cursor.executemany(cls.insertion_command(), [model.as_database_object for model in models])
+        # TODO check if list(models) is a performance killer
+        chunks = [list(models)[i:i+chunk_size] for i in range(0, len(models), chunk_size)]
+
+        for chunk in chunks:
+            cursor.executemany(cls.insertion_command(), [model.as_database_object for model in chunk])
         connection.commit()
 
     @classmethod
@@ -425,6 +431,9 @@ class User(Model):
 
         :return: the newly created user
         """
+        if User.get_user_by_name_or_mail(self.__email) or User.get_user_by_name_or_mail(self.__username):
+            raise IntegrityException()
+
         new_user_id = self._modify(sql.insert_user, **self.__as_new_database_object())
         new_user = self.get_user_by_id(new_user_id)
         self.__user_id = new_user.__user_id
