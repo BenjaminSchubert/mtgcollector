@@ -45,7 +45,7 @@
     height: 40%;
 }
 
-#card-details > div {
+#card-details-fields {
     overflow: auto;
 }
 

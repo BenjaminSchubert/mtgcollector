@@ -1,5 +1,6 @@
 // paths
 var imgPath = "/api/images/";
+var iconPath = "/api/icons/";
 var detailsPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
 
@@ -190,9 +191,10 @@ function createDetails(details) {
     createDetailsField(details, "artist", "Artist", createStringFromValue);
 }
 
-// Create a string from a value (in json). The resulting string has the \n replaced by <br>.
+// Create a string from a value (in json).
+// The resulting string has the \n replaced by <br>. And the placeholder like {W} are replaced with the links to icons.
 function createStringFromValue(details, key) {
-    return ("" + details[key]).replace(/\n/g, '<br>');
+    return insertImagesInText(("" + details[key]).replace(/\n/g, '<br>'));
 }
 
 // Create a string from a value (in json) which is an array. The resulting string has the \n replaced by <br>.
@@ -220,5 +222,17 @@ function createDetailsField(details, key, name, createStringFunction) {
 }
 
 function insertImagesInText(text) {
-    
+    for (var i = 0; i < text.length; ++i) {
+        if (text.charAt(i) === '{') {
+            var indexClose = text.indexOf('}', i+1); // index of }
+
+            if (indexClose != -1 && indexClose != i+1) {
+                text =
+                    text.substr(0, i) + // before {
+                    '<img src="' + iconPath + text.substr(i+1, indexClose-i-1) + '.png">' + // between {}, transformed
+                    text.substr(indexClose + 1); // after }
+            }
+        }
+    }
+    return text;
 }
