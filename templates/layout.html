@@ -14,20 +14,27 @@
 				<a class="navbar-brand" href="{{ url_for('index') }}">MTG-Collector</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
+				<ul class="nav navbar-nav navbar-left">
 					<li class="active">
 						<a href="{{ url_for('search') }}">Search</a>
 					</li>
 					<li>
 						<a href="{{ url_for('index') }}">Collection</a>
 					</li>
-                    <li>
-                        {% if not current_user.is_authenticated %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if not current_user.is_authenticated %}
+                        <li>
                             <a href="{{ url_for('login') }}">Login</a>
-                        {% else %}
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{ url_for('parameters') }}">Parameters</a>
+                        </li>
+                        <li>
                             <a href="{{ url_for('logout') }}">Logout</a>
-                        {% endif %}
-                    </li>
+                        </li>
+                    {% endif %}
 				</ul>
 			</div>
 		</div>

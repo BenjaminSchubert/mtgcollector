@@ -6,6 +6,7 @@ import mysql.connector.errors
 import mysql.connector.errorcode
 import werkzeug.routing
 from flask import redirect, url_for, render_template
+from flask.ext.login import login_required
 
 import lib.db
 import lib.db.maintenance
@@ -92,5 +93,6 @@ def update():
 
 
 @app.route("/parameters", methods=['GET', 'POST'])
+@login_required
 def parameters():
-    return "HELLO WORLD"
+    return render_template('parameters.html')
