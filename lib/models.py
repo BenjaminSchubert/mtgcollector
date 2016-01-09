@@ -124,12 +124,12 @@ class Edition(Model):
     @classmethod
     def insertion_command(cls) -> str:
         """ The command used to insert an edition in the database """
-        return sql.insert_edition
+        return sql.Edition.insert()
 
     @classmethod
     def table_creation_command(cls) -> str:
         """ The command used to insert values in the database"""
-        return sql.create_table_edition
+        return sql.Edition.create_table()
 
     @property
     def as_database_object(self) -> dict:
@@ -173,12 +173,12 @@ class Metacard(Model):
     @classmethod
     def table_creation_command(cls) -> str:
         """ The command to create the metacard table"""
-        return sql.create_table_metacard
+        return sql.Metacard.create_table()
 
     @classmethod
     def insertion_command(cls) -> str:
         """ The command used to insert a metacard in the database """
-        return sql.insert_metacard
+        return sql.Metacard.insert()
 
     @classmethod
     def get_ids_where(cls, card_name="", card_type="", order_by="metacard.name"):
@@ -200,7 +200,7 @@ class Metacard(Model):
             query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
             kwargs["type"] = "%" + card_type + "%"
 
-        query = sql.get_metacards_ids.format(selection=query_parameters, order=order_by)
+        query = sql.Metacard.get_ids().format(selection=query_parameters, order=order_by)
         return [value["card_id"] for value in cls._get(query, **kwargs)]
 
     @property
@@ -245,12 +245,12 @@ class Card(Model):
     @classmethod
     def table_creation_command(cls):
         """ The command used to create the card table """
-        return sql.create_table_cards
+        return sql.Card.create_table()
 
     @classmethod
     def insertion_command(cls) -> str:
         """ The command used to insert a table in the database """
-        return sql.insert_card
+        return sql.Card.insert()
 
     @property
     def as_database_object(self) -> dict:
@@ -273,7 +273,7 @@ class Card(Model):
 
     @classmethod
     def get(cls, card_id):
-        return cls._get(sql.get_card, card_id=card_id)
+        return cls._get(sql.Card.get(), card_id=card_id)
 
 
 class Tournament(Model):
@@ -288,12 +288,12 @@ class Tournament(Model):
     @classmethod
     def insertion_command(cls) -> str:
         """ Command to insert a tournament in the database """
-        return sql.insert_tournament
+        return sql.Tournament.insert()
 
     @classmethod
     def table_creation_command(cls) -> str:
         """ Creation command for the tournament table """
-        return sql.create_table_tournament
+        return sql.Tournament.create_table()
 
     @property
     def as_database_object(self) -> dict:
@@ -328,12 +328,12 @@ class User(Model):
     @classmethod
     def insertion_command(cls) -> str:
         """ Command used to insert a user in the database """
-        return sql.insert_user
+        return sql.User.insert()
 
     @classmethod
     def table_creation_command(cls) -> str:
         """ The command to create the user table """
-        return sql.create_table_user
+        return sql.User.create_table()
 
     @classmethod
     def get_user_by_name_or_mail(cls, identifier: str):
@@ -343,7 +343,7 @@ class User(Model):
         :param identifier: the identifier for email or username
         :return: User instance for the given user or None
         """
-        data = cls._get(sql.select_user, identifier=identifier)
+        data = cls._get(sql.User.get_by_mail_or_username(), identifier=identifier)
         if len(data) == 1:
             return User(**data[0])
         elif len(data) == 0:
@@ -360,22 +360,23 @@ class User(Model):
         :param user_id: the wanted user id
         :return: User instance or None
         """
-        data = cls._get(sql.get_user_by_id, user_id=user_id)
+        data = cls._get(sql.User.get_by_id(), user_id=user_id)
         if len(data):
             return User(**data[0])
 
     @classmethod
-    def get_users(cls, limit: int=None) -> list:
+    def get_users(cls, limit: int=None, offset: int=0) -> list:
         """
         Returns users with a given limit
 
         :param limit: maximum number of users to return
+        :param offset: offset for the search
         :return: list of User
         """
         if limit is not None:
-            users = cls._get(sql.get_users_with_limit, limit=limit)
+            users = cls._get(sql.User.get_with_limit(), limit=limit, offset=offset)
         else:
-            users = cls._get(sql.get_users)
+            users = cls._get(sql.User.get())
         return [User(**data) for data in users]
 
     @staticmethod
@@ -434,7 +435,7 @@ class User(Model):
         if User.get_user_by_name_or_mail(self.__email) or User.get_user_by_name_or_mail(self.__username):
             raise IntegrityException()
 
-        new_user_id = self._modify(sql.insert_user, **self.__as_new_database_object())
+        new_user_id = self._modify(sql.User.insert(), **self.__as_new_database_object())
         new_user = self.get_user_by_id(new_user_id)
         self.__user_id = new_user.__user_id
         self.__is_admin = new_user.__is_admin
@@ -447,7 +448,7 @@ class User(Model):
 
         :param admin: whether to turn the user as admin or remove him the rights to be
         """
-        self._modify(sql.set_admin, user_id=self.get_id(), admin=admin)
+        self._modify(sql.User.set_admin(), user_id=self.get_id(), admin=admin)
         self.__is_admin = admin
 
     def as_database_object(self) -> dict:

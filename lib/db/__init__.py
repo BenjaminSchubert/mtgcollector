@@ -7,8 +7,7 @@ import mysql.connector.conversion
 import mysql.connector.errors
 import mysql.connector.errorcode
 
-
-from lib.db.sql.mysql import MySQL as sql_commands
+from lib.db.sql import mysql as sql_commands
 import lib.db.populate
 
 mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
