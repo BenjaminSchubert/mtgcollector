@@ -5,17 +5,17 @@
 MTGCollector : an application to easily handle your Magic The Gathering collection !
 """
 
-
+import hashlib
 import os
 import random
-import hashlib
+
+import flask_login
+import flask_wtf.csrf
 from flask import Flask
 
 import lib.db
 import lib.tasks
-import flask_wtf.csrf
-import flask_login
-
+import lib.threading
 from lib.json import CustomJSONEncoder
 from lib.models import User
 
@@ -37,6 +37,7 @@ def setup_app(_app):
     lib.tasks.DBUpdater(_app).start()
 
     _app.json_encoder = CustomJSONEncoder
+    _app.notifier = lib.threading.Event()
 
 
 app = Flask(__name__)
@@ -54,4 +55,4 @@ from views import *
 
 if __name__ == '__main__':
     setup_app(app)
-    app.run(debug=os.environ.get("MTG_COLLECTOR_DEBUG", False))
+    app.run(threaded=True, debug=os.environ.get("MTG_COLLECTOR_DEBUG", False))

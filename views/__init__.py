@@ -61,3 +61,14 @@ def close_db(exception):
     db = getattr(flask.g, 'db', None)
     if db is not None:
         db.close()
+
+
+@app.route("/updates")
+def send_updates():
+    def get_update():
+        while True:
+            try:
+                yield "data: {}\n\n".format(app.notifier.wait_value(10))
+            except TimeoutError:
+                yield "data: ping\n\n"
+    return flask.Response(get_update(), mimetype="text/event-stream")
