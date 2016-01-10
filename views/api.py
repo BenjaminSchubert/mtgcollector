@@ -54,7 +54,11 @@ def get_default_image():
 @mtgcollector.app.route("/api/cards/<card_id>")
 def get_card_info(card_id):
     card = models.Card.get(card_id)
-    if len(card) != 1:
-        # TODO
-        raise Exception("FIXME")
-    return flask.jsonify(**card[0])
+    if len(card) == 1:
+        return flask.jsonify(**card[0])
+    elif len(card) > 1:
+        mtgcollector.app.logger.error("Got multiple cards for %(card_id)s", dict(card_id=card_id))
+        return flask.jsonify(**card[0])
+    else:
+        mtgcollector.app.logger.error("Got no information for card %(card_id)s", dict(card_id=card_id))
+        flask.abort(404)
