@@ -275,6 +275,16 @@ class Card(Model):
     def get(cls, card_id):
         return cls._get(sql.Card.get(), card_id=card_id)
 
+    @classmethod
+    def get_image_url(cls, card_id, logger, **kwargs):
+        cards = cls._get(sql.Card.get_multiverseid(), card_id=card_id, **kwargs)
+        if len(cards):
+            return "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={}&type=card".format(
+                    cards[0]["multiverseid"]
+            )
+        logger.warning("Could not download image for {}".format(card_id))
+        flask.abort(404)
+
 
 class Tournament(Model):
     """

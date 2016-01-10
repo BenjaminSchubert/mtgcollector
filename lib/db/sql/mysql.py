@@ -6,7 +6,24 @@ MySQL implementation of the commands needed to run MTGCollector application
 """
 
 
+import mysql.connector
+import mysql.connector.conversion
+
+
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
+# We need to match mysql converter to be able to accept list and sets
+mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
+mysql.connector.conversion.MySQLConverter._set_to_mysql = lambda self, value: ",".join(value).encode()
+
+
+def get_connection(app):
+    return mysql.connector.connect(
+        user=app.config["DATABASE_USER"], password=app.config["DATABASE_PASSWORD"],
+        host=app.config["DATABASE_HOST"], database=app.config["DATABASE_NAME"], port=app.config["DATABASE_PORT"],
+        raise_on_warnings=True
+    )
 
 
 class User:
@@ -181,6 +198,14 @@ class Card:
                 INNER JOIN edition
                     ON card.edition = edition.code
             WHERE card_id = %(card_id)s;
+        """
+
+    @classmethod
+    def get_multiverseid(cls):
+        """ get the multiverseid for the given card id """
+        return """
+            SELECT multiverseid FROM card WHERE
+            card_id=%(card_id)s
         """
 
 

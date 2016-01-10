@@ -8,6 +8,7 @@ import flask
 import requests
 
 import lib.db
+import lib.models
 import lib.db.maintenance
 
 
@@ -17,10 +18,15 @@ class Downloader(threading.Thread):
         app.downloader = self
         self.db = lib.db.maintenance.MaintenanceDB(app)
         self.app = app
-        self.queue = queue.Queue()
+        self.queue = qm'enfinueue.Queue()
         self.download_folder = os.path.join(app.static_folder, "images")
         self.setDaemon(True)
         self.rename_lock = threading.Lock()
+
+    def get_image_path(self, card_id: int):
+        data_folder_path = [str(card_id)[n] if len(str(card_id)) > n else "0" for n in range(4)]
+        data_folder_path.append(str(card_id) + ".jpg")
+        return os.path.join(self.app.static_folder, "images", *data_folder_path)
 
     def run(self):
         entry = self.queue.get()
@@ -30,7 +36,7 @@ class Downloader(threading.Thread):
                 entry = self.queue.get()
 
     def download_image(self, card_id: int, connection):
-        url = lib.db.get_image_url(card_id, connection=connection)
+        url = lib.models.Card.get_image_url(card_id, logger=self.app.logger, connection=connection)
         request = requests.get(url, stream=True)
 
         if request.status_code != requests.codes.ok:

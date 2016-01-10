@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from flask import Flask
 
-from lib.db.maintenance import MaintenanceDB
+from lib.db.maintenance import MaintenanceDB, lib
 from lib.parser import JSonCardParser
 from tests import DBConnectionMixin, DownloadProxy, download_file_resources
 
@@ -23,6 +23,7 @@ class TestMaintenanceDB(unittest.TestCase):
         """ Creates a temporary directory and sets an app up before running """
         self.directory = tempfile.TemporaryDirectory()
         self.app = Flask(__name__, static_folder=self.directory.name)
+        self.app.notifier = lib.threading.Event()
         self.app.config.from_object(DBConnectionMixin)
         self.maintenance = MaintenanceDB(self.app)
         self.maintenance.setup_db()
