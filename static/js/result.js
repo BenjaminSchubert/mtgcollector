@@ -170,6 +170,7 @@ function fetchCardDetails(id) {
         var cardDetails = $('#card-details');
         cardDetails.children('h2').text("Loading...");
         cardDetails.children('#card-details-fields').text("Loading...");
+        cardDetails.children('#number-cards-collection').hide();
         curIdDisplayed = id;
 
         // fetch details
@@ -199,12 +200,15 @@ function createDetails(details) {
     createDetailsField(details, "rarity", "Rarity", createStringFromValue);
     createDetailsField(details, "number", "Card Number", createStringFromValue);
     createDetailsField(details, "artist", "Artist", createStringFromValue);
+
+    // display inputs
+    cardDetails.children('#number-cards-collection').show();
 }
 
 // Create a string from a value (in json).
 // The resulting string has the \n replaced by <br>. And the placeholder like {W} are replaced with the links to icons.
 function createStringFromValue(details, key) {
-    return insertImagesInText(("" + details[key]).replace(/\n/g, '<br>'));
+    return insertImagesInText(("" + details[key]));
 }
 
 // Create a string from a value (in json) which is an array. The resulting string has the \n replaced by <br>.
@@ -216,7 +220,7 @@ function createStringFromArrayValue(details, key) {
             res += ", " + details[key][i];
         }
     }
-    return res.replace(/\n/g, '<br>');
+    return res;
 }
 
 function createDetailsField(details, key, name, createStringFunction) {
@@ -225,7 +229,7 @@ function createDetailsField(details, key, name, createStringFunction) {
 
         var newDetail = $('<div class="row"></div>');
         newDetail.append('<label class="col-md-4">' + name + '</label>');
-        newDetail.append('<div class="col-md-8">' + createStringFunction(details, key) + '</div>');
+        newDetail.append('<div class="col-md-8">' + createStringFunction(details, key).replace(/\n/g, '<br>') + '</div>');
 
         $('#card-details-fields').append(newDetail);
     }
