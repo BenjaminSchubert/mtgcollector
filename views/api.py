@@ -3,24 +3,33 @@ import os
 
 import flask
 import requests
+from flask import send_from_directory
 
 import mtgcollector
-from flask import redirect, send_from_directory
-
 from lib import models
 
-default_card_url = "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&type=card&name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
+default_card_url = (
+    "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&type=card&"
+    "name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
+)
 
 
 @mtgcollector.app.route("/api/images/<card_id>")
 def get_image(card_id):
-    filename = mtgcollector.lib.db.get_image_path(mtgcollector.app, card_id)
+    filename = mtgcollector.app.downloader.get_image_path(card_id)
     if not os.path.exists(os.path.join(mtgcollector.app.static_folder, filename)):
         mtgcollector.app.downloader.download_image(card_id, getattr(flask.g, "db"))
 
-    return send_from_directory(
-        os.path.join(mtgcollector.app.static_folder, os.path.dirname(filename)),
-        os.path.split(filename)[1])
+    return send_from_directory(os.path.dirname(filename), os.path.split(filename)[1])
+
+
+@mtgcollector.app.route("/api/icons/<icon>")
+def get_icon(icon):
+    filename = mtgcollector.app.downloader.get_icon_path(icon)
+    if not os.path.exists(os.path.join(mtgcollector.app.static_folder, filename)):
+        mtgcollector.app.downloader.download_icon(icon)
+
+    return send_from_directory(os.path.dirname(filename), icon)
 
 
 @mtgcollector.app.route("/api/images/default.png")

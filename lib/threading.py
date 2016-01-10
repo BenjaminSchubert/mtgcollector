@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
 import threading
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
@@ -16,7 +17,6 @@ class Event(threading.Event):
 
     def clear(self):
         super().clear()
-        self.value = None
 
     def wait_value(self, timeout=0):
         event = super().wait(timeout)
