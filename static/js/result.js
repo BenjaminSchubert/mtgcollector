@@ -17,15 +17,18 @@ var lockInfo = {
 // Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
 var detailsFetched = {};
 
+// current displayed card infos
+var curIdDisplayed;
+
 
 
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
-// Scroll stop detection is based on a timer of 250ms long.
+// Scroll stop detection is based on a timer of 150ms long.
 $.fn.scrollStopped = function(callback) {
     $(this).scroll(function (ev) {
         clearTimeout($(this).data('scrollTimeout'));
-        $(this).data('scrollTimeout', setTimeout(callback.bind(this), 100, ev));
+        $(this).data('scrollTimeout', setTimeout(callback.bind(this), 150, ev));
     });
 };
 
@@ -45,6 +48,9 @@ $(document).ready(function () {
             displayCardDetails($(this).parent());
         }
     });
+
+    // bind update numbers of cards in collection events
+    bindUpdateNCardInCollection();
 });
 
 
@@ -161,8 +167,10 @@ function fetchCardDetails(id) {
     if (detailsFetched[id] === undefined) {
 
         // loading
-        $('#card-details > h2').text("Loading...");
-        $('#card-details > div').text("Loading...");
+        var cardDetails = $('#card-details');
+        cardDetails.children('h2').text("Loading...");
+        cardDetails.children('#card-details-fields').text("Loading...");
+        curIdDisplayed = id;
 
         // fetch details
         $.get(detailsPath + id, function (data) {
@@ -175,8 +183,10 @@ function fetchCardDetails(id) {
 }
 
 function createDetails(details) {
-    $('#card-details > h2').text(details["name"]);
-    $('#card-details > div').empty();
+
+    var cardDetails = $('#card-details');
+    cardDetails.children('h2').text(details["name"]);
+    cardDetails.children('#card-details-fields').empty();
 
     if (details["types"][0] !== "Land") {
         createDetailsField(details, "manaCost", "Mana Cost", createStringFromValue);
@@ -217,7 +227,7 @@ function createDetailsField(details, key, name, createStringFunction) {
         newDetail.append('<label class="col-md-4">' + name + '</label>');
         newDetail.append('<div class="col-md-8">' + createStringFunction(details, key) + '</div>');
 
-        $('#card-details > div').append(newDetail);
+        $('#card-details-fields').append(newDetail);
     }
 }
 
@@ -235,4 +245,19 @@ function insertImagesInText(text) {
         }
     }
     return text;
+}
+
+function bindUpdateNCardInCollection() {
+    $("#number-cards-collection > div > input").on("change", function() {
+        addToCollection(curIdDisplayed, $('#n-normal').val(), $('#n-foil').val(), $('#n-promo').val())
+    });
+}
+
+function addToCollection(cardId, nNormal, nFoil, nPromo) {
+    var postData = {normal : nNormal, foil : nFoil};
+    console.log(postData);
+
+    $.post("/api/collection/" + cardId, postData , function(data) {
+        console.log(data);
+    });
 }
