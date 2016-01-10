@@ -12,21 +12,6 @@ create_table_card_legal_in_tournament = \
     """
 
 
-create_table_card_in_collection = \
-    """
-    CREATE TABLE card_in_collection (
-        user_id INT NOT NULL,
-        card_id INT NOT NULL,
-        num_normal INT NOT NULL DEFAULT 0,
-        num_foil INT NOT NULL DEFAULT 0,
-
-        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE RESTRICT,
-        FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-
-        PRIMARY KEY (user_id, card_id)
-    )
-    """
-
 create_table_deck = \
     """
     CREATE TABLE deck (

@@ -24,6 +24,8 @@ class Downloader(threading.Thread):
         self.rename_lock = threading.Lock()
 
     def get_image_path(self, card_id: int):
+        if card_id == "default.png":
+            return os.path.join(self.app.static_folder, "images", card_id)
         data_folder_path = [str(card_id)[n] if len(str(card_id)) > n else "0" for n in range(4)]
         data_folder_path.append(str(card_id) + ".jpg")
         return os.path.join(self.app.static_folder, "images", *data_folder_path)
@@ -59,7 +61,10 @@ class Downloader(threading.Thread):
                 os.remove(path_name)
 
     def download_image(self, image, connection):
-        url = lib.models.Card.get_image_url(image, logger=self.app.logger, connection=connection)
+        if image == "default":
+            url = lib.models.Card.get_default_image_url()
+        else:
+            url = lib.models.Card.get_image_url(image, logger=self.app.logger, connection=connection)
         file_path = self.get_image_path(image)
         self.download_item(url, file_path)
 

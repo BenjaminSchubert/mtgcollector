@@ -110,18 +110,34 @@ class Metacard:
                  %(cmc)s, %(text)s
             )
             ON DUPLICATE KEY UPDATE
-                name=VALUES(name), types=VALUES(types), subtypes=VALUES(subtypes), supertypes=VALUES(supertypes),
+                types=VALUES(types), subtypes=VALUES(subtypes), supertypes=VALUES(supertypes),
                 manaCost=VALUES(manaCost), power=VALUES(power), toughness=VALUES(toughness), colors=VALUES(colors),
                 cmc=VALUES(cmc), orig_text=VALUES(orig_text)
         """
 
     @classmethod
     def get_ids(cls):
-        """ command to get a card id for a metacard"""
+        """ command to get card ids for metacards """
         return """
             SELECT card.card_id
             FROM metacard
             INNER JOIN card ON card.name = metacard.name
+            WHERE {selection}
+            GROUP BY metacard.name
+            ORDER BY {order}
+        """
+
+    @classmethod
+    def get_ids_with_collection_information(cls):
+        """ command to get card ids for metacards with the number owned by the given user """
+        return """
+            SELECT
+                card.card_id,
+                IFNULL(SUM(card_in_collection.normal), 0) AS normal,
+                IFNULL(SUM(card_in_collection.foil), 0) AS foil
+            FROM metacard
+            INNER JOIN card ON card.name = metacard.name
+            LEFT JOIN card_in_collection ON card_in_collection.card_id = card.card_id
             WHERE {selection}
             GROUP BY metacard.name
             ORDER BY {order}
@@ -161,8 +177,8 @@ class Card:
             INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
             VALUES (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
             ON DUPLICATE KEY UPDATE
-                name=VALUES(name), number=VALUES(number), version=VALUES(version), rarity=VALUES(version),
-                edition=VALUES(edition), artist=VALUES(artist), flavor=VALUES(flavor)
+                version=VALUES(version), rarity=VALUES(version), edition=VALUES(edition), artist=VALUES(artist),
+                flavor=VALUES(flavor)
         """
 
     @classmethod
@@ -236,7 +252,7 @@ class Edition:
             INSERT INTO edition (code, releaseDate, name, type, block)
             VALUES (%(code)s, %(releaseDate)s, %(name)s, %(type)s, %(block)s)
             ON DUPLICATE KEY UPDATE
-                releaseDate=VALUES(releaseDate), name=VALUES(name), type=VALUES(type), block=VALUES(block)
+                releaseDate=VALUES(releaseDate), type=VALUES(type)
         """
 
     @classmethod
@@ -265,4 +281,43 @@ class Tournament:
             INSERT INTO tournament (name)
             VALUES (%(name)s)
             ON DUPLICATE KEY UPDATE name=VALUES(name)
+        """
+
+
+class Collection:
+    """
+    MySQL commands related to the collection table
+    """
+    @classmethod
+    def create_table(cls):
+        """ command to create the collection table """
+        return """
+            CREATE TABLE card_in_collection (
+                user_id INT NOT NULL,
+                card_id INT NOT NULL,
+                normal INT NOT NULL DEFAULT 0,
+                foil INT NOT NULL DEFAULT 0,
+
+                FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE RESTRICT,
+                FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+                PRIMARY KEY (user_id, card_id)
+            )
+        """
+
+    @classmethod
+    def insert(cls):
+        """ command to insert a new card in collection """
+        return """
+            INSERT INTO card_in_collection (user_id, card_id, normal, foil)
+            VALUES (%(user_id)s, %(card_id)s, %(normal)s, %(foil)s)
+            ON DUPLICATE KEY UPDATE normal=VALUES(normal), foil=VALUES(foil)
+        """
+
+    @classmethod
+    def delete(cls):
+        """ removes completely a card from the collection """
+        return """
+            DELETE FROM card_in_collection
+            WHERE card_id=%(card_id)s AND user_id=%(user_id)s
         """

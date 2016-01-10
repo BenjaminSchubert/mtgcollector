@@ -18,6 +18,8 @@ class Model(metaclass=abc.ABCMeta):
     """
     Abstract class representing a model used in an application. Allows for an ORM view of the used objects
     """
+    index = 0
+
     @classmethod
     @abc.abstractmethod
     def table_creation_command(cls) -> str:
@@ -79,14 +81,6 @@ class Model(metaclass=abc.ABCMeta):
         """
         cls.__execute(cls.table_creation_command(), connection)
 
-    def save(self, connection=None):
-        """
-        Insert the model into the database
-
-        :param connection: the database connection to use. If None, will use flask.g.db
-        :return: the last id inserted
-        """
-        return self._modify(self.insertion_command(), connection, **self.as_database_object)
 
     @classmethod
     def __execute(cls, command: str, connection=None, **kwargs):
@@ -181,7 +175,7 @@ class Metacard(Model):
         return sql.Metacard.insert()
 
     @classmethod
-    def get_ids_where(cls, card_name="", card_type="", order_by="metacard.name"):
+    def get_ids_where(cls, user_id=None, card_name="", card_type="", order_by="metacard.name"):
         def add_to_parameters(params, value):
             if params == "":
                 params += value
@@ -192,6 +186,13 @@ class Metacard(Model):
         query_parameters = ""
         kwargs = dict()
 
+        if user_id:
+            command = sql.Metacard.get_ids_with_collection_information()
+            add_to_parameters(query_parameters, "user.user_id = %(user_id)s")
+            kwargs["user_id"] = user_id
+        else:
+            command = sql.Metacard.get_ids()
+
         if card_name:
             query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
             kwargs["name"] = "%" + card_name + "%"
@@ -200,8 +201,8 @@ class Metacard(Model):
             query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
             kwargs["type"] = "%" + card_type + "%"
 
-        query = sql.Metacard.get_ids().format(selection=query_parameters, order=order_by)
-        return [value["card_id"] for value in cls._get(query, **kwargs)]
+        query = command.format(selection=query_parameters, order=order_by)
+        return [value for value in cls._get(query, **kwargs)]
 
     @property
     def as_database_object(self) -> dict:
@@ -229,6 +230,8 @@ class Card(Model):
     """
     A concrete representation of a card
     """
+    index = 1
+
     def __init__(
             self, name: str, rarity: str, number: str, edition: str, artist: str, flavor: str, version: int,
             multiverseid: int=None
@@ -285,6 +288,13 @@ class Card(Model):
         logger.warning("Could not download image for {}".format(card_id))
         flask.abort(404)
 
+    @classmethod
+    def get_default_image_url(cls):
+        return (
+            "http://gatherer.wizards.com/Handlers/Image.ashx?size=small&type=card&"
+            "name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
+        )
+
 
 class Tournament(Model):
     """
@@ -318,6 +328,39 @@ class Tournament(Model):
         return self.__name
 
 
+class Collection(Model):
+    """
+    Collection model
+
+    :param user_id
+    """
+    index = 2
+
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    @classmethod
+    def table_creation_command(cls) -> str:
+        return sql.Collection.create_table()
+
+    @classmethod
+    def insertion_command(cls) -> str:
+        return sql.Collection.insert()
+
+    def insert(self, card_id, normal, foil):
+        self._modify(self.insertion_command(), user_id=self.user_id, card_id=card_id, normal=normal, foil=foil)
+
+
+    def delete(self, card_id):
+        self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
+
+    def as_database_object(self) -> dict:
+        pass
+
+    def primary_key(self) -> dict:
+        return self.user_id
+
+
 class User(Model):
     """
     User model
@@ -334,6 +377,7 @@ class User(Model):
         self.__email = email
         self.__password = password
         self.__is_admin = is_admin
+        self.collection = Collection(self.__user_id)
 
     @classmethod
     def insertion_command(cls) -> str:

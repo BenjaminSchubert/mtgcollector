@@ -28,7 +28,9 @@ def search():
     form.csrf_enabled = False
 
     if form.validate() and flask.request.args:
-        return flask.render_template("result.html", cards=Metacard.get_ids_where(**form.data.copy()))
+        return flask.render_template("result.html", cards=Metacard.get_ids_where(
+                user_id=current_user.get_id(), **form.data.copy()
+        ))
     return flask.render_template("form.html", form=form, title="Search", method="get")
 
 
