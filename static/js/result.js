@@ -254,7 +254,21 @@ function bindUpdateNCardInCollection() {
 }
 
 function addToCollection(cardId, nNormal, nFoil, nPromo) {
-    var postData = {normal : nNormal, foil : nFoil};
+
+    // setup POST
+    var csrftoken = $('meta[name=csrf-token]').attr('content');
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            }
+        }
+    });
+
+    var postData = {
+        normal : nNormal,
+        foil : nFoil
+    };
     console.log(postData);
 
     $.post("/api/collection/" + cardId, postData , function(data) {

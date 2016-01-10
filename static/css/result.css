@@ -29,6 +29,8 @@
     background-color: #E0DDC5;
 
     border-left: 1px solid black;
+
+    overflow: auto;
 }
 
 #card-details > h2 {
@@ -43,10 +45,6 @@
     margin-bottom: 25px;
 
     height: 40%;
-}
-
-#card-details-fields {
-    overflow: auto;
 }
 
 #card-details-fields > div {
