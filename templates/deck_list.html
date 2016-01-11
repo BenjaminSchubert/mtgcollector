@@ -5,5 +5,24 @@
 {% endblock %}
 
 {% block body %}
-    
+    <div class="col-md-6 col-md-offset-3">
+        <table id="deck-list" class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Deck Name</th>
+                    <th>Colors</th>
+                    <th>Number of cards</th>
+                    <th>Side</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/deck_list.js') }}"></script>
 {% endblock %}
