@@ -10,7 +10,9 @@
         <div id="cards" class="row">
             {% for card in cards %}
                 <div id="{{ card['card_id'] }}" data-normal="{{ card['normal'] }}" data-foil="{{ card['foil'] }}" class="col-md-2 col-sm-3 col-xs-4">
-                    <img>
+                    <div class="card-inner">
+                        <img>
+                    </div>
                 </div>
             {% endfor %}
         </div>

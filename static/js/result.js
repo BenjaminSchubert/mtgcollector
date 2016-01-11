@@ -43,9 +43,9 @@ $(document).ready(function () {
     $('#cards > div').click(lockCardDetails);
 
     // what to do when hovering on card image
-    $('#cards > div > img').hover(function () {
+    $('#cards img').hover(function () {
         if (!lockInfo.locked) {
-            displayCardDetails($(this).parent());
+            displayCardDetails($(this).parent().parent().attr('id'));
         }
     });
 
@@ -72,12 +72,12 @@ function setPreloadMargin(nPixels) {
 
 // Resizes all div to image size
 function resizeDivHeights() {
-    $('#cards').find('> div').height(findImageHeight());
+    $('#cards > div').height(findImageHeight());
 }
 
 
 function findImageHeight() {
-    return $('#cards').find('> div').first().width() * 310 / 223; // 310 : card height, 223 : card width
+    return $('#cards > div').first().width() * 310 / 223; // 310 : card height, 223 : card width
 }
 
 // Unloads each div of #cards not in viewport.
@@ -86,27 +86,30 @@ function findImageHeight() {
 // Once the image is loaded, sets the 'src' attribute to the image path.
 function loadImagesInViewport() {
 
-    $('#cards').find('> div').withinviewport().each(function () {
+    $('#cards > div').withinviewport().each(function () {
         var curDiv = $(this);
+        var curId = curDiv.attr('id');
+        var curImg = curDiv.find('img');
 
         if (!curDiv.hasClass('loaded')) {
 
-            loadedIds.push(curDiv.attr('id'));
             curDiv.addClass('loaded');
+            loadedIds.push(curDiv.attr('id'));
 
-            curDiv.children('img').attr('src', defaultImgPath);
+            curImg.attr('src', defaultImgPath);
+            createStrip(curDiv);
 
             // Requests loading of the image
-            $.ajax(imgPath + curDiv.attr('id'))
+            $.ajax(imgPath + curId)
 
                 // image loaded
                 .done(function () {
-                    curDiv.children('img').attr('src', imgPath + curDiv.attr('id'));
+                    curImg.attr('src', imgPath + curId);
                 })
 
                 // image failed to load
                 .fail(function () {
-                    console.log("failed to load image number " + curDiv.attr('id'));
+                    console.log("failed to load image number " + curId);
                 });
         }
 
@@ -120,11 +123,11 @@ function unloadNotInViewPort() {
 
     for (var i = loadedIds.length-1; i >= 0; i--) {
         var id = loadedIds[i];
-        var notInVP = !$('#' + id).is(':within-viewport');
+        var curDiv = $('#' + id);
 
-        if (notInVP) {
-            $('#' + id).removeClass('loaded');
-            $('#' + id + ' > img').attr('src', '');
+        if (!curDiv.is(':within-viewport')) {
+            curDiv.removeClass('loaded');
+            curDiv.find('img').attr('src', '');
 
             loadedIds.splice(i, 1);
         }
@@ -132,33 +135,48 @@ function unloadNotInViewPort() {
 
 }
 
+function createStrip(curDiv) {
+
+    var nNormal = parseInt(curDiv.attr('data-normal'));
+    var nFoil = parseInt(curDiv.attr('data-foil'));
+    var tot = nNormal + nFoil;
+    var innerDiv = curDiv.children('.card-inner');
+
+    if (tot !== undefined && tot > 0) {
+        console.log('appending');
+        innerDiv.append(
+            '<div class="strip"></div>' +
+            '<div class="strip-values">' + tot + '</div>'
+        );
+    }
+}
+
 // Locks the details displayed on the card clicked (so hovering on images does not display details of other cards).
 // If a card was already locked and the one clicked at this moment is the same, unlock it, else lock the current one.
 function lockCardDetails() {
 
-    var currentId = $(this).attr('id');
+    var curId = $(this).attr('id');
 
     // lock if no card is clicked
     if (!lockInfo.locked) {
         lockInfo.locked = true;
-        lockInfo.lastId = currentId;
+        lockInfo.lastId = curId;
     } else {
 
         // unlock if click on same card, otherwise display the current card details
-        if (lockInfo.lastId === currentId) {
+        if (lockInfo.lastId === curId) {
             lockInfo.locked = false;
         } else {
-            lockInfo.lastId = currentId;
-            displayCardDetails($(this));
+            lockInfo.lastId = curId;
+            displayCardDetails(curId);
         }
     }
 }
 
 // Opens the details panel of the card clicked.
-function displayCardDetails(cardDiv) {
-    var curId = cardDiv.attr('id');
-    $('#card-details > img').attr('src', imgPath + curId);
-    fetchCardDetails(curId);
+function displayCardDetails(id) {
+    $('#card-details > img').attr('src', imgPath + id);
+    fetchCardDetails(id);
 }
 
 // If the details for the card whose id is 'id' are not yet fetched, fetches them.
