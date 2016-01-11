@@ -199,7 +199,7 @@ class LiveServerTestCase(unittest.TestCase):
             os.environ["MTG_COLLECTOR_CONFIG"] = os.path.join(self.directory, "config.cfg")
             mtgcollector.app.static_folder = self.directory
             setup_app(mtgcollector.app)
-            mtgcollector.app.run(debug=True, port=TestCaseWithDB.SERVER_PORT, use_reloader=False)
+            mtgcollector.app.run(debug=True, port=TestCaseWithDB.SERVER_PORT, use_reloader=False, threaded=True)
 
     def setUp(self):
         """ Starts a server before each test. In another temporary directory to completely isolate tests """

@@ -1,8 +1,8 @@
 import flask
 from flask_login import login_user, login_required, logout_user, current_user
 
+from lib.forms.auth import LoginForm
 from mtgcollector import app
-from views.forms.auth import LoginForm
 
 
 @app.route('/login', methods=["GET", "POST"])

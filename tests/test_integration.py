@@ -12,11 +12,8 @@ import selenium.webdriver
 from tests import LiveServerTestCase, DBConnectionMixin
 from tests.forms import InstallForm, AdminForm
 
-
 class IntegrationTest(LiveServerTestCase):
-    def tearDown(self):
-        """ Cleans up everything at the end of each test """
-        self.browser.close()
+    def drop_database(self):
         conn = mysql.connector.connect(
             user=DBConnectionMixin.DATABASE_USER, password=DBConnectionMixin.DATABASE_PASSWORD,
             host=DBConnectionMixin.DATABASE_HOST, port=DBConnectionMixin.DATABASE_PORT
@@ -25,10 +22,16 @@ class IntegrationTest(LiveServerTestCase):
         cursor.execute("DROP DATABASE IF EXISTS {}".format(DBConnectionMixin.DATABASE_NAME))
         conn.commit()
         conn.close()
+
+    def tearDown(self):
+        """ Cleans up everything at the end of each test """
+        self.browser.close()
+        self.drop_database()
         super().tearDown()
 
     def setUp(self):
         super().setUp()
+        self.drop_database()
         self.links = set()
         self.browser = selenium.webdriver.Firefox()
 
@@ -42,7 +45,10 @@ class IntegrationTest(LiveServerTestCase):
     def check_no_40X(self):
         for link in self.links:
             status = requests.get(link).status_code
-            self.assertGreaterEqual(400, status, "{} sent back {} error".format(link, status))
+            if link.split("/")[-1] in {"logout", "parameters"}:
+                self.assertEqual(401, status, "{} have been accessed but shouldn't have".format(link))
+            else:
+                self.assertGreaterEqual(400, status, "{} sent back {} error".format(link, status))
 
     def test_complete(self):
         """ Tests that everything more or less works as it should """

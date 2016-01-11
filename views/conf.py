@@ -2,19 +2,18 @@
 
 import flask
 import mysql.connector
-import mysql.connector.errors
 import mysql.connector.errorcode
+import mysql.connector.errors
 import werkzeug.routing
 from flask import redirect, url_for, render_template
-from flask.ext.login import login_required
+from flask.ext.login import login_required, login_user
 
 import lib.db
 import lib.db.maintenance
-import views.forms.install
-import views.forms.auth
+import lib.forms.install
+import lib.models
 from lib.conf import update_conf
 from mtgcollector import app
-import lib.models
 
 
 def validate_conf(form):
@@ -44,7 +43,7 @@ def validate_conf(form):
 
 
 def get_database_form():
-    form = views.forms.install.InstallationForm()
+    form = lib.forms.install.InstallationForm()
     if form.validate_on_submit():
         try:
             validate_conf(form)
@@ -65,11 +64,12 @@ def get_database_form():
 
 
 def get_user_form():
-    form = views.forms.auth.RegisterForm()
+    form = lib.forms.auth.RegisterForm()
 
     if form.validate_on_submit():
-        user_id = lib.models.User(username=form.username.data, email=form.email.data, password=form.password.data).create()
-        lib.models.User.set_admin(user_id)
+        user = lib.models.User(username=form.username.data, email=form.email.data, password=form.password.data).create()
+        user.set_admin(True)
+        login_user(user)
         return redirect(url_for("parameters"))
 
     return render_template('form.html', form=form, title="Admin Creation")
