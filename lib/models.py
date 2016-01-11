@@ -6,6 +6,8 @@ Models for MtgCollector
 """
 
 import abc
+import shlex
+
 import flask
 import datetime
 import typing
@@ -174,15 +176,21 @@ class Metacard(Model):
         return sql.Metacard.insert()
 
     @classmethod
-    def get_ids_where(cls, user_id=None, card_name="", card_type="", order_by="metacard.name"):
-        def add_to_parameters(params, value):
+    def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
+                      card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
+                      order_by="metacard.name"):
+        def add_to_parameters(params: str, value: str):
             if params == "":
-                params += value
+                params += "WHERE " + value
             else:
                 params += " AND " + value
             return params
 
+        def add_wildcard(entry: str):
+            return "%" + "%".join(shlex.split(entry.strip())) + "%"
+
         query_parameters = ""
+        having = ""
         kwargs = dict()
 
         if user_id:
@@ -194,13 +202,34 @@ class Metacard(Model):
 
         if card_name:
             query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
-            kwargs["name"] = "%" + card_name + "%"
+            kwargs["name"] = add_wildcard(card_name)
 
         if card_type:
             query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
-            kwargs["type"] = "%" + card_type + "%"
+            kwargs["type"] = add_wildcard(card_type)
 
-        query = command.format(selection=query_parameters, order=order_by)
+        if card_text:
+            query_parameters = add_to_parameters(query_parameters, "metacard.orig_text LIKE %(card_text)s")
+            kwargs["card_text"] = add_wildcard(card_text)
+
+        if card_context:
+            query_parameters = add_to_parameters(query_parameters, "card.flavor LIKE %(flavor)s")
+            kwargs["flavor"] = add_wildcard(card_context)
+
+        if card_number:
+            query_parameters = add_to_parameters(query_parameters, "card.number = %(card_number)s")
+            kwargs["card_number"] = card_number
+
+        if artist:
+            query_parameters = add_to_parameters(query_parameters, "card.artist LIKE %(artist)s")
+            kwargs["artist"] = add_wildcard(artist)
+
+        if in_collection:
+            having = ("HAVING (IFNULL(SUM(card_in_collection.normal), 0)"
+                      " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
+
+        query = command.format(selection=query_parameters, order=order_by, having=having)
+        print(query % kwargs)
         return [value for value in cls._get(query, **kwargs)]
 
     @property

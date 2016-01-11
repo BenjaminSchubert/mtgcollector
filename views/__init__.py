@@ -18,20 +18,24 @@ import views.auth
 @app.route("/")
 def index():
     if current_user.is_authenticated:
-        return flask.render_template("collection.html")
-    return flask.render_template("search.html")
+        # TODO once collection.html exists let's move to it
+        return flask.redirect("search")
+    return flask.redirect("search")
 
 
 @app.route("/search")
 def search():
     form = SearchForm(flask.request.args)
+    form.setup_authenticated(current_user.is_authenticated)
     form.csrf_enabled = False
 
     if form.validate() and flask.request.args:
         return flask.render_template("result.html", cards=Metacard.get_ids_where(
-                user_id=current_user.get_id(), **form.data.copy()
+                user_id=current_user.get_id(), **{k: v for forms in form.data.values() for k, v in forms.items()}
         ))
-    return flask.render_template("form.html", form=form, title="Search", method="get")
+    return flask.render_template(
+            "form.html", form=form, title="Search", method="get", css_classes="col-md-10 col-md-offset-1"
+    )
 
 
 @app.route("/decks")

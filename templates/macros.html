@@ -1,29 +1,34 @@
 {% macro render_field(field, label_visible=true, autofocus=false) -%}
-{% if field.type != "HiddenField" and field.type != "CSRFTokenField" and label_visible%}
-    <div class="form-group{% if field.errors %} has-error{% endif %}" {{ kwargs.pop('class_', '') }}>
-        <label for="{{ field.id }}" class="control-label col-sm-3">{{ field.label.text }}</label>
-        <div class="col-sm-9">
-            {{ field( autofocus=autofocus, class_="form-control", **kwargs) }}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <p class="help-block">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
+    {% if field.type != "HiddenField" and field.type != "CSRFTokenField" and label_visible%}
+        <div class="form-group{% if field.errors %} has-error{% endif %}" {{ kwargs.pop('class_', '') }}>
+            <label for="{{ field.id }}" class="control-label col-sm-3">{{ field.label.text }}</label>
+            <div class="col-sm-9">
+                {{ field( autofocus=autofocus, class_="form-control", **kwargs) }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p class="help-block">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
-    </div>
-{% endif %}
+    {% endif %}
 {%- endmacro %}
 
 
-{%  macro render_form(form, method="post", action=".", action_text="Submit", _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
+{% macro render_checkbox_field(field) %}
+    <div class="checkbox">
+        <label>{{ field.label.text }}<input type="checkbox" name="{{ field.id }}" value="y"></label>
+    </div>
+{%- endmacro  %}
 
-<form method="{{ method }}" action="{{ action }}" class="{{  _class }}">
-    {% if method != "get" %}
-        {{ form.hidden_tag() }}
-    {% endif %}
+{% macro render_inner_form(form) %}
     {% set autofocus=true %}
     {% for field in form %}
-        {% if field.type == "BooleanField" %}
+        {% if field.type == "FormField" %}
+            <div class="panel panel-danger col-md-4 col-lg-4 col-sm-12">
+                {{ render_inner_form(field) }}
+            </div>
+        {% elif field.type == "BooleanField" %}
             {{ render_checkbox_field(field) }}
         {% elif  field.type == "RadioField"%}
             {{ render_radio_field(field) }}
@@ -34,7 +39,17 @@
             {% set autofocus=false %}
         {% endif %}
     {% endfor %}
-    <button type="submit" id="{{ submit_id }}" class="{{ btn_class }} pull-right">{{ action_text }}</button>
-</form>
+{%- endmacro %}
 
+
+{%  macro render_form(form, method="post", action=".", action_text="Submit",
+                      _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
+    <form method="{{ method }}" action="{{ action }}" class="{{  _class }} row">
+        {% if method != "get" %}
+            {{ form.hidden_tag() }}
+        {% endif %}
+
+        {{ render_inner_form(form) }}
+        <button type="submit" id="{{ submit_id }}" class="{{ btn_class }} pull-right">{{ action_text }}</button>
+    </form>
 {%- endmacro %}

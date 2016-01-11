@@ -1,10 +1,23 @@
 {% extends "layout.html" %}
 {% from "macros.html" import render_form %}
 
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form.css') }}">
+{%  endblock %}
+
 {% block body %}
     {% set method=method or "post" %}
-    <div class="col-md-4 col-md-offset-4">
-        <h3 class="text-center">{{ title }}</h3>
-        {{ render_form(form, _class="form-horizontal", action=action, method=method) }}
+    {% if css_classes is defined %}
+        <div class="{{ css_classes }}">
+    {% else %}
+        <div class="col-md-4 col-md-offset-4">
+    {% endif %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ title }}</h3>
+            </div>
+            {{ render_form(form, _class="form-horizontal", action=action, method=method) }}
+
+        </div>
     </div>
 {% endblock %}

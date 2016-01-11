@@ -138,8 +138,9 @@ class Metacard:
             FROM metacard
             INNER JOIN card ON card.name = metacard.name
             LEFT JOIN card_in_collection ON card_in_collection.card_id = card.card_id
-            WHERE {selection}
+            {selection}
             GROUP BY metacard.name
+            {having}
             ORDER BY {order}
         """
 

@@ -1,0 +1,19 @@
+.panel > .panel-heading {
+	text-align: center;
+}
+
+.panel-title {
+    font-size: 20px;
+}
+
+.panel-primary {
+    margin-top: 3%;
+}
+
+.panel > form {
+    margin: 3%;
+}
+
+.panel > form > .panel {
+    padding: 3%;
+}
