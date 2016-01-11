@@ -3,7 +3,7 @@
 import flask
 import mysql.connector.errors
 import mysql.connector.errorcode
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from lib.forms.search import SearchForm
 from lib.models import Metacard
@@ -32,6 +32,13 @@ def search():
                 user_id=current_user.get_id(), **form.data.copy()
         ))
     return flask.render_template("form.html", form=form, title="Search", method="get")
+
+
+@app.route("/decks")
+@login_required
+def deck_list():
+    return flask.render_template("deck_list.html")
+
 
 
 @app.before_request
