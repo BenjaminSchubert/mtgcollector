@@ -2,10 +2,12 @@ input[type=checkbox] {
 	vertical-align: top;
 }
 
+/*noinspection CssUnusedSymbol*/
 #btn-submit {
 	margin-top: 20px;
 }
 
+/*noinspection CssUnusedSymbol*/
 .category {
 	border: 1px solid grey;
     border-radius: 3px;
@@ -15,6 +17,7 @@ input[type=checkbox] {
 	padding: 5px;
 }
 
+/*noinspection CssUnusedSymbol*/
 .category-title {
   	color: white;
     font-size: 120%;
@@ -23,8 +26,4 @@ input[type=checkbox] {
 	background-color: #006dcc;
   	
   	border-bottom: 1px solid grey;
-}
-
-.category-content {
-	
 }

@@ -37,7 +37,8 @@ class BaseForm(metaclass=abc.ABCMeta):
 
         browser.find_element_by_id(self.submit_button).click()
 
-    def check_errors(self, test_instance, browser, element_with_error, error_regex):
+    @staticmethod
+    def check_errors(test_instance, browser, element_with_error, error_regex):
         """
         Checks that the error message is displayed only once and in the correct place
 
@@ -149,5 +150,3 @@ class AdminForm(BaseForm):
         :param browser: the browser on which to conduct the tests
         """
         self.fill_form(browser)
-
-

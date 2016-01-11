@@ -52,8 +52,8 @@ class Model(metaclass=abc.ABCMeta):
         if connection is None:
             connection = getattr(flask.g, "db")
         cursor = connection.cursor()
-        # TODO check if list(models) is a performance killer
-        chunks = [list(models)[i:i+chunk_size] for i in range(0, len(models), chunk_size)]
+        models = list(models)
+        chunks = [models[i:i+chunk_size] for i in range(0, len(models), chunk_size)]
 
         for chunk in chunks:
             cursor.executemany(cls.insertion_command(), [model.as_database_object for model in chunk])
@@ -80,7 +80,6 @@ class Model(metaclass=abc.ABCMeta):
         :param connection: the database connection to use. If None, will use flask.g.db
         """
         cls.__execute(cls.table_creation_command(), connection)
-
 
     @classmethod
     def __execute(cls, command: str, connection=None, **kwargs):
@@ -349,7 +348,6 @@ class Collection(Model):
 
     def insert(self, card_id, normal, foil):
         self._modify(self.insertion_command(), user_id=self.user_id, card_id=card_id, normal=normal, foil=foil)
-
 
     def delete(self, card_id):
         self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
