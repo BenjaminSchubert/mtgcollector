@@ -22,6 +22,9 @@
 					<li>
 						<a href="{{ url_for('index') }}">Collection</a>
 					</li>
+                    <li>
+                        <a href="{{ url_for('deck_list') }}">Decks</a>
+                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if not current_user.is_authenticated %}
