@@ -36,7 +36,7 @@ function createDeckList(json) {
                 '<td class="deck-colors">' + insertImagesInText(deck.colors.toString()) + '</td>' +
                 '<td class="deck-n_cards">' + deck.n_cards + '</td>' +
                 '<td class="deck-side">' + deck.side + '/15</td>' +
-                '<td>' +
+                '<td class="button-go-deck">' +
                     '<button class="btn btn-primary">Go to deck</button>' +
                 '</td>' +
             '</tr>'
@@ -48,8 +48,8 @@ function createDeckList(json) {
 }
 
 function bindButtonGoDeck() {
-    $('.deck-row > button').click(function () {
-        document.location = "decks/" + $(this).parentsUntil('.deck-row').parent().attr('id');
+    $('.button-go-deck').click(function () {
+        document.location = "decks/" + $(this).parent().attr('id');
     });
 }
 
