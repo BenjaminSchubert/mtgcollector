@@ -216,6 +216,8 @@ class Metacard(Model):
                     return add_to_parameters(
                         query_parameters_, "metacard.{name} BETWEEN %({name_min})s AND %({name_max})s"
                     ).format(name=entry_name, name_min=entry_min, name_max=entry_max)
+            else:
+                return query_parameters_
 
         query_parameters = ""
         having = ""
