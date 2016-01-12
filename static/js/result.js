@@ -48,8 +48,8 @@ $(document).ready(function () {
         }
     });
 
-    // bind update numbers of cards in collection events
-    bindUpdateNCardInCollection();
+    // bind editable values
+    bindEditable();
 });
 
 
@@ -252,9 +252,17 @@ function createDetailsField(details, key, name, createStringFunction) {
     }
 }
 
-function bindUpdateNCardInCollection() {
-    $("#number-cards-collection > div > input").on("change", function() {
-        addToCollection(curIdDisplayed, $('#n-normal').val(), $('#n-foil').val(), $('#n-promo').val())
+function bindEditable() {
+
+    var cardDetails = $('#card-details');
+
+    cardDetails.find('#n-normal').editable({
+        type: 'text',
+        title: 'Enter new number',
+        placement: 'right',
+
+        url: deckPostPath,
+        name: "n_normal"
     });
 }
 

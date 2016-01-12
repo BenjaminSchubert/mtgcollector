@@ -39,6 +39,10 @@
     margin-bottom: 15px;
 }
 
+#card-details-upper {
+    margin-bottom: 30px;
+}
+
 #card-details-fields > div {
     margin-top: 2px;
     margin-bottom: 2px;
