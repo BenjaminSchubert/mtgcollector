@@ -2,10 +2,6 @@
     margin-top: 30px;
 }
 
-.deck-values {
-    cursor: pointer;
-}
-
-.deck-values:hover {
-    background-color: #dcdcdc;
+.deck-row button {
+    padding: 0;
 }

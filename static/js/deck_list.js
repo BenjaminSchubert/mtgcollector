@@ -2,7 +2,6 @@ var jsonPath = "api/decks/json";
 
 $(document).ready(function () {
     fetchJson(createDeckList);
-    bindRows();
 });
 
 function fetchJson(callback) {
@@ -22,20 +21,24 @@ function createDeckList(json) {
         console.log(deck);
 
         deckList.append(
-            '<tr id="' + deck.id + '" class="deck-values">' +
+            '<tr id="' + deck.id + '" class="deck-row">' +
                 '<th scope="row">' + (i+1) + '</th>' +
                 '<td>' + deck.name + '</td>' +
                 '<td>' + insertImagesInText(deck.colors.toString()) + '</td>' +
                 '<td>' + deck.cards + '</td>' +
                 '<td>' + deck.side + '/15</td>' +
+                '<td>' +
+                    '<button class="btn btn-primary">Go to deck</button>' +
+                '</td>' +
             '</tr>'
         );
     });
+
+    bindRows();
 }
 
 function bindRows() {
-    $('.deck-values').click(function () {
-        //console.log($(this).attr('id'));
-        document.location = "decks/" + $(this).attr('id');
+    $('.deck-row button').click(function () {
+        document.location = "decks/" + $(this).parentsUntil('.deck-row').parent().attr('id');
     });
 }
