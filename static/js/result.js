@@ -1,6 +1,6 @@
 // paths
 var imgPath = "/api/images/";
-var detailsPath = "/api/cards/";
+var detailsPath = "/api/n_cards/";
 var defaultImgPath = imgPath + "default.png";
 
 // contains ids of elements which are currently in view port
@@ -13,7 +13,7 @@ var lockInfo = {
     lastId: null
 };
 
-// Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
+// Contains as keys the ids of the n_cards whose details are already fetched and as values the details as json.
 var detailsFetched = {};
 
 // current displayed card infos
@@ -39,16 +39,16 @@ $(document).ready(function () {
     initView();
 
     // what to do when clicking on card image
-    $('#cards > div').click(lockCardDetails);
+    $('#n_cards > div').click(lockCardDetails);
 
     // what to do when hovering on card image
-    $('#cards img').hover(function () {
+    $('#n_cards img').hover(function () {
         if (!lockInfo.locked) {
             displayCardDetails($(this).parent().parent().attr('id'));
         }
     });
 
-    // bind update numbers of cards in collection events
+    // bind update numbers of n_cards in collection events
     bindUpdateNCardInCollection();
 });
 
@@ -62,7 +62,7 @@ function initView() {
 }
 
 
-// Allows loading of cards in a margin of nPixels before the top and after the bottom of viewport
+// Allows loading of n_cards in a margin of nPixels before the top and after the bottom of viewport
 function setPreloadMargin(nPixels) {
     withinviewport.defaults.top = -nPixels;
     withinviewport.defaults.bottom = -nPixels;
@@ -71,21 +71,21 @@ function setPreloadMargin(nPixels) {
 
 // Resizes all div to image size
 function resizeDivHeights() {
-    $('#cards > div').height(findImageHeight());
+    $('#n_cards > div').height(findImageHeight());
 }
 
 
 function findImageHeight() {
-    return $('#cards > div').first().width() * 310 / 223; // 310 : card height, 223 : card width
+    return $('#n_cards > div').first().width() * 310 / 223; // 310 : card height, 223 : card width
 }
 
-// Unloads each div of #cards not in viewport.
+// Unloads each div of #n_cards not in viewport.
 // For those which are :
 // sets default image to tag 'img' and loads image based on the 'div' id.
 // Once the image is loaded, sets the 'src' attribute to the image path.
 function loadImagesInViewport() {
 
-    $('#cards > div').withinviewport().each(function () {
+    $('#n_cards > div').withinviewport().each(function () {
         var curDiv = $(this);
         var curId = curDiv.attr('id');
         var curImg = curDiv.find('img');
@@ -117,7 +117,7 @@ function loadImagesInViewport() {
     unloadNotInViewPort();
 }
 
-// "Unloads" the cards which are not in view port anymore by changing the 'src' attr of the img tag to "".
+// "Unloads" the n_cards which are not in view port anymore by changing the 'src' attr of the img tag to "".
 function unloadNotInViewPort() {
 
     for (var i = loadedIds.length-1; i >= 0; i--) {
@@ -150,7 +150,7 @@ function createStrip(curDiv) {
     }
 }
 
-// Locks the details displayed on the card clicked (so hovering on images does not display details of other cards).
+// Locks the details displayed on the card clicked (so hovering on images does not display details of other n_cards).
 // If a card was already locked and the one clicked at this moment is the same, unlock it, else lock the current one.
 function lockCardDetails() {
 
@@ -187,7 +187,7 @@ function fetchCardDetails(id) {
         var cardDetails = $('#card-details');
         cardDetails.children('h2').text("Loading...");
         cardDetails.children('#card-details-fields').text("Loading...");
-        cardDetails.children('#number-cards-collection').hide();
+        cardDetails.children('#number-n_cards-collection').hide();
         curIdDisplayed = id;
 
         // fetch details
@@ -219,7 +219,7 @@ function createDetails(details) {
     createDetailsField(details, "artist", "Artist", createStringFromValue);
 
     // display inputs
-    cardDetails.children('#number-cards-collection').show();
+    cardDetails.children('#number-n_cards-collection').show();
 }
 
 // Create a string from a value (in json).
@@ -253,7 +253,7 @@ function createDetailsField(details, key, name, createStringFunction) {
 }
 
 function bindUpdateNCardInCollection() {
-    $("#number-cards-collection > div > input").on("change", function() {
+    $("#number-n_cards-collection > div > input").on("change", function() {
         addToCollection(curIdDisplayed, $('#n-normal').val(), $('#n-foil').val(), $('#n-promo').val())
     });
 }

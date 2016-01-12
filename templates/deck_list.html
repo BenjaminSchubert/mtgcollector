@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-editable.css') }}" />
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/deck_list.css') }}" />
 {% endblock %}
 
@@ -24,6 +25,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-editable.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/deck_list.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,5 @@
 var jsonPath = "api/decks/json";
+var deckPostPath = "api/decks";
 
 $(document).ready(function () {
     fetchJson(createDeckList);
@@ -6,8 +7,8 @@ $(document).ready(function () {
 
 function fetchJson(callback) {
     var testJson = [
-        {id: 42, name: "Test", colors: ["{R}", "{G}", "{B}"], cards: 42, side: 14},
-        {id: 1, name: "Test2", colors: ["{R}", "{G}", "{W}"], cards: 40, side: 15}
+        {id: 42, user_index: 1, name: "Test", colors: ["{R}", "{G}", "{B}"], n_cards: 42, side: 14},
+        {id: 1, user_index: 3, name: "Test2", colors: ["{R}", "{G}", "{W}"], n_cards: 40, side: 15}
     ]
     callback(testJson);
     //$.get(jsonPath, callback(data));
@@ -22,11 +23,19 @@ function createDeckList(json) {
 
         deckList.append(
             '<tr id="' + deck.id + '" class="deck-row">' +
-                '<th scope="row">' + (i+1) + '</th>' +
-                '<td>' + deck.name + '</td>' +
-                '<td>' + insertImagesInText(deck.colors.toString()) + '</td>' +
-                '<td>' + deck.cards + '</td>' +
-                '<td>' + deck.side + '/15</td>' +
+                '<th class="deck-user-index" scope="row">' +
+                    '<a href="#" value="' + deck.user_index + '" data-pk="' + deck.id + '">' +
+                        deck.user_index +
+                    '</a>' +
+                '</th>' +
+                '<td class="deck-name">' +
+                    '<a href="#" value="' + deck.name + '" data-pk="' + deck.id + '">' +
+                        deck.name +
+                    '</a>' +
+                '</td>' +
+                '<td class="deck-colors">' + insertImagesInText(deck.colors.toString()) + '</td>' +
+                '<td class="deck-n_cards">' + deck.n_cards + '</td>' +
+                '<td class="deck-side">' + deck.side + '/15</td>' +
                 '<td>' +
                     '<button class="btn btn-primary">Go to deck</button>' +
                 '</td>' +
@@ -34,11 +43,34 @@ function createDeckList(json) {
         );
     });
 
-    bindRows();
+    bindButtonGoDeck();
+    bindEditable();
 }
 
-function bindRows() {
-    $('.deck-row button').click(function () {
+function bindButtonGoDeck() {
+    $('.deck-row > button').click(function () {
         document.location = "decks/" + $(this).parentsUntil('.deck-row').parent().attr('id');
+    });
+}
+
+function bindEditable() {
+    $.fn.editable.defaults.mode = 'popup';
+
+    $('.deck-user-index > a').editable({
+        type: 'text',
+        title: 'Enter new number',
+        placement: 'right',
+
+        url: deckPostPath,
+        name: "user_index"
+    });
+
+    $('.deck-name > a').editable({
+        type: 'text',
+        title: 'Enter new name',
+        placement: 'right',
+
+        url: deckPostPath,
+        name: "name"
     });
 }
