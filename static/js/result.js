@@ -188,7 +188,7 @@ function fetchCardDetails(id) {
         var cardDetails = $('#card-details');
         cardDetails.children('h2').text("Loading...");
         cardDetails.children('#card-details-fields').text("Loading...");
-        cardDetails.children('#number-cards-collection').hide();
+        cardDetails.children('#card-details-upper').hide();
         curIdDisplayed = id;
 
         // fetch details
@@ -205,6 +205,7 @@ function createDetails(details) {
 
     var cardDetails = $('#card-details');
     cardDetails.children('h2').text(details["name"]);
+    cardDetails.children('#card-details-upper').show();
     cardDetails.children('#card-details-fields').empty();
 
     if (details["types"][0] !== "Land") {
@@ -218,9 +219,6 @@ function createDetails(details) {
     createDetailsField(details, "rarity", "Rarity", createStringFromValue);
     createDetailsField(details, "number", "Card Number", createStringFromValue);
     createDetailsField(details, "artist", "Artist", createStringFromValue);
-
-    // display inputs
-    cardDetails.children('#number-cards-collection').show();
 }
 
 // Create a string from a value (in json).
@@ -260,10 +258,19 @@ function bindEditable() {
     cardDetails.find('#n-normal').editable({
         type: 'text',
         title: 'Enter new number',
-        placement: 'right',
+        placement: 'left',
 
         url: numCardPostPath,
         name: "n_normal"
+    });
+
+    cardDetails.find('#n-foil').editable({
+        type: 'text',
+        title: 'Enter new number',
+        placement: 'left',
+
+        url: numCardPostPath,
+        name: "n_foil"
     });
 }
 
