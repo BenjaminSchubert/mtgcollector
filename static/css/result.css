@@ -47,7 +47,16 @@
     color: black;
 }
 
-#card-details-fields > div {
+#card-details-upper .popover {
+    right: 0 !important;
+}
+
+#card-details-upper a {
+    cursor: pointer;
+    color: black;
+}
+
+#card-details-lower > div {
     margin-top: 2px;
     margin-bottom: 2px;
 }

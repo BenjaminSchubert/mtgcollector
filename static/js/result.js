@@ -17,11 +17,6 @@ var lockInfo = {
 // Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
 var detailsFetched = {};
 
-// current displayed card infos
-var curIdDisplayed;
-
-
-
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
 // Scroll stop detection is based on a timer of 150ms long.
@@ -51,6 +46,8 @@ $(document).ready(function () {
 
     // bind editable values
     bindEditable();
+
+    setupPost();
 });
 
 
@@ -180,6 +177,7 @@ function displayCardDetails(id) {
 }
 
 // If the details for the card whose id is 'id' are not yet fetched, fetches them.
+// When the details are available, call the callback.
 function fetchCardDetails(id) {
 
     if (detailsFetched[id] === undefined) {
@@ -188,26 +186,60 @@ function fetchCardDetails(id) {
         var cardDetails = $('#card-details');
         cardDetails.children('h2').text("Loading...");
         cardDetails.children('#card-details-fields').text("Loading...");
-        cardDetails.children('#card-details-upper').hide();
-        curIdDisplayed = id;
 
         // fetch details
         $.get(detailsPath + id, function (data) {
             detailsFetched[id] = data;
-            createDetails(detailsFetched[id]);
+            createDetails(id);
         });
     } else {
-        createDetails(detailsFetched[id]);
+        createDetails(id);
     }
 }
 
-function createDetails(details) {
+function createDetails(id) {
 
+    var details = detailsFetched[id];
     var cardDetails = $('#card-details');
-    cardDetails.children('h2').text(details["name"]);
-    cardDetails.children('#card-details-upper').show();
-    cardDetails.children('#card-details-fields').empty();
 
+    cardDetails.children('h2').text(details["name"]);
+    cardDetails.find('#number-cards-collection').empty();
+    cardDetails.children('#card-details-lower').empty();
+
+    createDetailsUpper(id);
+    createDetailsLower(details);
+}
+
+function createDetailsUpper(id) {
+
+    var cardDiv = $('#' + id);
+
+    $('#number-cards-collection').append('<p>In collection</p>');
+    createRowNumCards(id, "Normal", cardDiv.attr('data-normal'));
+    createRowNumCards(id, "Foil", cardDiv.attr('data-foil'));
+}
+
+function createRowNumCards(id, labelVal, num) {
+    var row = $('<div class="row"></div>');
+    var label = $('<label class="col-md-9">' + labelVal  + '</label>');
+    var input = $('<a>' + num + '</a>').attr({
+        "class": "col-md-3",
+        "data-placement": "left",
+        "data-title": "Number of cards",
+        "data-type": "number",
+        "data-url": numCardPostPath + id,
+        "data-pk": id,
+        "data-name": labelVal
+    });
+
+    input.editable();
+
+    row.append(label);
+    row.append(input);
+    $('#number-cards-collection').append(row);
+}
+
+function createDetailsLower(details) {
     if (details["types"][0] !== "Land") {
         createDetailsField(details, "manaCost", "Mana Cost", createStringFromValue);
         createDetailsField(details, "cmc", "Converted Mana Cost", createStringFromValue);
@@ -247,7 +279,7 @@ function createDetailsField(details, key, name, createStringFunction) {
         newDetail.append('<label class="col-md-4">' + name + '</label>');
         newDetail.append('<div class="col-md-8">' + createStringFunction(details, key).replace(/\n/g, '<br>') + '</div>');
 
-        $('#card-details-fields').append(newDetail);
+        $('#card-details-lower').append(newDetail);
     }
 }
 
@@ -256,7 +288,7 @@ function bindEditable() {
     var cardDetails = $('#card-details');
 
     cardDetails.find('#n-normal').editable({
-        type: 'text',
+        type: 'number',
         title: 'Enter new number',
         placement: 'left',
 
@@ -265,7 +297,7 @@ function bindEditable() {
     });
 
     cardDetails.find('#n-foil').editable({
-        type: 'text',
+        type: 'number',
         title: 'Enter new number',
         placement: 'left',
 
@@ -274,17 +306,11 @@ function bindEditable() {
     });
 }
 
-function addToCollection(cardId, nNormal, nFoil, nPromo) {
 
-    // setup POST
-    var csrftoken = $('meta[name=csrf-token]').attr('content');
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken)
-            }
-        }
-    });
+
+function addToCollection(id, nNormal, nFoil) {
+
+    setupPost();
 
     var postData = {
         normal : nNormal,
@@ -292,7 +318,7 @@ function addToCollection(cardId, nNormal, nFoil, nPromo) {
     };
     console.log(postData);
 
-    $.post("/api/collection/" + cardId, postData , function(data) {
+    $.post("/api/collection/" + id, postData , function(data) {
         console.log(data);
     });
 }

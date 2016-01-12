@@ -2,6 +2,7 @@ var jsonPath = "api/decks/json";
 var deckPostPath = "api/decks";
 
 $(document).ready(function () {
+    setupPost();
     fetchJson(createDeckList);
 });
 
