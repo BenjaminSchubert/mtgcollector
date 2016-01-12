@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-editable.css') }}" />
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/result.css') }}" />
 {% endblock %}
 
@@ -20,25 +21,33 @@
 
     <div id="card-details" class="col-md-4 col-sm-4 col-xs-4">
         <h2></h2>
-        <img>
-        <div id="card-details-fields" class="container-fluid"></div>
-        <div id="number-cards-collection" class="container-fluid" style="display: none;">
-            <p>Number of cards in collection</p>
-            <div class="row">
-                <label class="col-md-4">Normal</label>
-                <input id="n-normal" type="number" min="0" value="0"/>
-            </div>
+        <div class="container-fluid">
+            <div clas="row">
+                <img id="card-details-img" class="col-md-8">
+                <div class="col-md-4">
+                    <div id="number-cards-collection" class="container-fluid">
+                        <p>Number of cards in collection</p>
+                        <div class="row">
+                            <label class="col-md-4">Normal</label>
+                            <input id="n-normal" type="number" min="0" value="0"/>
+                        </div>
 
-            <div class="row">
-                <label class="col-md-4">Foil</label>
-                <input id="n-foil" type="number" min="0" value="0"/>
-            </div>
+                        <div class="row">
+                            <label class="col-md-4">Foil</label>
+                            <input id="n-foil" type="number" min="0" value="0"/>
+                        </div>
 
-            <div class="row">
-                <label class="col-md-4">Promo</label>
-                <input id="n-promo" type="number" min="0" value="0"/>
+                        <div class="row">
+                            <label class="col-md-4">Promo</label>
+                            <input id="n-promo" type="number" min="0" value="0"/>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+
+        <div id="card-details-fields" class="container-fluid"></div>
     </div>
 {% endblock %}
 
@@ -46,6 +55,7 @@
 {% block scripts %}
     <script type="text/javascript" src="/static/js/withinviewport.js"></script>
     <script type="text/javascript" src="/static/js/jquery.withinviewport.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-editable.min.js') }}"></script>
     <script type="text/javascript" src="/static/js/utils.js"></script>
     <script type="text/javascript" src="/static/js/result.js"></script>
 {% endblock %}

@@ -39,15 +39,6 @@
     margin-bottom: 15px;
 }
 
-#card-details > img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 25px;
-
-    height: 40%;
-}
-
 #card-details-fields > div {
     margin-top: 2px;
     margin-bottom: 2px;

@@ -174,7 +174,7 @@ function lockCardDetails() {
 
 // Opens the details panel of the card clicked.
 function displayCardDetails(id) {
-    $('#card-details > img').attr('src', imgPath + id);
+    $('#card-details-img').attr('src', imgPath + id);
     fetchCardDetails(id);
 }
 
