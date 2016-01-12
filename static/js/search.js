@@ -7,14 +7,24 @@ bindSubmitButton();
 
 function bindSubmitButton() {
     $('#button_submit').click(function (e) {
-
-        var url = $('#form-search input')
-            .filter(function (index, element) {
-                return $(element).val() != "";
-            })
-            .serialize();
+        var url = $('#form-search input').filter(filterNotDefaultInput).serialize();
 
         document.location = "search?" + url;
         e.preventDefault(); // prevent default submit event
     });
+}
+
+function filterNotDefaultInput(index, elem) {
+    var jElem = $(elem);
+    var value = jElem.val();
+
+    // if slider input
+    if (jElem.hasClass('slider')) {
+        var values = value.split(',');
+
+        return !(parseInt(jElem.attr('data-slider-min')) === parseInt(values[0]) &&
+            parseInt(jElem.attr('data-slider-max')) === parseInt(values[1]));
+    }
+
+    return value !== "";
 }

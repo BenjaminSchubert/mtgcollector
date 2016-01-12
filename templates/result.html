@@ -48,9 +48,9 @@
 
 
 {% block scripts %}
-    <script type="text/javascript" src="/static/js/withinviewport.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.withinviewport.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/withinviewport.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.withinviewport.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-editable.min.js') }}"></script>
-    <script type="text/javascript" src="/static/js/utils.js"></script>
-    <script type="text/javascript" src="/static/js/result.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/result.js') }}"></script>
 {% endblock %}
