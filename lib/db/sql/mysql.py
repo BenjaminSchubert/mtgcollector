@@ -4,7 +4,7 @@
 """
 MySQL implementation of the commands needed to run MTGCollector application
 """
-
+import abc
 
 import mysql.connector
 import mysql.connector.conversion
@@ -143,7 +143,7 @@ class Metacard:
                 IFNULL(SUM(card_in_collection.foil), 0) AS foil
             FROM metacard
             INNER JOIN card ON card.name = metacard.name
-            LEFT JOIN card_in_collection ON card_in_collection.card_id = card.card_id
+            LEFT OUTER JOIN card_in_collection ON card_in_collection.card_id = card.card_id
             {selection}
             GROUP BY metacard.name
             {having}
@@ -360,7 +360,62 @@ class Deck:
     def list(cls):
         """ command to get a list of decks for the given user_id """
         return """
-            SELECT *
+            SELECT deck.deck_id,
+                user_id,
+                deck_name,
+                user_index,
+                CAST(IFNULL(SUM(card_in_deck.number), 0) AS INT) AS n_deck,
+                CAST(IFNULL(SUM(card_in_side.number), 0) AS INT) AS n_side
             FROM deck
+            LEFT JOIN card_in_deck
+                ON card_in_deck.deck_id = deck.deck_id
+            LEFT JOIN card_in_side
+                ON card_in_side.deck_id = deck.deck_id
             WHERE user_id=%(user_id)s
+            GROUP BY deck.deck_id
         """
+
+
+class CardInDeckEntity(abc.ABCMeta):
+    """
+    Abstract helper for cardsInDeck and cardsInSide
+    """
+    @classmethod
+    @abc.abstractmethod
+    def table_name(mcs) -> str:
+        """ the table name """
+
+    @classmethod
+    def create_table(mcs) -> str:
+        """ command to create the table """
+        return """
+            CREATE TABLE {table_name} (
+                decK_id INT NOT NULL,
+                card_id INT NOT NULL,
+                number SMALLINT NOT NULL,
+
+                FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                UNIQUE(deck_id, card_id)
+            )
+        """.format(table_name=mcs.table_name())
+
+
+class CardInDeck(CardInDeckEntity):
+    """
+    MySQL commands to handle adding and removing cards in a deck
+    """
+    @classmethod
+    def table_name(mcs) -> str:
+        """ the table name """
+        return "card_in_deck"
+
+
+class CardInSide(CardInDeckEntity):
+    """
+    MySQL commands to handle adding and removing cards in a side deck
+    """
+    @classmethod
+    def table_name(mcs) -> str:
+        """ the table name """
+        return "card_in_side"

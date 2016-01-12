@@ -4,7 +4,6 @@
 """
 Custom JSON operations
 """
-
 from flask.json import JSONEncoder
 
 
@@ -19,4 +18,3 @@ class CustomJSONEncoder(JSONEncoder):
         if isinstance(obj, set):
             return list(obj)
         return JSONEncoder.default(self, obj)
-

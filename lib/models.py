@@ -426,6 +426,50 @@ class Deck(Model):
         pass
 
 
+class CardInDeck(Model):
+    """
+    Represents a card in a deck
+    """
+    index = 3
+
+    @classmethod
+    def table_creation_command(cls) -> str:
+        """ command to create the database table """
+        return sql.CardInDeck.create_table()
+
+    def as_database_object(self) -> dict:
+        pass
+
+    @classmethod
+    def insertion_command(cls) -> str:
+        pass
+
+    def primary_key(self) -> dict:
+        pass
+
+
+class CardInSide(Model):
+    """
+    Represents a card in a side deck
+    """
+    index = 3
+
+    @classmethod
+    def table_creation_command(cls) -> str:
+        """ command to create the database table """
+        return sql.CardInSide.create_table()
+
+    def primary_key(self) -> dict:
+        pass
+
+    @classmethod
+    def insertion_command(cls) -> str:
+        pass
+
+    def as_database_object(self) -> dict:
+        pass
+
+
 class DeckList:
     """
     Proxy to obtain lists for a

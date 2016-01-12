@@ -12,25 +12,6 @@ create_table_card_legal_in_tournament = \
     """
 
 
-
-create_table_card_in_deck = \
-    """
-    CREATE TABLE card_in_deck(
-        deck_id INT NOT NULL,
-        card_name VARCHAR(150) NOT NULL,
-        number SMALLINT NOT NULL DEFAULT 1,
-
-        FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (card_name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE CASCADE,
-        UNIQUE(deck_id, card_name)
-    )
-    """
-
-
-
-
-
-
 allow_card_in_tournament = \
     """
     INSERT INTO card_legal_in_tournament (card_name, tournament_name, type)
