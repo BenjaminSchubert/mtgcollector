@@ -30,8 +30,10 @@
             </div>
         {% elif field.type == "BooleanField" %}
             {{ render_checkbox_field(field) }}
-        {% elif  field.type == "RadioField"%}
+        {% elif  field.type == "RadioField" %}
             {{ render_radio_field(field) }}
+        {% elif field.type == "SliderFiekd" %}
+            {{ render_slider_field(field) }}
         {% else %}
             {{ render_field(field, autofocus=autofocus) }}
         {% endif %}

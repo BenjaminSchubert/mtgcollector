@@ -4,6 +4,7 @@
 """
 MySQL implementation of the commands needed to run MTGCollector application
 """
+
 import abc
 
 import mysql.connector
@@ -98,8 +99,8 @@ class Metacard:
                 subtypes VARCHAR(80),
                 supertypes SET('Legendary', 'Snow', 'World', 'Basic', 'Ongoing'),
                 manaCost VARCHAR(50),
-                power VARCHAR(4),
-                toughness VARCHAR(4),
+                power FLOAT,
+                toughness FLOAT,
                 colors SET('Red', 'Green', 'White', 'Blue', 'Black'),
                 cmc FLOAT NOT NULL,
                 orig_text TEXT
@@ -137,8 +138,7 @@ class Metacard:
     def get_ids_with_collection_information(cls):
         """ command to get card ids for metacards with the number owned by the given user """
         return """
-            SELECT
-                card.card_id,
+            SELECT card.card_id,
                 IFNULL(SUM(card_in_collection.normal), 0) AS normal,
                 IFNULL(SUM(card_in_collection.foil), 0) AS foil
             FROM metacard
@@ -149,6 +149,11 @@ class Metacard:
             {having}
             ORDER BY {order}
         """
+
+    @classmethod
+    def maximum(cls):
+        """ command to get the minimum value for a column """
+        return """ SELECT MAX({maximum}) AS max FROM metacard """
 
 
 class Card:
@@ -192,8 +197,7 @@ class Card:
     def get(cls):
         """ command to get a card """
         return """
-            SELECT
-                multiverseid,
+            SELECT multiverseid,
                 metacard.name as name,
                 edition.name as edition,
                 rarity,

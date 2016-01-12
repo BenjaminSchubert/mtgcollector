@@ -158,12 +158,24 @@ class Metacard(Model):
         self.__supertypes = supertypes
         self.__manaCost = manaCost
         self.__text = text
-        self.__power = power
-        self.__toughness = toughness
         self.__colors = colors
         self.__cmc = cmc
         self.__instances = []
         self.__legalities = []
+
+        try:
+            self.__power = float(power)
+        except TypeError:
+            self.__power = None
+        except ValueError:
+            self.__power = -1
+
+        try:
+            self.__toughness = float(toughness)
+        except TypeError:
+            self.__toughness = None
+        except ValueError:
+            self.__toughness = -1
 
     @classmethod
     def table_creation_command(cls) -> str:
@@ -178,6 +190,7 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
                       card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
+                      power: str="",
                       order_by="metacard.name"):
         def add_to_parameters(params: str, value: str):
             if params == "":
@@ -228,8 +241,26 @@ class Metacard(Model):
             having = ("HAVING (IFNULL(SUM(card_in_collection.normal), 0)"
                       " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
 
+        if power:
+            power_min, power_max = map(int, power.split(","))
+            query_parameters = add_to_parameters(
+                    query_parameters, "metacard.power BETWEEN %(power_min)s AND %(power_max)s"
+            )
+            kwargs["power_min"] = power_min
+            kwargs["power_max"] = power_max
+
         query = command.format(selection=query_parameters, order=order_by, having=having)
         return [value for value in cls._get(query, **kwargs)]
+
+    @classmethod
+    def maximum(cls, maximum) -> int:
+        """
+        The maximum value in the Metacard table for the given field
+
+        :param maximum: the field for which to take the max
+        :return the maximum value
+        """
+        return cls._get(sql.Metacard.maximum().format(maximum=maximum))[0]["max"]
 
     @property
     def as_database_object(self) -> dict:

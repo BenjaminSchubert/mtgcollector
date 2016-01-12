@@ -34,7 +34,7 @@ def search():
                 user_id=current_user.get_id(), **{k: v for forms in form.data.values() for k, v in forms.items()}
         ))
     return flask.render_template(
-            "form.html", form=form, title="Search", method="get", css_classes="col-md-10 col-md-offset-1"
+            "search.html", form=form, title="Search", method="get", css_classes="col-md-10 col-md-offset-1"
     )
 
 
