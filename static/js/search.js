@@ -2,8 +2,14 @@
  * Created by Benjamin Schubert and Basile Vu on 1/12/16.
  */
 
-$(".slider").slider({});
-bindSubmitButton();
+$(document).ready(function () {
+    $(".slider").slider({});
+
+    bindSubmitButton();
+    bindReplaceMinOneByStar();
+
+    replaceMinOneByStar();
+})
 
 function bindSubmitButton() {
     $('#button_submit').click(function (e) {
@@ -27,4 +33,14 @@ function filterNotDefaultInput(index, elem) {
     }
 
     return value !== "";
+}
+
+function bindReplaceMinOneByStar() {
+    $('#form-search input.slider').change(replaceMinOneByStar);
+}
+
+function replaceMinOneByStar() {
+    $('.slider .tooltip.tooltip-main .tooltip-inner').each(function () {
+        $(this).text($(this).text().replace("-1", "*"));
+    })
 }
