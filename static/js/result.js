@@ -2,6 +2,7 @@
 var imgPath = "/api/images/";
 var detailsPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
+var numCardPostPath = "/api/collection/";
 
 // contains ids of elements which are currently in view port
 var loadedIds = [];
@@ -261,7 +262,7 @@ function bindEditable() {
         title: 'Enter new number',
         placement: 'right',
 
-        url: deckPostPath,
+        url: numCardPostPath,
         name: "n_normal"
     });
 }
