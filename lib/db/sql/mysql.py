@@ -19,6 +19,12 @@ mysql.connector.conversion.MySQLConverter._set_to_mysql = lambda self, value: ",
 
 
 def get_connection(app):
+    """
+    returns a connection to the database
+
+    :param app: Flask app containing the configuration
+    :return: MySQL connection to the database
+    """
     return mysql.connector.connect(
         user=app.config["DATABASE_USER"], password=app.config["DATABASE_PASSWORD"],
         host=app.config["DATABASE_HOST"], database=app.config["DATABASE_NAME"], port=app.config["DATABASE_PORT"],
@@ -321,4 +327,40 @@ class Collection:
         return """
             DELETE FROM card_in_collection
             WHERE card_id=%(card_id)s AND user_id=%(user_id)s
+        """
+
+
+class Deck:
+    """
+    MySQL commands related to the DeckList model
+    """
+    @classmethod
+    def create_table(cls):
+        """ command to create the deck """
+        return """
+            CREATE TABLE deck (
+                deck_id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
+                deck_name VARCHAR(255) NOT NULL,
+                user_index INT NOT NULL,
+
+                FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+            )
+        """
+
+    @classmethod
+    def insert(cls):
+        """ command to insert a new deck in the database """
+        return """
+            INSERT INTO deck (user_id, deck_name, user_index)
+            VALUES (%(user_id)s, %(deck_name)s, %(user_index))
+        """
+
+    @classmethod
+    def list(cls):
+        """ command to get a list of decks for the given user_id """
+        return """
+            SELECT *
+            FROM deck
+            WHERE user_id=%(user_id)s
         """

@@ -229,7 +229,6 @@ class Metacard(Model):
                       " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
 
         query = command.format(selection=query_parameters, order=order_by, having=having)
-        print(query % kwargs)
         return [value for value in cls._get(query, **kwargs)]
 
     @property
@@ -388,6 +387,63 @@ class Collection(Model):
         return self.user_id
 
 
+class Deck(Model):
+    """
+    Deck model
+
+    :param user_id
+    """
+    index = 2
+
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    @classmethod
+    def table_creation_command(cls) -> str:
+        """ table creation command """
+        return sql.Deck.create_table()
+
+    @classmethod
+    def insertion_command(cls) -> str:
+        """ command to insert a new deck """
+        sql.Deck.insert()
+
+    @classmethod
+    def list(cls, user_id: int) -> typing.List[typing.Dict[str, str]]:
+        """
+        Gets a list of decks for the given user_id
+
+        :param user_id: the id of the user for which to get decks
+        :return: list of Decks
+        """
+        return cls._get(sql.Deck.list(), user_id=user_id)
+
+
+    def primary_key(self) -> dict:
+        pass
+
+    def as_database_object(self) -> dict:
+        pass
+
+
+class DeckList:
+    """
+    Proxy to obtain lists for a
+
+    :param user_id
+    """
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    def list(self) -> typing.List[typing.Dict[str, str]]:
+        """
+        Returns the list of decks
+
+        :return: list of deck
+        """
+        return Deck.list(self.user_id)
+
+
 class User(Model):
     """
     User model
@@ -405,6 +461,7 @@ class User(Model):
         self.__password = password
         self.__is_admin = is_admin
         self.collection = Collection(self.__user_id)
+        self.decks = DeckList(self.__user_id)
 
     @classmethod
     def insertion_command(cls) -> str:

@@ -12,16 +12,6 @@ create_table_card_legal_in_tournament = \
     """
 
 
-create_table_deck = \
-    """
-    CREATE TABLE deck (
-        deck_id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT NOT NULL,
-        deck_name VARCHAR(255) NOT NULL,
-
-        FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
-    )
-    """
 
 create_table_card_in_deck = \
     """

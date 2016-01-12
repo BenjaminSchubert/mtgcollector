@@ -44,7 +44,6 @@ def deck_list():
     return flask.render_template("deck_list.html")
 
 
-
 @app.before_request
 def setup_db():
     try:

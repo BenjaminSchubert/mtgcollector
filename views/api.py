@@ -59,3 +59,9 @@ def add_to_collection(card_id):
 def remove_from_collection(card_id):
     current_user.collection.delete(card_id=card_id)
     return flask.jsonify(card_id=card_id)
+
+
+@mtgcollector.app.route("/api/decks")
+@login_required
+def list_decks():
+    return flask.jsonify(*current_user.decks.list())
