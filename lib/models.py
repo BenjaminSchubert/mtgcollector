@@ -190,7 +190,7 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
                       card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
-                      power: str="",
+                      power: str="", toughness: str="", cmc: str="",
                       order_by="metacard.name"):
         def add_to_parameters(params: str, value: str):
             if params == "":
@@ -201,6 +201,21 @@ class Metacard(Model):
 
         def add_wildcard(entry: str):
             return "%" + "%".join(shlex.split(entry.strip())) + "%"
+
+        def treat_range(query_parameters_, value, entry_name):
+            if value:
+                entry_max = "{}_max".format(entry_name)
+                entry_min = "{}_min".format(entry_name)
+                kwargs[entry_min], max_value = map(int, value.split(","))
+                if max_value == cls.maximum(entry_name):
+                    return add_to_parameters(query_parameters_, "metacard.{name} >= %({name_min})s").format(
+                            name=entry_name, name_min=entry_min
+                    )
+                else:
+                    kwargs[entry_max] = max_value
+                    return add_to_parameters(
+                        query_parameters_, "metacard.{name} BETWEEN %({name_min})s AND %({name_max})s"
+                    ).format(name=entry_name, name_min=entry_min, name_max=entry_max)
 
         query_parameters = ""
         having = ""
@@ -241,13 +256,9 @@ class Metacard(Model):
             having = ("HAVING (IFNULL(SUM(card_in_collection.normal), 0)"
                       " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
 
-        if power:
-            power_min, power_max = map(int, power.split(","))
-            query_parameters = add_to_parameters(
-                    query_parameters, "metacard.power BETWEEN %(power_min)s AND %(power_max)s"
-            )
-            kwargs["power_min"] = power_min
-            kwargs["power_max"] = power_max
+        query_parameters = treat_range(query_parameters, power, "power")
+        query_parameters = treat_range(query_parameters, toughness, "toughness")
+        query_parameters = treat_range(query_parameters, cmc, "cmc")
 
         query = command.format(selection=query_parameters, order=order_by, having=having)
         return [value for value in cls._get(query, **kwargs)]
@@ -260,7 +271,7 @@ class Metacard(Model):
         :param maximum: the field for which to take the max
         :return the maximum value
         """
-        return cls._get(sql.Metacard.maximum().format(maximum=maximum))[0]["max"]
+        return cls._get(sql.Metacard.maximum().format(maximum=maximum))[1]["max"]
 
     @property
     def as_database_object(self) -> dict:

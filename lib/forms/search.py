@@ -28,15 +28,15 @@ class SearchInputForm(SubForm):
 
 
 class ValuesForm(SubForm):
-    power = SliderField(
-        "Power",
-        min_value=-1,
-        max_value=10
-    )
+    power = SliderField("Power", min_value=-1, max_value=10)
+    toughness = SliderField("Toughness", min_value=-1, max_value=10)
+    cmc = SliderField("Mana Cost", min_value=0, max_value=10)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.power.set_max_value(lib.models.Metacard.maximum("power"))
+        self.toughness.set_max_value(lib.models.Metacard.maximum("toughness"))
+        self.cmc.set_max_value(lib.models.Metacard.maximum("cmc"))
 
 
 class MCQForm(SubForm):

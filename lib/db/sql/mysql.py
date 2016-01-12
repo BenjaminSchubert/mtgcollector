@@ -153,7 +153,7 @@ class Metacard:
     @classmethod
     def maximum(cls):
         """ command to get the minimum value for a column """
-        return """ SELECT MAX({maximum}) AS max FROM metacard """
+        return """ SELECT {maximum} AS max FROM metacard ORDER BY {maximum} DESC LIMIT 2"""
 
 
 class Card:

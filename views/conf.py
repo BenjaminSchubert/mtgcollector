@@ -48,7 +48,7 @@ def get_database_form():
         try:
             validate_conf(form)
         except werkzeug.routing.ValidationError:
-            return render_template("form.html", form=form, title="Database Setup")
+            return render_template("form.html", form=form, id_="form-database-setup", title="Database Setup")
 
         update_conf(
             DATABASE_USER=form.username.data,
@@ -60,7 +60,7 @@ def get_database_form():
         app.update_db.set()
         return redirect(url_for("install"))
 
-    return render_template('form.html', form=form, action=flask.url_for("install"))
+    return render_template('form.html', form=form, id_="form-database", action=flask.url_for("install"))
 
 
 def get_user_form():
@@ -72,7 +72,7 @@ def get_user_form():
         login_user(user)
         return redirect(url_for("parameters"))
 
-    return render_template('form.html', form=form, title="Admin Creation")
+    return render_template('form.html', form=form, id_="form-admin", title="Admin Creation")
 
 
 @app.route("/install", methods=['GET', 'POST'])

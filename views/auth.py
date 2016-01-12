@@ -18,7 +18,8 @@ def login():
         return flask.redirect(flask.request.values.get("next") or flask.request.referrer or "index")
 
     return flask.render_template(
-        'form.html', form=form, title="Login", action_url=flask.url_for("login", next=flask.request.referrer)
+        'form.html', form=form, id_="login-form", title="Login",
+        action_url=flask.url_for("login", next=flask.request.referrer)
     )
 
 
