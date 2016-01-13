@@ -17,3 +17,10 @@
 .panel > form > .panel {
     padding: 3%;
 }
+
+
+.form-horizontal .control-label {
+    text-align: left;
+    padding: 0;
+    padding-top: 5px;
+}

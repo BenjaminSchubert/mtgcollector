@@ -31,8 +31,10 @@ class ValuesForm(SubForm):
     toughness = SliderField("Toughness", min_value=-1, max_value=10)
     cmc = SliderField("Mana Cost", min_value=0, max_value=10)
     colors = MultiCheckboxField("Colors", choices=[
-            ("Red", "{R}"), ("Blue", "{B}"), ("Green", "{G}"), ("White", "{W}"), ("Colorless", "{C}")
+            ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("Blue", "{B}"), ("Black", "{B}"), ("Colorless", "{C}")
         ])
+    only_selected_colors = BooleanField("Only selected")
+    all_selected_colors = BooleanField("All Selected")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

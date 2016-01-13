@@ -190,7 +190,8 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
                       card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
-                      power: str="", toughness: str="", cmc: str="", colors: str="",
+                      power: str="", toughness: str="", cmc: str="", colors: str="", only_selected_colors: bool=False,
+                      all_selected_colors: bool=False,
                       order_by="metacard.name"):
         def add_to_parameters(params: str, value: str):
             if params == "":
@@ -219,6 +220,11 @@ class Metacard(Model):
             else:
                 return query_parameters_
 
+        def sum_colors(colors):
+            return sum([color_translation[color] for color in colors])
+
+        color_translation = {"Red": 1, "Green": 2, "White": 4, "Blue": 8, "Black": 16}
+        all_colors = {"Red", "Green", "White", "Blue", "Black"}
         query_parameters = ""
         having = ""
         kwargs = dict()
@@ -257,6 +263,30 @@ class Metacard(Model):
         if in_collection:
             having = ("HAVING (IFNULL(SUM(card_in_collection.normal), 0)"
                       " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
+
+        if "Colorless" in colors and len(colors) == 1:
+            query_parameters = add_to_parameters(query_parameters, "metacard.colors IS NULL")
+        elif colors:
+            colors = set(colors)
+            if all_selected_colors:
+                if only_selected_colors:
+                    query_parameters = add_to_parameters(query_parameters, "metacard.colors = %(colors)s")
+                    kwargs["colors"] = sum_colors(colors & all_colors)
+                else:
+                    query_parameters = add_to_parameters(query_parameters, "(metacard.colors & %(colors)s) = %(colors)s")
+                    kwargs["colors"] = sum_colors(colors & all_colors)
+            else:
+                if only_selected_colors:
+                    query_parameters = add_to_parameters(
+                            query_parameters, "(((metacard.colors & %(colors)s) = 0) {colorless})"
+                    )
+                    kwargs["colors"] = sum_colors(all_colors - colors)
+                else:
+                    query_parameters = add_to_parameters(
+                            query_parameters, "(((metacard.colors & %(colors)s) > 0) {colorless})")
+                    kwargs["colors"] = sum_colors(colors & all_colors)
+
+                query_parameters = query_parameters.format(colorless=" OR (metacard.colors IS NULL)")
 
         query_parameters = treat_range(query_parameters, power, "power")
         query_parameters = treat_range(query_parameters, toughness, "toughness")

@@ -16,8 +16,9 @@
 
 
 {% macro render_checkbox_field(field) %}
-    <div class="checkbox">
-        <label><input type="checkbox" name="{{ field.id }}" value="y">{{ field.label.text }}</label>
+    <div class="form-group">
+        <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+        {{ field( autofocus=autofocus, **kwargs) }}
     </div>
 {%- endmacro  %}
 
@@ -30,8 +31,6 @@
             </div>
         {% elif field.type == "BooleanField" %}
             {{ render_checkbox_field(field) }}
-        {% elif  field.type == "RadioField" %}
-            {{ render_radio_field(field) }}
         {% else %}
             {{ render_field(field, autofocus=autofocus) }}
         {% endif %}
