@@ -56,6 +56,15 @@
     color: black;
 }
 
+#button-add-to-deck {
+    margin-top: 5px;
+}
+
+.popover-buttons button {
+    margin-left: 3px;
+}
+
+
 #card-details-lower > div {
     margin-top: 2px;
     margin-bottom: 2px;
