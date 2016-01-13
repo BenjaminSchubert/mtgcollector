@@ -45,5 +45,5 @@ class SliderField(Field):
 
 
 class MultiCheckboxField(SelectMultipleField):
-    widget = GroupWidget(prefix_label=False)
+    widget = GroupWidget()
     option_widget = widgets.CheckboxInput()
