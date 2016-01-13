@@ -190,11 +190,11 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
                       card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
-                      power: str="", toughness: str="", cmc: str="",
+                      power: str="", toughness: str="", cmc: str="", colors: str="",
                       order_by="metacard.name"):
         def add_to_parameters(params: str, value: str):
             if params == "":
-                params += "WHERE " + value
+                params = "WHERE " + value
             else:
                 params += " AND " + value
             return params
@@ -266,14 +266,17 @@ class Metacard(Model):
         return [value for value in cls._get(query, **kwargs)]
 
     @classmethod
-    def maximum(cls, maximum) -> int:
+    def maximum(cls, maximum) -> typing.Union[int, None]:
         """
         The maximum value in the Metacard table for the given field
 
         :param maximum: the field for which to take the max
         :return the maximum value
         """
-        return cls._get(sql.Metacard.maximum().format(maximum=maximum))[1]["max"]
+        try:
+            return cls._get(sql.Metacard.maximum().format(maximum=maximum))[1]["max"]
+        except IndexError:  # this might happen if the database if not yet initialized, let's return a safe value
+            return None
 
     @property
     def as_database_object(self) -> dict:

@@ -4,12 +4,11 @@
 """
 Search form to easily find cards
 """
-
 from flask_wtf import Form
 from wtforms import StringField, TextAreaField, FormField, BooleanField
 
 import lib.models
-from lib.forms.fields import SliderField
+from lib.forms.fields import SliderField, MultiCheckboxField
 
 
 class SubForm(Form):
@@ -31,6 +30,9 @@ class ValuesForm(SubForm):
     power = SliderField("Power", min_value=-1, max_value=10)
     toughness = SliderField("Toughness", min_value=-1, max_value=10)
     cmc = SliderField("Mana Cost", min_value=0, max_value=10)
+    colors = MultiCheckboxField("Colors", choices=[
+            ("Red", "{R}"), ("Blue", "{B}"), ("Green", "{G}"), ("White", "{W}"), ("Colorless", "{C}")
+        ])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

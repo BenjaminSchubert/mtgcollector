@@ -17,7 +17,7 @@
 
 {% macro render_checkbox_field(field) %}
     <div class="checkbox">
-        <label>{{ field.label.text }}<input type="checkbox" name="{{ field.id }}" value="y"></label>
+        <label><input type="checkbox" name="{{ field.id }}" value="y">{{ field.label.text }}</label>
     </div>
 {%- endmacro  %}
 
@@ -32,8 +32,6 @@
             {{ render_checkbox_field(field) }}
         {% elif  field.type == "RadioField" %}
             {{ render_radio_field(field) }}
-        {% elif field.type == "SliderFiekd" %}
-            {{ render_slider_field(field) }}
         {% else %}
             {{ render_field(field, autofocus=autofocus) }}
         {% endif %}

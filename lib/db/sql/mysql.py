@@ -129,7 +129,7 @@ class Metacard:
             SELECT card.card_id
             FROM metacard
             INNER JOIN card ON card.name = metacard.name
-            WHERE {selection}
+            {selection}
             GROUP BY metacard.name
             ORDER BY {order}
         """

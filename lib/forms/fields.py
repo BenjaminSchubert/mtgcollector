@@ -1,14 +1,23 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-from wtforms import Field
-from wtforms.widgets import Input
+from wtforms import Field, SelectMultipleField, widgets
+from wtforms.widgets import HTMLString, html_params
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
 
+class GroupWidget:
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault('id', field.id)
+        html = ['<%s %s>' % ("div", html_params(**kwargs))]
+        for subfield in field:
+            html.append('<span>%s %s</span>' % (subfield(), subfield.label))
+        html.append('</%s>' % "div")
+        return HTMLString(''.join(html))
+
 
 class SliderField(Field):
-    class SliderWidget(Input):
+    class SliderWidget(widgets.Input):
         input_type = "text"
 
         def __call__(self, field, **kwargs):
@@ -33,3 +42,8 @@ class SliderField(Field):
 
     def set_max_value(self, value):
         self.max_value = value
+
+
+class MultiCheckboxField(SelectMultipleField):
+    widget = GroupWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
