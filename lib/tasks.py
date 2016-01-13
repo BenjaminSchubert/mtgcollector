@@ -61,7 +61,7 @@ class Downloader(threading.Thread):
                 os.remove(path_name)
 
     def download_image(self, image, connection):
-        if image == "default":
+        if image == "default.png":
             url = lib.models.Card.get_default_image_url()
         else:
             url = lib.models.Card.get_image_url(image, logger=self.app.logger, connection=connection)
