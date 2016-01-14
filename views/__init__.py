@@ -26,7 +26,7 @@ def index():
 @app.route("/search")
 def search():
     form = SearchForm(flask.request.args)
-    form.setup_authenticated(current_user.is_authenticated)
+    form.setup_fields(current_user.is_authenticated)
     form.csrf_enabled = False
 
     if form.validate() and flask.request.args:

@@ -267,7 +267,7 @@ class Edition:
         """
 
     @classmethod
-    def get_name_id(cls):
+    def list(cls):
         """ command to get all editions names and ids """
         return """ SELECT code, name FROM edition ORDER BY name """
 

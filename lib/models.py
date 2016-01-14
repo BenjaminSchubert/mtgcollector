@@ -126,6 +126,11 @@ class Edition(Model):
         """ The command used to insert values in the database"""
         return sql.Edition.create_table()
 
+    @classmethod
+    def list(cls) -> typing.List[typing.Dict[str, str]]:
+        """ returns a list of Editions of the form (code, name) """
+        return cls._get(sql.Edition.list())
+
     @property
     def as_database_object(self) -> dict:
         """ A dictionary view of the edition """

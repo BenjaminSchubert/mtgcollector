@@ -58,6 +58,6 @@ class SearchForm(Form):
     values_inputs = FormField(ValuesForm)
     mcq_inputs = FormField(MCQForm)
 
-    def setup_authenticated(self, user_authenticated: bool):
+    def setup_forms(self, user_authenticated: bool):
         if not user_authenticated:
             self.mcq_inputs.clean_authenticated_fields()
