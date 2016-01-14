@@ -54,36 +54,10 @@ $(document).ready(function () {
 
     bindEditable();
     setupPost();
-    prepareDeckModal();
 });
 
 function setImagesErrorPath() {
     $('img').attr('onerror', 'this.src="' + defaultImgPath + '"');
-}
-
-function prepareDeckModal() {
-    var options = '';
-    existingDecks.forEach(function (deck) {
-        options += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
-    });
-
-    $('#deck-selection').append(options);
-
-    // post data
-    $('#modal-submit-button').click(function () {
-        var deckId = $('#deck-selection').find(":selected").attr('deck-id');
-
-        var postData = {
-            card_id: $('#modal-add-to-deck').attr('card-id'),
-            n_cards: $('#number-cards-to-add').val(),
-            side : $('#add-to-side').is(':checked')
-        };
-
-        $.post(deckPostPath + deckId, postData , function (data) {
-            console.log(data);
-            $('#modal-add-to-deck').modal('hide');
-        });
-    });
 }
 
 
@@ -241,7 +215,6 @@ function createDetails(id) {
     cardDetails.children('h2').text(details["name"]);
     cardDetails.find('#card-details-upper-right').empty();
     cardDetails.children('#card-details-lower').empty();
-    $('#modal-add-to-deck').attr('card-id', id);
 
     createDetailsUpper(id);
     createDetailsLower(details);
@@ -258,7 +231,7 @@ function createDetailsUpper(id) {
     parentDiv.append('<p>In collection</p>');
     createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'));
     createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'));
-    createButtonAddToDeck(parentDiv);
+    createButtonAddToDeck(id, parentDiv);
 
     var details = detailsFetched[id];
     if (details["types"][0] !== "Land") {
@@ -302,17 +275,43 @@ function createRowNumCards(parentDiv, id, labelVal, num) {
 }
 
 // Creates the button to add the current card to a deck.
-function createButtonAddToDeck(parentDiv) {
-    var button = $('<button>Add to deck</button>');
+function createButtonAddToDeck(id, parentDiv) {
 
-    button.attr({
-        'id': 'button-add-to-deck',
-        'class': 'btn btn-primary',
-        'data-toggle': 'modal',
-        'data-target': '#modal-add-to-deck'
+    var button = $('<button class="btn btn-primary" data-card-id="' + id + '">Add to deck</button>');
+    var buttonDiv = $('<div class="popover-wrapper"></div>');
+    buttonDiv.append(button);
+
+    button.click(function () {
+
+        // create popover content
+        var content = '<select id="deck-selection" data-card-id="' +  + '">';
+        existingDecks.forEach(function (deck) {
+            content += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
+        });
+        content +=
+            '</select>' +
+            '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
+            '<input id="add-to-side" type="checkbox">';
+
+        // create popover
+        var popover = createPopover($(content), function () {
+            var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-id');
+
+            var postData = {
+                card_id: id,
+                n_cards: $('#number-cards-to-add').val(),
+                side : $('#add-to-side').is(':checked')
+            };
+
+            $.post(deckPostPath + deckId, postData, function (data) {
+                console.log(data);
+            });
+        });
+
+        buttonDiv.append(popover);
     });
 
-    parentDiv.append(button);
+    parentDiv.append(buttonDiv);
 }
 
 // Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.

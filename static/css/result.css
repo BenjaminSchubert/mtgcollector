@@ -35,8 +35,8 @@
 }
 
 #card-details .row {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 #card-details > h2 {
@@ -52,10 +52,6 @@
     color: black;
 }
 
-#card-details-upper .popover {
-    right: 0 !important;
-}
-
 #card-details-upper a {
     cursor: pointer;
     color: black;
@@ -65,11 +61,6 @@
     margin-top: 5px;
     margin-bottom: 30px;
 }
-
-.popover-buttons button {
-    margin-left: 3px;
-}
-
 
 #card-details-lower > div {
     margin-top: 2px;

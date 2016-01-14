@@ -27,3 +27,45 @@ function setupPost() {
         }
     });
 }
+
+function createPopover(node, buttonOkFunc) {
+
+    var nodeContainer = $('<div class="row popover-node-container"></div>');
+    nodeContainer.append(node);
+
+    var buttonSubmit = $(
+        '<button type="submit" class="btn btn-primary">' +
+            '<i class="glyphicon glyphicon-ok"></i>' +
+        '</button>'
+    );
+
+    var buttonCancel = $(
+        '<button type="button" class="btn">' +
+            '<i class="glyphicon glyphicon-remove"></i>' +
+        '</button>'
+    );
+
+    buttonSubmit.click(function () {
+        buttonOkFunc();
+        $('.popover-main-container').remove();
+    });
+
+    buttonCancel.click(function () {
+        $('.popover-main-container').remove();
+    });
+
+    var buttons = $(
+        '<div class="col-md-5 popover-buttons">' +
+            '<div class="container-fluid">' +
+                '<div class="row"></div>' +
+            '</div>' +
+        '</div>'
+    );
+
+    buttons.find('.row').append(buttonSubmit, buttonCancel);
+
+    var container = $('<div class="popover-main-container container-fluid"><div class="row"></div></div>');
+    container.append(nodeContainer, buttons);
+
+    return container;
+}
