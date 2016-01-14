@@ -10,7 +10,6 @@ import abc
 import mysql.connector
 import mysql.connector.conversion
 
-
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
 
@@ -187,7 +186,8 @@ class Card:
         """ command to insert a card """
         return """
             INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
-            VALUES (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
+            VALUES
+                (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
             ON DUPLICATE KEY UPDATE
                 version=VALUES(version), rarity=VALUES(version), edition=VALUES(edition), artist=VALUES(artist),
                 flavor=VALUES(flavor)
@@ -370,10 +370,11 @@ class Deck:
             CREATE TABLE deck (
                 deck_id INT PRIMARY KEY AUTO_INCREMENT,
                 user_id INT NOT NULL,
-                deck_name VARCHAR(255) NOT NULL,
-                user_index INT NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                user_index INT DEFAULT 0 NOT NULL,
 
-                FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+                FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                UNIQUE(user_id, name)
             )
         """
 
@@ -381,8 +382,8 @@ class Deck:
     def insert(cls):
         """ command to insert a new deck in the database """
         return """
-            INSERT INTO deck (user_id, deck_name, user_index)
-            VALUES (%(user_id)s, %(deck_name)s, %(user_index))
+            INSERT INTO deck (user_id, name)
+            VALUES (%(user_id)s, %(name)s)
         """
 
     @classmethod
@@ -391,7 +392,7 @@ class Deck:
         return """
             SELECT deck.deck_id,
                 user_id,
-                deck_name,
+                name,
                 user_index,
                 IFNULL(SUM(card_in_deck.number), 0) AS n_deck,
                 IFNULL(SUM(card_in_side.number), 0) AS n_side
@@ -402,6 +403,15 @@ class Deck:
                 ON card_in_side.deck_id = deck.deck_id
             WHERE user_id=%(user_id)s
             GROUP BY deck.deck_id
+        """
+
+    @classmethod
+    def get(cls):
+        """ command to get the deck corresponding to the given name and user_id """
+        return """
+            SELECT *
+            FROM deck
+            WHERE user_id = %(user_id)s AND name = %(name)s
         """
 
 

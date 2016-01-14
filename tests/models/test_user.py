@@ -22,7 +22,7 @@ class TestUser(TestCaseWithDB, unittest.TestCase):
     @classmethod
     def table_creation_commands(cls) -> Iterable[str]:
         """ commands to execute to setup the database for our tests """
-        return [User.table_creation_command()]
+        return [User._table_creation_command()]
 
     @classmethod
     def tables_to_truncate(cls) -> Iterable[str]:
