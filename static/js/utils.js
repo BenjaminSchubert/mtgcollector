@@ -1,18 +1,18 @@
 var iconPath = "/api/icons/";
 
+// Placeholders like {W} are replaced with the url to icons (iconPath + W.png in this example).
 function insertImagesInText(text) {
-    for (var i = 0; i < text.length; ++i) {
-        if (text.charAt(i) === '{') {
-            var indexClose = text.indexOf('}', i+1); // index of }
+    return text.replace(/{([^{}]+)}/g, '<img src="' + iconPath + '\$1.png">');
+}
 
-            if (indexClose != -1 && indexClose != i+1) {
-                text =
-                    text.substr(0, i) + // before {
-                    '<img src="' + iconPath + text.substr(i+1, indexClose-i-1) + '.png">' + // between {}, transformed
-                    text.substr(indexClose + 1); // after }
-            }
-        }
-    }
+// Formats text to html content. \n become <br> and first values (+1 : ...) are in bold (<b>+1</b> : ...).
+function formatTextToHTMLContent(text) {
+    // replace \n
+    text = text.replace(/\n/g, '<br>');
+
+    // first values in bold
+    text = text.replace(/(^|<br>)([\+\-][^:]+:)/g, "\$1<b>\$2</b>");
+
     return text;
 }
 

@@ -295,8 +295,7 @@ function createDetailsLower(details) {
     createDetailsField(details, "artist", "Artist", createStringFromValue);
 }
 
-// Create a string from a value (in json).
-// The resulting string has the \n replaced by <br>. And the placeholder like {W} are replaced with the links to icons.
+// Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.
 function createStringFromValue(details, key) {
     return insertImagesInText(("" + details[key]));
 }
@@ -319,7 +318,7 @@ function createDetailsField(details, key, name, createStringFunction) {
 
         var newDetail = $('<div class="row"></div>');
         newDetail.append('<label class="col-md-4">' + name + '</label>');
-        newDetail.append('<div class="col-md-8">' + createStringFunction(details, key).replace(/\n/g, '<br>') + '</div>');
+        newDetail.append('<div class="col-md-8">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
 
         $('#card-details-lower').append(newDetail);
     }
