@@ -39,6 +39,7 @@ $(document).ready(function () {
     $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
     $(window).resize(initView);
 
+    setImagesErrorPath();
     initView();
 
     // what to do when clicking on card image
@@ -51,13 +52,14 @@ $(document).ready(function () {
         }
     });
 
-    // bind editable values
     bindEditable();
-
     setupPost();
-
     prepareDeckModal();
 });
+
+function setImagesErrorPath() {
+    $('img').attr('onerror', 'this.src="' + defaultImgPath + '"');
+}
 
 function prepareDeckModal() {
     var options = '';
