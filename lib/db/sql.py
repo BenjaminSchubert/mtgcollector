@@ -237,6 +237,19 @@ class Card:
         """ list all different rarity formats """
         return """ SELECT DISTINCT rarity FROM card """
 
+    @classmethod
+    def collection(cls):
+        """ list all ids from the collection of the given user """
+        return """
+            SELECT card.card_id,
+                card_in_collection.normal,
+                card_in_collection.foil
+            FROM card
+            INNER JOIN card_in_collection
+            ON card.card_id = card_in_collection.card_id
+            WHERE user_id = %(user_id)s
+        """
+
 
 class Edition:
     """

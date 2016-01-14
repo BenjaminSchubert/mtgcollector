@@ -201,8 +201,8 @@ class Metacard(Model):
     def get_ids_where(cls, user_id: int=None, name: str= "", types: str= "", text: str= "", context: str= "",
                       number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
                       cmc: str="", colors: str="", only_selected_colors: bool=False, all_selected_colors: bool=False,
-                      edition: str= "", block: str="", format: str="", rarity: str="",
-                      order_by="metacard.name"):
+                      edition: str= "", block: str="", format: str="", rarity: str="", order_by="metacard.name",
+                      **kwargs):
         def add_to_parameters(params: str, value: str):
             if params == "":
                 params = "WHERE " + value
@@ -327,7 +327,7 @@ class Metacard(Model):
         query_parameters = treat_range(query_parameters, cmc, "cmc")
 
         query = command.format(selection=query_parameters, order=order_by, having=having)
-        return [value for value in cls._get(query, **kwargs)]
+        return cls._get(query, **kwargs)
 
     @classmethod
     def maximum(cls, maximum) -> typing.Union[int, None]:
@@ -362,6 +362,16 @@ class Metacard(Model):
     def primary_key(self):
         """ This is a value allowing to uniquely identify an instance of Metacard """
         return self.__name
+
+    @classmethod
+    def get_collection(cls, user_id: int) -> typing.List[typing.Dict[str, str]]:
+        """
+        returns all cards in the collection for the given user_id
+
+        :param user_id: the user for which to get the collection
+        :return list of cards
+        """
+        return cls._get(sql.Card.collection(), user_id=user_id)
 
 
 class Card(Model):
