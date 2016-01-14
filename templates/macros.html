@@ -22,15 +22,17 @@
     </div>
 {%- endmacro  %}
 
+{% macro render_separator_field(field) %}
+    {{ field }}
+{%- endmacro %}
+
 {% macro render_inner_form(form) %}
     {% set autofocus=true %}
     {% for field in form %}
-        {% if field.type == "FormField" %}
-            <div class="panel panel-danger col-md-4 col-lg-4 col-sm-12">
-                {{ render_inner_form(field) }}
-            </div>
-        {% elif field.type == "BooleanField" %}
+        {% if field.type == "BooleanField" %}
             {{ render_checkbox_field(field) }}
+        {% elif field.type == "StartSeparatorField" or field.type == "StopSeparatorField" %}
+            {{ render_separator_field(field) }}
         {% else %}
             {{ render_field(field, autofocus=autofocus) }}
         {% endif %}
@@ -42,13 +44,19 @@
 
 
 {%  macro render_form(form, id_, method="post", action=".", action_text="Submit",
-                      _class="", btn_class="btn btn_default", submit_id="button_submit") -%}
-    <form id="{{ id_ }}" method="{{ method }}" action="{{ action }}" class="{{  _class }} row">
-        {% if method != "get" %}
-            {{ form.hidden_tag() }}
-        {% endif %}
+                      _class="", btn_class="btn btn-primary", submit_id="button_submit") -%}
+    <form id="{{ id_ }}" method="{{ method }}" action="{{ action }}" class="{{  _class }}">
+        <div class="row">
+            {% if method != "get" %}
+                {{ form.hidden_tag() }}
+            {% endif %}
 
-        {{ render_inner_form(form) }}
-        <button type="submit" id="{{ submit_id }}" class="{{ btn_class }} pull-right">{{ action_text }}</button>
+            {{ render_inner_form(form) }}
+        </div>
+        <div class="row">
+            <div class="col-md-offset-9 col-md-2">
+                <button type="submit" id="{{ submit_id }}" class="{{ btn_class }} pull-right">{{ action_text }}</button>
+            </div>
+        </div>
     </form>
 {%- endmacro %}

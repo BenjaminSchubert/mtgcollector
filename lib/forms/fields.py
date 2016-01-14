@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 from wtforms import Field, SelectMultipleField, widgets
-from wtforms.widgets import HTMLString, html_params
+from wtforms.widgets import HTMLString, html_params, Input
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
@@ -47,3 +47,20 @@ class SliderField(Field):
 class MultiCheckboxField(SelectMultipleField):
     widget = GroupWidget()
     option_widget = widgets.CheckboxInput()
+
+
+class StartSeparator(Input):
+    def __call__(self, field, **kwargs):
+        return HTMLString('<div %s>' % self.html_params(class_="panel panel-danger col-md-4 col-lg-4 col-sm-12"))
+
+
+class StopSeparator(Input):
+    def __call__(self, field, **kwargs):
+        return HTMLString('</div>')
+
+
+class StartSeparatorField(Field):
+    widget = StartSeparator()
+
+class StopSeparatorField(Field):
+    widget = StopSeparator()

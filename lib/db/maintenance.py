@@ -34,9 +34,10 @@ class MaintenanceDB:
     def __update(self, card_parser):
         with self.DBManager(self.app) as connection:
             lib.models.Edition.bulk_insert(card_parser.editions, connection=connection)
-            lib.models.Tournament.bulk_insert(card_parser.tournaments, connection=connection)
+            lib.models.Format.bulk_insert(card_parser.formats, connection=connection)
             lib.models.Metacard.bulk_insert(card_parser.metacards, connection=connection)
             lib.models.Card.bulk_insert(card_parser.cards, connection=connection)
+            lib.models.LegalInFormat.bulk_insert(card_parser.legal_in_format, connection=connection)
 
     def setup_db(self):
         conn = mysql.connector.connect(

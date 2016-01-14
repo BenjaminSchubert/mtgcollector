@@ -25,13 +25,12 @@ def index():
 
 @app.route("/search")
 def search():
-    form = SearchForm(flask.request.args)
-    form.setup_fields(current_user.is_authenticated)
+    form = SearchForm(current_user.is_authenticated, flask.request.args)
     form.csrf_enabled = False
 
     if form.validate() and flask.request.args:
         return flask.render_template("result.html", cards=Metacard.get_ids_where(
-                user_id=current_user.get_id(), **{k: v for forms in form.data.values() for k, v in forms.items()}
+                user_id=current_user.get_id(), **form.data
         ))
     return flask.render_template(
         "search.html", form=form, id_="form-search", title="Search", method="get",

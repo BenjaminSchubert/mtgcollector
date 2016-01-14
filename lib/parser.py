@@ -5,19 +5,20 @@
 An update handler and card parser for cards retrieved on mtgjson.com
 """
 
-import flask
+import datetime
 import json
 import os
 import re
+import zipfile
+from io import BytesIO
+
+import flask
 import requests
 import requests.exceptions
 import typing
 
-import datetime
-import zipfile
-from io import BytesIO
-
-from lib.models import Edition, Metacard, Card, Tournament
+from lib.models import Edition, Metacard, Card, Format
+from lib.models import LegalInFormat
 
 CardList = typing.Dict[str, typing.Dict[str, typing.Union[str, typing.List]]]
 
@@ -37,7 +38,8 @@ class JSonCardParser:
         self.__editions = set()  # type: typing.Set[Edition]
         self.__metacards = set()  # type: typing.Set[Metacard]
         self.__cards = set()  # type: typing.Set[Card]
-        self.__tournaments = set()  # type: typing.Set[Tournament]
+        self.__formats = set()  # type: typing.Set[Format]
+        self.__legal_in_format = set()  # type: typing.Set[LegalInFormat]
         self.__json = None  # type: CardList
         self.__pending_update = False  # type: bool
         self.download_directory = os.path.join(self.__app.static_folder, "downloads")
@@ -129,8 +131,11 @@ class JSonCardParser:
 
                 for legality in metacard.get("legalities", []):
                     if not legality["format"].endswith("Block"):
-                        self.__tournaments.add(Tournament(
+                        self.__formats.add(Format(
                             legality["format"]
+                        ))
+                        self.__legal_in_format.add(LegalInFormat(
+                            metacard.get("name"), legality["format"], legality["legality"]
                         ))
 
     def __download_latest_version(self, version: str) -> str:
@@ -205,8 +210,15 @@ class JSonCardParser:
         return self.__cards
 
     @property
-    def tournaments(self):
+    def formats(self):
         """ Set of all tournaments retrieved from the file """
-        if self.__tournaments is None or self.__pending_update:
+        if self.__formats is None or self.__pending_update:
             self.__load_data()
-        return self.__tournaments
+        return self.__formats
+
+    @property
+    def legal_in_format(self):
+        """ Set of all legalities """
+        if self.__legal_in_format is None or self.__pending_update:
+            self.__load_data()
+        return self.__legal_in_format

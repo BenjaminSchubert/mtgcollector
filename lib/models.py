@@ -131,6 +131,11 @@ class Edition(Model):
         """ returns a list of Editions of the form (code, name) """
         return cls._get(sql.Edition.list())
 
+    @classmethod
+    def blocks(cls) -> typing.List[typing.Dict[str, str]]:
+        """ returns all existing blocs """
+        return cls._get(sql.Edition.blocks())
+
     @property
     def as_database_object(self) -> dict:
         """ A dictionary view of the edition """
@@ -193,10 +198,10 @@ class Metacard(Model):
         return sql.Metacard.insert()
 
     @classmethod
-    def get_ids_where(cls, user_id: int=None, card_name: str="", card_type: str="", card_text: str="",
-                      card_context: str="", card_number: str="", artist: str="", in_collection: bool=False,
-                      power: str="", toughness: str="", cmc: str="", colors: str="", only_selected_colors: bool=False,
-                      all_selected_colors: bool=False,
+    def get_ids_where(cls, user_id: int=None, name: str= "", types: str= "", text: str= "", context: str= "",
+                      number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
+                      cmc: str="", colors: str="", only_selected_colors: bool=False, all_selected_colors: bool=False,
+                      edition: str= "", block: str="", format: str="", rarity: str="",
                       order_by="metacard.name"):
         def add_to_parameters(params: str, value: str):
             if params == "":
@@ -225,8 +230,8 @@ class Metacard(Model):
             else:
                 return query_parameters_
 
-        def sum_colors(colors):
-            return sum([color_translation[color] for color in colors])
+        def sum_colors(colors_):
+            return sum([color_translation[color] for color in colors_])
 
         color_translation = {"Red": 1, "Green": 2, "White": 4, "Blue": 8, "Black": 16}
         all_colors = {"Red", "Green", "White", "Blue", "Black"}
@@ -241,25 +246,25 @@ class Metacard(Model):
         else:
             command = sql.Metacard.get_ids()
 
-        if card_name:
+        if name:
             query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
-            kwargs["name"] = add_wildcard(card_name)
+            kwargs["name"] = add_wildcard(name)
 
-        if card_type:
+        if types:
             query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
-            kwargs["type"] = add_wildcard(card_type)
+            kwargs["type"] = add_wildcard(types)
 
-        if card_text:
+        if text:
             query_parameters = add_to_parameters(query_parameters, "metacard.orig_text LIKE %(card_text)s")
-            kwargs["card_text"] = add_wildcard(card_text)
+            kwargs["card_text"] = add_wildcard(text)
 
-        if card_context:
+        if context:
             query_parameters = add_to_parameters(query_parameters, "card.flavor LIKE %(flavor)s")
-            kwargs["flavor"] = add_wildcard(card_context)
+            kwargs["flavor"] = add_wildcard(context)
 
-        if card_number:
+        if number:
             query_parameters = add_to_parameters(query_parameters, "card.number = %(card_number)s")
-            kwargs["card_number"] = card_number
+            kwargs["card_number"] = number
 
         if artist:
             query_parameters = add_to_parameters(query_parameters, "card.artist LIKE %(artist)s")
@@ -268,6 +273,28 @@ class Metacard(Model):
         if in_collection:
             having = ("HAVING (IFNULL(SUM(card_in_collection.normal), 0)"
                       " + IFNULL(SUM(card_in_collection.foil), 0)) > 0")
+
+        if edition:
+            query_parameters = add_to_parameters(query_parameters, "card.edition = %(edition)s")
+            kwargs["edition"] = edition
+
+        if block:
+            query_parameters = add_to_parameters(
+                    query_parameters, "card.edition IN (SELECT code FROM edition WHERE block = %(block)s)"
+            )
+            kwargs["block"] = block
+
+        if format:
+            query_parameters = add_to_parameters(
+                    query_parameters,
+                    ("card.name IN (SELECT card_name FROM card_legal_in_format WHERE format = %(format)s"
+                        "AND type != 'Banned')")
+            )
+            kwargs["format"] = format
+
+        if rarity:
+            query_parameters = add_to_parameters(query_parameters, "card.rarity = %(rarity)s")
+            kwargs["rarity"] = rarity
 
         if "Colorless" in colors and len(colors) == 1:
             query_parameters = add_to_parameters(query_parameters, "metacard.colors IS NULL")
@@ -278,7 +305,9 @@ class Metacard(Model):
                     query_parameters = add_to_parameters(query_parameters, "metacard.colors = %(colors)s")
                     kwargs["colors"] = sum_colors(colors & all_colors)
                 else:
-                    query_parameters = add_to_parameters(query_parameters, "(metacard.colors & %(colors)s) = %(colors)s")
+                    query_parameters = add_to_parameters(
+                            query_parameters, "(metacard.colors & %(colors)s) = %(colors)s"
+                    )
                     kwargs["colors"] = sum_colors(colors & all_colors)
             else:
                 if only_selected_colors:
@@ -404,12 +433,16 @@ class Card(Model):
             "name=The%20Ultimate%20Nightmare%20of%20Wizards%20of%20the%20Coast%20Customer%20Service&options="
         )
 
+    @classmethod
+    def rarities(cls):
+        return [card["rarity"].pop() for card in cls._get(sql.Card.rarities())]
 
-class Tournament(Model):
+
+class Format(Model):
     """
-    Tournament model
+    Format model
 
-    :param name: the name of the tournament
+    :param name: the name of the format
     """
     def __init__(self, name):
         self.__name = name
@@ -417,12 +450,17 @@ class Tournament(Model):
     @classmethod
     def insertion_command(cls) -> str:
         """ Command to insert a tournament in the database """
-        return sql.Tournament.insert()
+        return sql.Format.insert()
 
     @classmethod
     def table_creation_command(cls) -> str:
         """ Creation command for the tournament table """
-        return sql.Tournament.create_table()
+        return sql.Format.create_table()
+
+    @classmethod
+    def list(cls) -> typing.List[typing.Dict[str, str]]:
+        """ list all existing tournament formats """
+        return cls._get(sql.Format.list())
 
     @property
     def as_database_object(self) -> dict:
@@ -550,6 +588,41 @@ class CardInSide(Model):
 
     def as_database_object(self) -> dict:
         pass
+
+
+class LegalInFormat(Model):
+    """
+    Represents that a card is not legal in a tournament
+    """
+    index = 3
+
+    def __init__(self, card_name, _format, _type):
+        self.__card_name = card_name
+        self.__format = _format
+        self.__type = _type
+
+    @classmethod
+    def table_creation_command(cls) -> str:
+        """ command to create the database table """
+        return sql.LegalInFormat.create_table()
+
+    @property
+    def as_database_object(self) -> dict:
+        """ gets a dictionary view of the object for insertion in the database """
+        return {
+            "card_name": self.__card_name,
+            "format": self.__format,
+            "type": self.__type
+        }
+
+    @property
+    def primary_key(self) -> dict:
+        """ primary card for the card in format """
+        return (self.__card_name, self.__format)
+
+    @classmethod
+    def insertion_command(cls) -> str:
+        return sql.LegalInFormat.insert()
 
 
 class DeckList:

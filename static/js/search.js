@@ -11,11 +11,12 @@ $(document).ready(function () {
     replaceMinOneByStar();
 
     replaceIcons();
-})
+});
+
 
 function bindSubmitButton() {
     $('#button_submit').click(function (e) {
-        var url = $('#form-search input').filter(filterNotDefaultInput).serialize();
+        var url = $('#form-search input, #form-search select').filter(filterNotDefaultInput).serialize();
 
         document.location = "search?" + url;
         e.preventDefault(); // prevent default submit event
@@ -34,6 +35,7 @@ function filterNotDefaultInput(index, elem) {
             parseInt(jElem.attr('data-slider-max')) === parseInt(values[1]));
     }
 
+    console.log(elem, value, value !== "");
     return value !== "";
 }
 
@@ -48,7 +50,7 @@ function replaceMinOneByStar() {
 }
 
 function replaceIcons() {
-    $('#values_inputs-colors label').each(function () {
+    $('#colors label').each(function () {
         var text = insertImagesInText($(this).text());
         $(this).empty();
         $(this).append(text)

@@ -230,10 +230,12 @@ class Card:
     @classmethod
     def get_multiverseid(cls):
         """ get the multiverseid for the given card id """
-        return """
-            SELECT multiverseid FROM card WHERE
-            card_id=%(card_id)s
-        """
+        return """ SELECT multiverseid FROM card WHERE card_id=%(card_id)s """
+
+    @classmethod
+    def rarities(cls):
+        """ list all different rarity formats """
+        return """ SELECT DISTINCT rarity FROM card """
 
 
 class Edition:
@@ -257,7 +259,7 @@ class Edition:
         """
 
     @classmethod
-    def insert(cls):
+    def insert(cls) -> str:
         """ command to insert an edition """
         return """
             INSERT INTO edition (code, releaseDate, name, type, block)
@@ -267,32 +269,42 @@ class Edition:
         """
 
     @classmethod
-    def list(cls):
+    def list(cls) -> str:
         """ command to get all editions names and ids """
         return """ SELECT code, name FROM edition ORDER BY name """
 
+    @classmethod
+    def blocks(cls) -> str:
+        """ command to get all different blocs """
+        return """ SELECT DISTINCT block FROM edition ORDER BY name """
 
-class Tournament:
+
+class Format:
     """
-    MySQL commands related to the Tournament model
+    MySQL commands related to the Format model
     """
     @classmethod
     def create_table(cls):
-        """ command to create the Tournament table """
+        """ command to create the format table """
         return """
-            CREATE TABLE tournament (
+            CREATE TABLE format (
                 name VARCHAR(150) PRIMARY KEY
             )
         """
 
     @classmethod
     def insert(cls):
-        """ command to insert a tournament """
+        """ command to insert a format """
         return """
-            INSERT INTO tournament (name)
+            INSERT INTO format (name)
             VALUES (%(name)s)
             ON DUPLICATE KEY UPDATE name=VALUES(name)
         """
+
+    @classmethod
+    def list(cls) -> str:
+        """ method to get all format """
+        return """ SELECT * FROM format """
 
 
 class Collection:
@@ -423,3 +435,32 @@ class CardInSide(CardInDeckEntity):
     def table_name(mcs) -> str:
         """ the table name """
         return "card_in_side"
+
+
+class LegalInFormat:
+    """
+    MySQL commands to handle which formats which card is available in
+    """
+    @classmethod
+    def create_table(cls) -> str:
+        """ command to create the table """
+        return """
+            CREATE TABLE card_legal_in_format (
+                card_name VARCHAR(150) NOT NULL,
+                format VARCHAR(150) NOT NULL,
+                type SET('Restricted', 'Legal', 'Banned') NOT NULL,
+
+                FOREIGN KEY (card_name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                FOREIGN KEY (format) REFERENCES format(name) ON DELETE RESTRICT ON UPDATE RESTRICT ,
+                UNIQUE (card_name, format)
+            )
+        """
+
+    @classmethod
+    def insert(cls) -> str:
+        """ command to make a card valid in a format """
+        return """
+            INSERT INTO card_legal_in_format (card_name, format, type)
+            VALUES (%(card_name)s, %(format)s, %(type)s)
+            ON DUPLICATE KEY UPDATE type=VALUES(type)
+        """

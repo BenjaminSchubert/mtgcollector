@@ -11,7 +11,7 @@
 }
 
 .panel > form {
-    margin: 3%;
+    margin: 2%;
 }
 
 .panel > form > .panel {
@@ -20,8 +20,7 @@
 
 .form-horizontal .control-label {
     text-align: left;
-    padding: 0;
-    padding-top: 5px;
+    padding: 5px 0 0;
 }
 
 #values_inputs-colors img {
@@ -30,4 +29,36 @@
 
 #values_inputs-colors label {
     margin-right: 7px;
+}
+
+#form-search {
+    display: table;
+}
+
+#form-search .row {
+    margin: 0;
+}
+
+#form-search .panel {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+    padding: 2%;
+}
+
+.form-container {
+    padding-top: 2%;
+    padding-left: 2%;
+    padding-right: 2%;
+    margin: 0;
+}
+
+
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#button_submit {
+    font-size: 18px;
 }
