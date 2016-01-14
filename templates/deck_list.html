@@ -21,6 +21,39 @@
 
             <tbody></tbody>
         </table>
+        <button id="create-deck-button" class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-create-deck">Create new deck</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-create-deck" tabindex="-1" role="dialog" aria-labelledby="Create new deck" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Create a new deck</h4>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form id="modal-form" role="form">
+                        <div class="form-group">
+                            <label for="deck-name">Deck name</label>
+                            <input id="deck-name" class="form-control" type="text">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button id="modal-submit-button" type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
