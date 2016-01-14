@@ -4,6 +4,7 @@ var deckPostPath = "api/decks";
 $(document).ready(function () {
     setupPost();
     fetchJson(createDeckList);
+    bindModalButton();
 });
 
 function fetchJson(callback) {
@@ -73,5 +74,23 @@ function bindEditable() {
 
         url: deckPostPath,
         name: "name"
+    });
+}
+
+function bindModalButton() {
+    $('#modal-submit-button').click(function () {
+        var postData = {
+            name: $('#deck-name').val()
+        };
+
+        if (postData.name === "") {
+            $('#modal-form').addClass('has-error');
+        } else {
+            $.post(deckPostPath, postData, function (data) {
+                console.log(data);
+                $('#modal-add-to-deck').modal('hide');
+                $('#modal-form').removeClass('has-error');
+            });
+        }
     });
 }

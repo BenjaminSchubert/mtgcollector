@@ -39,6 +39,7 @@ $(document).ready(function () {
     $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
     $(window).resize(initView);
 
+    setImagesErrorPath();
     initView();
 
     // what to do when clicking on card image
@@ -51,31 +52,11 @@ $(document).ready(function () {
         }
     });
 
-    // bind editable values
-    bindEditable();
-
     setupPost();
-
-    prepareDeckModal();
 });
 
-function prepareDeckModal() {
-    var options = '';
-    existingDecks.forEach(function (deck) {
-        options += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
-    });
-
-    $('#deck-selection').append(options);
-
-    // post data
-    $('#modal-submit-button').click(function () {
-        var deckId = $('#deck-selection').find(":selected").attr('deck-id');
-        var cardId = $('#modal-add-to-deck').attr('card-id');
-
-        $.post(deckPostPath + deckId, {card_id : cardId} , function (data) {
-            console.log(data);
-        });
-    });
+function setImagesErrorPath() {
+    $('img').attr('onerror', 'this.src="' + defaultImgPath + '"');
 }
 
 
@@ -233,7 +214,6 @@ function createDetails(id) {
     cardDetails.children('h2').text(details["name"]);
     cardDetails.find('#card-details-upper-right').empty();
     cardDetails.children('#card-details-lower').empty();
-    $('#modal-add-to-deck').attr('card-id', id);
 
     createDetailsUpper(id);
     createDetailsLower(details);
@@ -248,14 +228,14 @@ function createDetailsUpper(id) {
     var cardDiv = $('#' + id);
 
     parentDiv.append('<p>In collection</p>');
-    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'));
-    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'));
-    createButtonAddToDeck(parentDiv);
+    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), false);
+    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), true);
+    createButtonAddToDeck(id, parentDiv);
 
     var details = detailsFetched[id];
     if (details["types"][0] !== "Land") {
         createDetailsField(parentDiv, details, "manaCost", "Mana Cost", createStringFromValue);
-        createDetailsField(parentDiv, details, "cmc", "Converted Mana Cost", createStringFromValue);
+        createDetailsField(parentDiv, details, "cmc", "Cmc", createStringFromValue);
     }
     createDetailsField(parentDiv, details, "types", "Types", createStringFromArrayValue);
     createDetailsField(parentDiv, details, "rarity", "Rarity", createStringFromValue);
@@ -273,38 +253,79 @@ function createDetailsLower(details) {
 }
 
 // Creates and editable input for number of cards of a type (normal or foil for example).
-function createRowNumCards(parentDiv, id, labelVal, num) {
-    var row = $('<div class="row"></div>');
+function createRowNumCards(parentDiv, id, labelVal, num, isFoil) {
+    var row = $('<div class="row popover-wrapper"></div>');
     var label = $('<label class="col-md-9">' + labelVal  + '</label>');
-    var input = $('<a>' + num + '</a>').attr({
-        'class': 'col-md-3',
-        'data-placement': 'left',
-        'data-title': 'Number of cards',
-        'data-type': 'number',
-        'data-url': numCardPostPath + id,
-        'data-pk': id,
-        'data-name': labelVal
-    });
-
-    input.editable();
+    var link = $('<a class="col-md-3">' + num + '</a>');
 
     row.append(label);
-    row.append(input);
+    row.append(link);
+
+    link.click(function () {
+        // create popover content
+        var content = $(
+            '<label>Num cards</label>' +
+            '<input id="num-cards-to-add" type="number" class="form-control">'
+        );
+
+        // create popover
+        var popover = createPopover(content, function () {
+            var postData = {
+                id: id,
+                n_cards: $('#num-cards-to-add').val(),
+                foil: isFoil
+            };
+
+            $.post(numCardPostPath + id, postData, function (data) {
+                console.log(data);
+                link.text(data);
+            });
+        });
+
+        row.append(popover);
+    });
+
     parentDiv.append(row);
 }
 
 // Creates the button to add the current card to a deck.
-function createButtonAddToDeck(parentDiv) {
-    var button = $('<button>Add to deck</button>');
+function createButtonAddToDeck(id, parentDiv) {
 
-    button.attr({
-        'id': 'button-add-to-deck',
-        'class': 'btn btn-primary',
-        'data-toggle': 'modal',
-        'data-target': '#modal-add-to-deck'
+    var button = $('<button class="btn btn-primary" data-card-id="' + id + '">Add to deck</button>');
+    var buttonDiv = $('<div class="popover-wrapper"></div>');
+    buttonDiv.append(button);
+
+    button.click(function () {
+
+        // create popover content
+        var content = '<select id="deck-selection" data-card-id="' +  + '">';
+        existingDecks.forEach(function (deck) {
+            content += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
+        });
+        content +=
+            '</select>' +
+            '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
+            '<input id="add-to-side" type="checkbox">';
+
+        // create popover
+        var popover = createPopover($(content), function () {
+            var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-id');
+
+            var postData = {
+                card_id: id,
+                n_cards: $('#number-cards-to-add').val(),
+                side : $('#add-to-side').is(':checked')
+            };
+
+            $.post(deckPostPath + deckId, postData, function (data) {
+                console.log(data);
+            });
+        });
+
+        buttonDiv.append(popover);
     });
 
-    parentDiv.append(button);
+    parentDiv.append(buttonDiv);
 }
 
 // Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.
@@ -345,27 +366,4 @@ function createDetailsField(parentDiv, details, key, name, createStringFunction)
 
         parentDiv.append(newDetail);
     }
-}
-
-// Binds editable fields.
-function bindEditable() {
-    var cardDetails = $('#card-details');
-
-    cardDetails.find('#n-normal').editable({
-        type: 'number',
-        title: 'Enter new number',
-        placement: 'left',
-
-        url: numCardPostPath,
-        name: "n_normal"
-    });
-
-    cardDetails.find('#n-foil').editable({
-        type: 'number',
-        title: 'Enter new number',
-        placement: 'left',
-
-        url: numCardPostPath,
-        name: "n_foil"
-    });
 }
