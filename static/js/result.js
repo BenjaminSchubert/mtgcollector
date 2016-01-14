@@ -52,7 +52,6 @@ $(document).ready(function () {
         }
     });
 
-    bindEditable();
     setupPost();
 });
 
@@ -229,8 +228,8 @@ function createDetailsUpper(id) {
     var cardDiv = $('#' + id);
 
     parentDiv.append('<p>In collection</p>');
-    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'));
-    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'));
+    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), false);
+    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), true);
     createButtonAddToDeck(id, parentDiv);
 
     var details = detailsFetched[id];
@@ -254,23 +253,38 @@ function createDetailsLower(details) {
 }
 
 // Creates and editable input for number of cards of a type (normal or foil for example).
-function createRowNumCards(parentDiv, id, labelVal, num) {
-    var row = $('<div class="row"></div>');
+function createRowNumCards(parentDiv, id, labelVal, num, isFoil) {
+    var row = $('<div class="row popover-wrapper"></div>');
     var label = $('<label class="col-md-9">' + labelVal  + '</label>');
-    var input = $('<a>' + num + '</a>').attr({
-        'class': 'col-md-3',
-        'data-placement': 'left',
-        'data-title': 'Number of cards',
-        'data-type': 'number',
-        'data-url': numCardPostPath + id,
-        'data-pk': id,
-        'data-name': labelVal
-    });
-
-    input.editable();
+    var link = $('<a class="col-md-3">' + num + '</a>');
 
     row.append(label);
-    row.append(input);
+    row.append(link);
+
+    link.click(function () {
+        // create popover content
+        var content = $(
+            '<label>Num cards</label>' +
+            '<input id="num-cards-to-add" type="number" class="form-control">'
+        );
+
+        // create popover
+        var popover = createPopover(content, function () {
+            var postData = {
+                id: id,
+                n_cards: $('#num-cards-to-add').val(),
+                foil: isFoil
+            };
+
+            $.post(numCardPostPath + id, postData, function (data) {
+                console.log(data);
+                link.text(data);
+            });
+        });
+
+        row.append(popover);
+    });
+
     parentDiv.append(row);
 }
 
@@ -352,27 +366,4 @@ function createDetailsField(parentDiv, details, key, name, createStringFunction)
 
         parentDiv.append(newDetail);
     }
-}
-
-// Binds editable fields.
-function bindEditable() {
-    var cardDetails = $('#card-details');
-
-    cardDetails.find('#n-normal').editable({
-        type: 'number',
-        title: 'Enter new number',
-        placement: 'left',
-
-        url: numCardPostPath,
-        name: "n_normal"
-    });
-
-    cardDetails.find('#n-foil').editable({
-        type: 'number',
-        title: 'Enter new number',
-        placement: 'left',
-
-        url: numCardPostPath,
-        name: "n_foil"
-    });
 }
