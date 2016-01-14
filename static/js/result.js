@@ -70,10 +70,16 @@ function prepareDeckModal() {
     // post data
     $('#modal-submit-button').click(function () {
         var deckId = $('#deck-selection').find(":selected").attr('deck-id');
-        var cardId = $('#modal-add-to-deck').attr('card-id');
 
-        $.post(deckPostPath + deckId, {card_id : cardId} , function (data) {
+        var postData = {
+            card_id: $('#modal-add-to-deck').attr('card-id'),
+            n_cards: $('#number-cards-to-add').val(),
+            side : $('#add-to-side').is(':checked')
+        };
+
+        $.post(deckPostPath + deckId, postData , function (data) {
             console.log(data);
+            $('#modal-add-to-deck').modal('hide');
         });
     });
 }
@@ -255,7 +261,7 @@ function createDetailsUpper(id) {
     var details = detailsFetched[id];
     if (details["types"][0] !== "Land") {
         createDetailsField(parentDiv, details, "manaCost", "Mana Cost", createStringFromValue);
-        createDetailsField(parentDiv, details, "cmc", "Converted Mana Cost", createStringFromValue);
+        createDetailsField(parentDiv, details, "cmc", "Cmc", createStringFromValue);
     }
     createDetailsField(parentDiv, details, "types", "Types", createStringFromArrayValue);
     createDetailsField(parentDiv, details, "rarity", "Rarity", createStringFromValue);
