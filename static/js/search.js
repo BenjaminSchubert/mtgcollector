@@ -9,6 +9,8 @@ $(document).ready(function () {
     bindReplaceMinOneByStar();
 
     replaceMinOneByStar();
+
+    replaceIcons();
 })
 
 function bindSubmitButton() {
@@ -42,5 +44,13 @@ function bindReplaceMinOneByStar() {
 function replaceMinOneByStar() {
     $('.slider .tooltip.tooltip-main .tooltip-inner').each(function () {
         $(this).text($(this).text().replace("-1", "*"));
+    })
+}
+
+function replaceIcons() {
+    $('#values_inputs-colors label').each(function () {
+        var text = insertImagesInText($(this).text());
+        $(this).empty();
+        $(this).append(text)
     })
 }

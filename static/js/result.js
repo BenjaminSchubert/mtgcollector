@@ -88,19 +88,19 @@ function initView() {
 }
 
 
-// Allows loading of cards in a margin of nPixels before the top and after the bottom of viewport
+// Allows loading of cards in a margin of nPixels before the top and after the bottom of viewport.
 function setPreloadMargin(nPixels) {
     withinviewport.defaults.top = -nPixels;
     withinviewport.defaults.bottom = -nPixels;
 }
 
 
-// Resizes all div to image size
+// Resizes all div to image size.
 function resizeDivHeights() {
     $('#cards > div').height(findImageHeight());
 }
 
-
+// Finds the current height of a card.
 function findImageHeight() {
     return $('#cards > div').first().width() * 310 / 223; // 310 : card height, 223 : card width
 }
@@ -224,6 +224,7 @@ function fetchCardDetails(id) {
     }
 }
 
+// Creates the details view for the current locked card / hovered card
 function createDetails(id) {
 
     var details = detailsFetched[id];
@@ -238,17 +239,41 @@ function createDetails(id) {
     createDetailsLower(details);
 }
 
+// Creates upper part of the card details
 function createDetailsUpper(id) {
 
+    var parentDiv = $('#card-details-upper-right');
+
+    // TODO: can be changed when cards as json
     var cardDiv = $('#' + id);
 
-    $('#card-details-upper-right').append('<p>In collection</p>');
-    createRowNumCards(id, "Normal", cardDiv.attr('data-normal'));
-    createRowNumCards(id, "Foil", cardDiv.attr('data-foil'));
-    createButtonAddToDeck();
+    parentDiv.append('<p>In collection</p>');
+    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'));
+    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'));
+    createButtonAddToDeck(parentDiv);
+
+    var details = detailsFetched[id];
+    if (details["types"][0] !== "Land") {
+        createDetailsField(parentDiv, details, "manaCost", "Mana Cost", createStringFromValue);
+        createDetailsField(parentDiv, details, "cmc", "Converted Mana Cost", createStringFromValue);
+    }
+    createDetailsField(parentDiv, details, "types", "Types", createStringFromArrayValue);
+    createDetailsField(parentDiv, details, "rarity", "Rarity", createStringFromValue);
+
 }
 
-function createRowNumCards(id, labelVal, num) {
+// Creates lower parts of card details
+function createDetailsLower(details) {
+    var parentDiv = $('#card-details-lower');
+    createDetailsField(parentDiv, details, "orig_text", "Card Text", createStringFromValue);
+    createDetailsField(parentDiv, details, "flavor", "Flavor Text", createStringFromValue);
+    createDetailsField(parentDiv, details, "edition", "Edition", createStringFromValue);
+    createDetailsField(parentDiv, details, "number", "Card Number", createStringFromValue);
+    createDetailsField(parentDiv, details, "artist", "Artist", createStringFromValue);
+}
+
+// Creates and editable input for number of cards of a type (normal or foil for example).
+function createRowNumCards(parentDiv, id, labelVal, num) {
     var row = $('<div class="row"></div>');
     var label = $('<label class="col-md-9">' + labelVal  + '</label>');
     var input = $('<a>' + num + '</a>').attr({
@@ -265,10 +290,11 @@ function createRowNumCards(id, labelVal, num) {
 
     row.append(label);
     row.append(input);
-    $('#card-details-upper-right').append(row);
+    parentDiv.append(row);
 }
 
-function createButtonAddToDeck() {
+// Creates the button to add the current card to a deck.
+function createButtonAddToDeck(parentDiv) {
     var button = $('<button>Add to deck</button>');
 
     button.attr({
@@ -278,21 +304,7 @@ function createButtonAddToDeck() {
         'data-target': '#modal-add-to-deck'
     });
 
-    $('#card-details-upper-right').append(button);
-}
-
-function createDetailsLower(details) {
-    if (details["types"][0] !== "Land") {
-        createDetailsField(details, "manaCost", "Mana Cost", createStringFromValue);
-        createDetailsField(details, "cmc", "Converted Mana Cost", createStringFromValue);
-    }
-    createDetailsField(details, "types", "Types", createStringFromArrayValue);
-    createDetailsField(details, "orig_text", "Card Text", createStringFromValue);
-    createDetailsField(details, "flavor", "Flavor Text", createStringFromValue);
-    createDetailsField(details, "edition", "Edition", createStringFromValue);
-    createDetailsField(details, "rarity", "Rarity", createStringFromValue);
-    createDetailsField(details, "number", "Card Number", createStringFromValue);
-    createDetailsField(details, "artist", "Artist", createStringFromValue);
+    parentDiv.append(button);
 }
 
 // Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.
@@ -312,20 +324,31 @@ function createStringFromArrayValue(details, key) {
     return res;
 }
 
-function createDetailsField(details, key, name, createStringFunction) {
+/**
+ * Creates a field corresponding to a detail value.
+ *
+ * Params :
+ * parentDiv : the div to which attach the created element
+ * details : object containing values
+ * key : the key to access the value which will be displayed
+ * name : value of the label
+ * createStringFunction : function which will create a string from the value. Useful to define behaviour related to the
+ * value type (for example arrays).
+ */
+function createDetailsField(parentDiv, details, key, name, createStringFunction) {
     // if value at 'key' is set and a key 'key' exists, create the elements
     if (details[key] !== null && details[key] !== undefined) {
 
         var newDetail = $('<div class="row"></div>');
-        newDetail.append('<label class="col-md-4">' + name + '</label>');
-        newDetail.append('<div class="col-md-8">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
+        newDetail.append('<label class="col-md-6">' + name + '</label>');
+        newDetail.append('<div class="col-md-6">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
 
-        $('#card-details-lower').append(newDetail);
+        parentDiv.append(newDetail);
     }
 }
 
+// Binds editable fields.
 function bindEditable() {
-
     var cardDetails = $('#card-details');
 
     cardDetails.find('#n-normal').editable({

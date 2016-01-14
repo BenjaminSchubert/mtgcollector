@@ -34,6 +34,11 @@
     overflow: auto;
 }
 
+#card-details .row {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
 #card-details > h2 {
     text-align: center;
     margin-bottom: 15px;
@@ -58,6 +63,7 @@
 
 #button-add-to-deck {
     margin-top: 5px;
+    margin-bottom: 30px;
 }
 
 .popover-buttons button {
