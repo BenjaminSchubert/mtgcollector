@@ -8,7 +8,7 @@ Forms used across the application
 from flask.ext.wtf import Form
 from wtforms import StringField, IntegerField, PasswordField, TextAreaField, BooleanField, SelectField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange, InputRequired, Optional
 
 from lib.forms.fields import StartSeparatorField, StopSeparatorField, SliderField, MultiCheckboxField
 from lib.forms.validators import validate_port, validate_host
@@ -120,3 +120,33 @@ class SearchForm(Form):
 
         if not user_authenticated:
             del self.in_collection
+
+
+class AddToCollectionForm(Form):
+    """
+    Form to add a card to the collection
+    """
+    n_normal = IntegerField(validators=[InputRequired(), NumberRange(min=0)])
+    n_foil = IntegerField(validators=[InputRequired(), NumberRange(min=0)])
+
+
+class RenameDeck(Form):
+    """
+    Form to rename a deck
+    """
+    name = StringField(validators=[DataRequired()])
+
+
+class ChangeDeckIndex(Form):
+    """
+    Form to change a deck index
+    """
+    index = IntegerField(validators=[InputRequired(), NumberRange(min=0)])
+
+
+class AddToDeckForm(Form):
+    """
+    Form to add a card to a deck
+    """
+    number = IntegerField(validators=[InputRequired(), NumberRange(min=0)])
+    side = BooleanField()

@@ -1,12 +1,18 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Handles the first configuration of the server
+"""
 
 import flask
 import mysql.connector
 import mysql.connector.errorcode
 import mysql.connector.errors
 import werkzeug.routing
+import werkzeug.wrappers
 from flask import redirect, url_for, render_template
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, login_user, current_user
 
 import lib.db
 import lib.db.maintenance
@@ -15,8 +21,15 @@ import lib.models
 from lib.conf import update_conf
 from mtgcollector import app
 
+__author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
-def validate_conf(form):
+
+def validate_conf(form: lib.forms.InstallationForm):
+    """
+    Checks that the parameters given by the client are correct and allow a successful connection to the database
+
+    :param form: form containing the informations
+    """
     app.config.update({
         "DATABASE_USER": form.username.data,
         "DATABASE_HOST": form.host.data,
@@ -42,8 +55,9 @@ def validate_conf(form):
                 app.config.pop(value)
 
 
-def get_database_form():
-    form = lib.forms.install.InstallationForm()
+def get_database_form() -> werkzeug.wrappers.Response:
+    """ Setups and validates configuration to the database """
+    form = lib.forms.InstallationForm()
     if form.validate_on_submit():
         try:
             validate_conf(form)
@@ -64,7 +78,8 @@ def get_database_form():
 
 
 def get_user_form():
-    form = lib.forms.auth.RegisterForm()
+    """ setups the administrator """
+    form = lib.forms.RegisterForm()
 
     if form.validate_on_submit():
         user = lib.models.User(username=form.username.data, email=form.email.data, password=form.password.data).create()
@@ -77,6 +92,7 @@ def get_user_form():
 
 @app.route("/install", methods=['GET', 'POST'])
 def install():
+    """ route to create the connection to the database and the first user """
     # No db connection, it is not already setup
     if not getattr(flask.g, "db", None):
         return get_database_form()
@@ -87,12 +103,16 @@ def install():
 
 
 @app.route("/update", methods=['GET', 'POST'])
+@login_required
 def update():
-    app.update_db.set()
+    """ route to update the database """
+    if current_user.is_admin():
+        app.update_db.set()
     return redirect(url_for("index"))
 
 
 @app.route("/parameters", methods=['GET', 'POST'])
 @login_required
 def parameters():
+    """ user parameters """
     return render_template('parameters.html', active_page="parameters")

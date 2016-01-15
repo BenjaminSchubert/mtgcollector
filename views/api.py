@@ -14,6 +14,7 @@ from flask.ext.login import login_required, current_user
 
 import mtgcollector
 from lib import models
+from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
@@ -56,35 +57,27 @@ def get_card_info(card_id: int) -> werkzeug.wrappers.Response:
     :param card_id: card for which to fetch information
     :return: an http response containing the Card information, json formatted
     """
-    card = models.Card.get(card_id)
-    if len(card) == 1:
-        return flask.jsonify(**card[0])
-    elif len(card) > 1:
-        mtgcollector.app.logger.error("Got multiple cards for %(card_id)s", dict(card_id=card_id))
-        return flask.jsonify(**card[0])
-    else:
-        mtgcollector.app.logger.error("Got no information for card %(card_id)s", dict(card_id=card_id))
-        flask.abort(404)
+    return flask.jsonify(**models.Card.get(card_id)[0])
 
 
-@mtgcollector.app.route("/api/collection/", methods=["POST"])
+@mtgcollector.app.route("/api/collection/<card_id>", methods=["POST"])
 @login_required
-def add_to_collection() -> werkzeug.wrappers.Response:
+def add_to_collection(card_id) -> werkzeug.wrappers.Response:
     """
     adds the given card to the collection.
 
     The 'normal' and 'foil' argument are expected in the POST request.
     They must be integers
 
-    :return: a json formatted response containing the card_id, the new number of foil and normal iteration
+    :param card_id: id of the card to add to the collection
     """
-    card_id = flask.request.form.get("id", type=int)
-    normal = flask.request.form.get('n_normal', type=int)
-    foil = flask.request.form.get('n_foil', type=int)
+    form = AddToCollectionForm()
 
-    current_user.collection.insert(card_id=card_id, normal=normal, foil=foil)
-
-    return flask.jsonify(card_id=card_id, normal=normal, foil=foil)
+    if form.validate_on_submit():
+        current_user.collection.insert(card_id=card_id, **form.data)
+        return ('', 200)
+    else:
+        return (form.errors, 400)
 
 
 @mtgcollector.app.route("/api/decks", methods=["GET"])
@@ -94,34 +87,46 @@ def list_decks() -> werkzeug.wrappers.Response:
     return flask.jsonify(decks=current_user.decks.list())
 
 
-@mtgcollector.app.route("/api/decks", methods=["POST"])
-@login_required
-def add_deck() -> werkzeug.wrappers.Response:
-    """ adds a new deck with the given name """
-    return flask.jsonify(dict(deck=current_user.decks.add(flask.request.form["name"])))
-
-
 @mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
 @login_required
-def modify_deck(name: str) -> werkzeug.wrappers.Response:
+def create_deck(name: str) -> werkzeug.wrappers.Response:
     """
-    Allows the user to customize its deck
+    Creates a new deck for the authenticated user
 
-    The following POST data are checked :
-        name : the new name for the deck
-        index : the new user_index to give to the deck
+    :param name: name of the deck to create
+    """
+    current_user.decks.add(name)
+    return ('', 200)
+
+
+@mtgcollector.app.route("/api/decks/<name>/rename", methods=["POST"])
+@login_required
+def rename_deck(name: str) -> werkzeug.wrappers.Response:
+    """
+    Renames the deck given in the url with the new name given in POST parameters
 
     :param name: name of the deck to rename
     """
-    new_name = flask.request.form.get("name")
-    index = flask.request.form.get("index")
+    form = RenameDeck()
+    if form.validate_on_submit():
+        current_user.decks.rename(name, form.data["name"])
+        return ('', 200)
+    return (form.errors, 400)
 
-    if new_name:
-        current_user.decks.rename(name, new_name)
-    if index:
-        current_user.decks.set_index(name, index)
 
-    return ('', 200)
+@mtgcollector.app.route("/api/decks/<name>/index", methods=["POST"])
+@login_required
+def change_deck_index(name: str) -> werkzeug.wrappers.Response:
+    """
+    Changes the deck user index to the given value
+
+    :param name: name of the deck for which to change the index
+    """
+    form = ChangeDeckIndex()
+    if form.validate_on_submit():
+        current_user.decks.set_index(name, form.data["index"])
+        return ('', 200)
+    return (form.errors, 400)
 
 
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
@@ -134,13 +139,11 @@ def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
     :param card_id: id of the card to add
     :return: the number of card of this id now in the deck
     """
-    number = flask.request.form.get('n_cards', type=int)
-    side = bool(flask.request.form.get("side", type=int))
-
-    if card_id is None or number is None or side is None:
-        return flask.abort(400)
-
-    return flask.jsonify(dict(card=current_user.decks.add_card(name, card_id, number, side)))
+    form = AddToDeckForm()
+    if form.validate_on_submit():
+        current_user.decks.add_card(name, card_id, **form.data)
+        return ('', 200)
+    return (form.errors, 400)
 
 
 @mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])

@@ -45,10 +45,7 @@ class IntegrationTest(LiveServerTestCase):
     def check_no_40X(self):
         for link in self.links:
             status = requests.get(link).status_code
-            if link.split("/")[-1] in {"logout", "parameters", "decks"}:
-                self.assertEqual(401, status, "{} have been accessed but shouldn't have".format(link))
-            else:
-                self.assertGreaterEqual(400, status, "{} sent back {} error".format(link, status))
+            self.assertGreaterEqual(400, status, "{} sent back {} error".format(link, status))
 
     def test_complete(self):
         """ Tests that everything more or less works as it should """

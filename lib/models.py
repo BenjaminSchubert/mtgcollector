@@ -644,19 +644,20 @@ class Collection(Model):
         """ command to add a card to a collection """
         return sql.Collection.insert()
 
-    def insert(self, card_id: int, normal: int, foil: int) -> None:
+    # noinspection PyShadowingBuiltins
+    def insert(self, card_id: int, n_normal: int, n_foil: int) -> None:
         """
         adds a new card to the collection.
 
         If both normal and foil are 0, will delete all instances of the card instead
         :param card_id: card to add to the collection
-        :param normal: number of normal copy
-        :param foil: number of foil copy
+        :param n_normal: number of normal copy
+        :param n_foil: number of foil copy
         """
-        if normal == foil == 0:
+        if n_normal == n_foil == 0:
             self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
         else:
-            self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=normal, foil=foil)
+            self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=n_normal, foil=n_foil)
 
     def _as_database_object(self) -> dict:
         """ this is never used """
