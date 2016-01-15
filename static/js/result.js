@@ -3,6 +3,7 @@ var imgPath = "/api/images/";
 var detailsPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
 var numCardPostPath = "/api/collection/";
+var deckGetPath = "api/decks";
 var deckPostPath = "api/decks/";
 
 // TODO change once api/decks ok
@@ -39,6 +40,7 @@ $(document).ready(function () {
     $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
     $(window).resize(initView);
 
+    fetchExistingDecks();
     setImagesErrorPath();
     initView();
 
@@ -54,6 +56,12 @@ $(document).ready(function () {
 
     setupPost();
 });
+
+function fetchExistingDecks() {
+    $.get(deckGetPath, function (data) {
+        existingDecks = data;
+    });
+}
 
 function setImagesErrorPath() {
     $('img').attr('onerror', 'this.src="' + defaultImgPath + '"');

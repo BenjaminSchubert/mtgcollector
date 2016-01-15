@@ -1,5 +1,19 @@
-var jsonPath = "api/decks/json";
+var getDeckPath = "api/decks";
 var deckPostPath = "api/decks";
+
+// TODO
+var test = {
+    "decks": [
+        {
+            "deck_id": 1,
+            "n_deck": 0,
+            "n_side": 0,
+            "name": "Test deck 2",
+            "user_id": 1,
+            "user_index": 0
+        }
+    ]
+};
 
 $(document).ready(function () {
     setupPost();
@@ -8,36 +22,37 @@ $(document).ready(function () {
 });
 
 function fetchJson(callback) {
-    var testJson = [
-        {id: 42, user_index: 1, name: "Test", colors: ["{R}", "{G}", "{B}"], n_cards: 42, side: 14},
-        {id: 1, user_index: 3, name: "Test2", colors: ["{R}", "{G}", "{W}"], n_cards: 40, side: 15}
-    ]
-    callback(testJson);
-    //$.get(jsonPath, callback(data));
+    $.get(getDeckPath, function (data) {
+        callback(data);
+    });
 }
 
-function createDeckList(json) {
+function createDeckList(data) {
     var deckList = $('#deck-list > tbody');
+    var decks = data.decks;
 
-    $.each(json, function (i, deck) {
+    decks.forEach(function (deck) {
 
-        console.log(deck);
+        var colorsHTML = "";
+        if (deck["colors"] !== undefined && deck["colors"] !== null) {
+            colorsHTML = insertImagesInText(deck["colors"].toString());
+        }
 
         deckList.append(
-            '<tr id="' + deck.id + '" class="deck-row">' +
+            '<tr id="' + deck["deck_id"] + '" class="deck-row">' +
                 '<th class="deck-user-index" scope="row">' +
-                    '<a href="#" value="' + deck.user_index + '" data-pk="' + deck.id + '">' +
-                        deck.user_index +
+                    '<a href="#" value="' + deck["user_index"] + '" data-pk="' + deck["deck-id"] + '">' +
+                        deck["user_index"] +
                     '</a>' +
                 '</th>' +
                 '<td class="deck-name">' +
-                    '<a href="#" value="' + deck.name + '" data-pk="' + deck.id + '">' +
-                        deck.name +
+                    '<a href="#" value="' + deck["name"] + '" data-pk="' + deck["deck-id"] + '">' +
+                        deck["name"] +
                     '</a>' +
                 '</td>' +
-                '<td class="deck-colors">' + insertImagesInText(deck.colors.toString()) + '</td>' +
-                '<td class="deck-n_cards">' + deck.n_cards + '</td>' +
-                '<td class="deck-side">' + deck.side + '/15</td>' +
+                '<td class="deck-colors">' + colorsHTML + '</td>' +
+                '<td class="deck-n-deck">' + deck["n_deck"] + '</td>' +
+                '<td class="deck-n-side">' + deck["n_side"] + '/15</td>' +
                 '<td class="button-go-deck">' +
                     '<button class="btn btn-primary">Go to deck</button>' +
                 '</td>' +
