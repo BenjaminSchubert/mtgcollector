@@ -30,6 +30,9 @@ function setupPost() {
 
 function createPopover(node, buttonOkFunc) {
 
+    // close other popovers
+    $('.popover-main-container').remove();
+
     var nodeContainer = $('<div class="row popover-node-container"></div>');
     nodeContainer.append(node);
 
