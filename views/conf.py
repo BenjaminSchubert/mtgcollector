@@ -95,4 +95,4 @@ def update():
 @app.route("/parameters", methods=['GET', 'POST'])
 @login_required
 def parameters():
-    return render_template('parameters.html')
+    return render_template('parameters.html', active_page="parameters")

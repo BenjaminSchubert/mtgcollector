@@ -1,3 +1,22 @@
+{% set left_navigation_bar = [
+    (url_for('search'), 'Search'),
+    (url_for('collection'), 'Collection'),
+    (url_for('decks'), 'Decks')
+] -%}
+
+
+{% if not current_user.is_authenticated %}
+    {% set right_navigation_bar = [
+        (url_for('login'), 'Login')
+    ] -%}
+{% else %}
+    {% set right_navigation_bar = [
+        (url_for('parameters'), 'Parameters'),
+        (url_for('logout'), 'Logout')
+    ] -%}
+{% endif %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,29 +35,18 @@
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav navbar-left">
-					<li class="active">
-						<a href="{{ url_for('search') }}">Search</a>
-					</li>
-					<li>
-						<a href="{{ url_for('index') }}">Collection</a>
-					</li>
-                    <li>
-                        <a href="{{ url_for('deck_list') }}">Decks</a>
-                    </li>
+                    {% for href, caption in left_navigation_bar %}
+                        <li{% if caption.lower() == active_page %} class="active"{% endif %}>
+                            <a href="{{ href|e }}">{{ caption|e }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    {% if not current_user.is_authenticated %}
-                        <li>
-                            <a href="{{ url_for('login') }}">Login</a>
+                    {% for href, caption in right_navigation_bar %}
+                        <li{% if caption.lower() == active_page %} class="active"{% endif %}>
+                            <a href="{{ href|e }}">{{ caption|e }}</a>
                         </li>
-                    {% else %}
-                        <li>
-                            <a href="{{ url_for('parameters') }}">Parameters</a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('logout') }}">Logout</a>
-                        </li>
-                    {% endif %}
+                    {% endfor %}
 				</ul>
 			</div>
 		</div>
