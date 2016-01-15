@@ -67,22 +67,22 @@ def get_card_info(card_id: int) -> werkzeug.wrappers.Response:
         flask.abort(404)
 
 
-@mtgcollector.app.route("/api/collection/<card_id>", methods=["POST"])
+@mtgcollector.app.route("/api/collection/", methods=["POST"])
 @login_required
-def add_to_collection(card_id: int) -> werkzeug.wrappers.Response:
+def add_to_collection() -> werkzeug.wrappers.Response:
     """
     adds the given card to the collection.
 
     The 'normal' and 'foil' argument are expected in the POST request.
     They must be integers
 
-    :param card_id: card to add to the collection
     :return: a json formatted response containing the card_id, the new number of foil and normal iteration
     """
-    normal = flask.request.form.get('normal', type=int)
-    foil = flask.request.form.get('foil', type=int)
+    card_id = flask.request.form.get("id", type=int)
+    normal = flask.request.form.get('n_normal', type=int)
+    foil = flask.request.form.get('n_foil', type=int)
 
-    if normal == foil == 0:
+    if normal == foil == 0:  # TODO remove if trigger is decided
         current_user.collection.delete(card_id=card_id)
 
     current_user.collection.insert(card_id=card_id, normal=normal, foil=foil)
