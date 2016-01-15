@@ -387,20 +387,23 @@ class Deck:
         """
 
     @classmethod
+    def delete(cls):
+        """ command to remove the given deck """
+        return """ DELETE FROM deck WHERE name = %(name)s AND user_id = %(user_id)s """
+
+    @classmethod
     def list(cls):
         """ command to get a list of decks for the given user_id """
         return """
-            SELECT deck.deck_id,
-                user_id,
-                name,
+            SELECT name,
                 user_index,
-                IFNULL(SUM(card_in_deck.number), 0) AS n_deck,
-                IFNULL(SUM(card_in_side.number), 0) AS n_side
-            FROM deck
-            LEFT JOIN card_in_deck
-                ON card_in_deck.deck_id = deck.deck_id
-            LEFT JOIN card_in_side
-                ON card_in_side.deck_id = deck.deck_id
+                IFNULL(deck.card_sum, 0) AS n_deck,
+                IFNULL(side.card_sum, 0) AS n_side
+            FROM deck AS decks
+            LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_deck GROUP BY deck_id) AS deck
+                ON deck.deck_id = decks.deck_id
+            LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_side GROUP BY deck_id) AS side
+                ON side.deck_id = decks.deck_id
             WHERE user_id=%(user_id)s
             GROUP BY deck.deck_id
         """
@@ -408,8 +411,9 @@ class Deck:
     @classmethod
     def get(cls):
         """ command to get the deck corresponding to the given name and user_id """
+        # TODO check if this is useful
         return """
-            SELECT *
+            SELECT user_index, name
             FROM deck
             WHERE user_id = %(user_id)s AND name = %(name)s
         """
@@ -429,7 +433,7 @@ class CardInDeckEntity(abc.ABCMeta):
         """ command to create the table """
         return """
             CREATE TABLE {table_name} (
-                decK_id INT NOT NULL,
+                deck_id INT NOT NULL,
                 card_id INT NOT NULL,
                 number SMALLINT NOT NULL,
 
@@ -437,6 +441,28 @@ class CardInDeckEntity(abc.ABCMeta):
                 FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
                 UNIQUE(deck_id, card_id)
             )
+        """.format(table_name=mcs.table_name())
+
+    @classmethod
+    def add(mcs) -> str:
+        """ add a card to a deck """
+        return """
+            INSERT INTO {table_name} (deck_id, card_id, number)
+            SELECT deck_id, %(card_id)s, %(number)s
+            FROM deck
+            WHERE user_id = %(user_id)s AND deck.name = %(deck_name)s
+            ON DUPLICATE KEY UPDATE number=VALUES(number)
+        """.format(table_name=mcs.table_name())
+
+    @classmethod
+    def get_cards(mcs) -> str:
+        """ list all cards in the deck"""
+        return """
+            SELECT number, card_id
+            FROM card_in_deck
+            INNER JOIN deck
+            ON card_in_deck.decK_id = deck.deck_id
+            WHERE user_id = %(user_id)s AND deck.name = %(deck_name)s
         """.format(table_name=mcs.table_name())
 
 

@@ -101,4 +101,36 @@ def list_decks() -> werkzeug.wrappers.Response:
 @login_required
 def add_deck() -> werkzeug.wrappers.Response:
     """ adds a new deck with the given name """
-    return current_user.decks.add(flask.request.form["name"])
+    return flask.jsonify(dict(deck=current_user.decks.add(flask.request.form["name"])))
+
+
+@mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
+@login_required
+def add_card_to_deck(name) -> werkzeug.wrappers.Response:
+    """
+    Adds a new card to the given deck
+
+    :param name: name of the deck to which to add the card
+    :return: the number of card of this id now in the deck
+    """
+    card_id = flask.request.form.get("card_id", type=int)
+    number = flask.request.form.get('n_cards', type=int)
+    side = bool(flask.request.form.get("side", type=int))
+
+    if card_id is None or number is None or side is None:
+        return flask.abort(400)
+
+    return flask.jsonify(dict(card=current_user.decks.add_card(name, card_id, number, side)))
+
+
+@mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])
+@login_required
+def delete_deck(name) -> werkzeug.wrappers.Response:
+    """
+    deletes the given deck
+
+    :param name: name of the deck to delete
+    :return: 200 OK on completion
+    """
+    current_user.decks.delete(name)
+    return ('', 200)

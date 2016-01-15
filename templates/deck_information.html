@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-editable.css') }}" />
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/utils.css') }}" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/result.css') }}" />
+{% endblock %}
+
+
+{% block body %}
+    <div class="col-md-8 col-sm-8 col-xs-8">
+        <div id="cards" class="row">
+            {% for card in cards %}
+                <div id="{{ card['card_id'] }}" data-normal="{{ card['normal'] }}" data-foil="{{ card['foil'] }}" class="col-md-2 col-sm-3 col-xs-4">
+                    <div class="card-inner">
+                        <img>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="card-details" class="col-md-4 col-sm-4 col-xs-4">
+        <h2></h2>
+        <div id="card-details-upper" class="container-fluid">
+            <div class="row">
+                <img id="card-details-img" class="col-md-7">
+                <div class="col-md-5">
+                    <div id="card-details-upper-right" class="container-fluid"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="card-details-lower" class="container-fluid"></div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/withinviewport.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.withinviewport.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-editable.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/result.js') }}"></script>
+{% endblock %}

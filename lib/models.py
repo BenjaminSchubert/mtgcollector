@@ -706,19 +706,86 @@ class Deck(Model):
         :return: the new created deck
         """
         cls._modify(sql.Deck.insert(), user_id=user_id, name=name)
-        return flask.jsonify(cls._get(sql.Deck.get(), user_id=user_id, name=name)[0])
+        return cls._get(sql.Deck.get(), user_id=user_id, name=name)[0]
+
+    @classmethod
+    def delete(cls, user_id: int, name: str):
+        """
+        Deletes the deck given in parameter
+
+        :param user_id: id of the user owning the deck
+        :param name: name of the deck
+        """
+        cls._modify(sql.Deck.delete(), user_id=user_id, name=name)
+
+    @classmethod
+    def add_card(cls, user_id: int, deck_name: str, card_id: int, number: int, side: bool):
+        """
+        add a card to the deck identified by the given name
+
+        :param user_id: id of the user owning the deck
+        :param deck_name: name of the deck to which to add the card
+        :param card_id: id of the card to add
+        :param number: number of time to add the card
+        :param side: whether to add the card in the side or in the deck
+        """
+        if side:
+            return CardInSide.add(user_id, deck_name, card_id, number)
+        return CardInDeck.add(user_id, deck_name, card_id, number)
+
+    @classmethod
+    def get_cards(cls, user_id: int, deck_name: str, side: bool=False)\
+            -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+        """
+        gets the cards that are in the given deck
+        :param user_id: user owning the deck
+        :param deck_name: identifier of the deck
+        :param side: whether the cards in the side are asked or the others
+        :return: list of cards in the asked deck
+        """
+        if side:
+            return CardInSide.get_cards(user_id, deck_name)
+        else:
+            return CardInDeck.get_cards(user_id, deck_name)
 
 
-class CardInDeck(Model):
+class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
     """
-    Represents a card in a deck
+    Represents a card in a deck, either side or not
     """
     index = 3
 
     @classmethod
+    @abc.abstractmethod
+    def sql_class(cls) -> sql.CardInDeckEntity:
+        """ the sql commands to the given entity """
+
+    @classmethod
     def _table_creation_command(cls) -> str:
         """ command to create the database table """
-        return sql.CardInDeck.create_table()
+        return cls.sql_class().create_table()
+
+    @classmethod
+    def add(cls, user_id: int, deck_name: str, card_id: int, number: int):
+        """
+        add a card to a deck
+
+        :param user_id: user owning the deck
+        :param deck_name: name of the deck
+        :param card_id: id of the card
+        :param number: number of time to add the card
+        """
+        cls._modify(cls.sql_class().add(), user_id=user_id, deck_name=deck_name, card_id=card_id, number=number)
+
+    @classmethod
+    def get_cards(cls, user_id: int, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+        """
+        return all cards matching the given deck
+        :param user_id: user owning the deck
+        :param deck_name: name of the deck
+        :return: cards in the given deck
+        """
+        return cls._get(cls.sql_class().get_cards(), user_id=user_id, deck_name=deck_name)
 
     def _as_database_object(self) -> dict:
         """ this is never used """
@@ -734,29 +801,29 @@ class CardInDeck(Model):
         raise NotImplementedError()
 
 
-class CardInSide(Model):
+# noinspection PyAbstractClass
+class CardInDeck(CardInDeckMeta):
+    """
+    Represents a card in a deck, either side or not
+    """
+
+    @classmethod
+    def sql_class(cls) -> sql.CardInDeck:
+        """ gets the sql commands associated to this object """
+        return sql.CardInDeck
+
+
+# noinspection PyAbstractClass
+class CardInSide(CardInDeckMeta):
     """
     Represents a card in a side deck
     """
     index = 3
 
     @classmethod
-    def _table_creation_command(cls) -> str:
-        """ command to create the database table """
-        return sql.CardInSide.create_table()
-
-    def _primary_key(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
-
-    @classmethod
-    def _insertion_command(cls) -> str:
-        """ this is never used """
-        raise NotImplementedError()
-
-    def _as_database_object(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
+    def sql_class(cls) -> sql.CardInSide:
+        """ gets the sql commands associated to this object """
+        return sql.CardInSide
 
 
 class LegalInFormat(Model):
@@ -824,6 +891,33 @@ class DeckList:
         :return: the new deck information
         """
         return Deck.add(self.user_id, name)
+
+    def delete(self, name: str):
+        """
+        Deletes the deck given in parameter
+
+        :param name: name of the deck to delete
+        """
+        Deck.delete(self.user_id, name)
+
+    def add_card(self, deck_name: str, card_id: int, number: int, side: bool):
+        """
+        add a card to the deck identified by the given name
+
+        :param deck_name: name of the deck to which to add the card
+        :param card_id: id of the card to add
+        :param number: number of time to add the card
+        :param side: whether to add the card in the side or in the deck
+        """
+        return Deck.add_card(self.user_id, deck_name, card_id, number, side)
+
+    def get_cards(self, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+        """
+        get all cards in the
+        :param deck_name: name of the deck for which to get the cards
+        :return: list of cards in the deck
+        """
+        return Deck.get_cards(self.user_id, deck_name)
 
 
 class User(Model):
