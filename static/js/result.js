@@ -157,13 +157,16 @@ function unloadNotInViewPort() {
 
 function createStrip(curDiv) {
 
-    if (curDiv.find('.strip').length > 0) {
-        return;
-    }
-
     var nNormal = parseInt(curDiv.attr('data-normal'));
     var nFoil = parseInt(curDiv.attr('data-foil'));
     var tot = nNormal + nFoil;
+
+    // if already created, update number
+    if (curDiv.find('.strip').length > 0) {
+        curDiv.find('.strip-values').text(tot);
+        return;
+    }
+
     var innerDiv = curDiv.children('.card-inner');
 
     if (tot !== undefined && tot > 0) {
@@ -301,7 +304,7 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
                 n_normal = $('#num-cards-to-add').val();
                 n_foil = $('#n-foil').text();
             } else {
-                n_normal = $('#n-foil').text();
+                n_normal = $('#n-normal').text();
                 n_foil = $('#num-cards-to-add').val()
             }
 
@@ -311,8 +314,10 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
                 n_foil: n_foil
             };
 
+            console.log("card number update send data : {normal:" + postData.n_normal + ", foil:" + postData.n_foil + "}");
+
             $.post(numCardPostPath, postData, function (data) {
-                console.log(data);
+                console.log("card number update response data : {normal:" + data.normal + ", foil:" + data.foil + "}");
                 link.text(isNormal ? data.normal : data.foil);
 
                 var cardDiv = $('#' + id);
