@@ -247,8 +247,9 @@ class Metacard(Model):
     def get_ids_where(cls, user_id: int=None, name: str= "", types: str= "", text: str= "", context: str= "",
                       number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
                       cmc: str="", colors: str="", only_selected_colors: bool=False, all_selected_colors: bool=False,
-                      edition: str= "", block: str="", format: str="", rarity: str="", order_by="metacard.name",
-                      **kwargs: typing.Dict) -> typing.List[typing.Dict[str, typing.Dict[str, str]]]:
+                      edition: str="", block: str="", format: str="", rarity: str="", order_by="metacard.name",
+                      supertypes: str="", **kwargs: typing.Dict)\
+            -> typing.List[typing.Dict[str, typing.Dict[str, str]]]:
         """
         This allows for extensive filtering and complex queries on the cards. It will return all ids of cards
         matching the given criteria
@@ -276,6 +277,7 @@ class Metacard(Model):
         :param format: the playable format in which the card must be legal
         :param rarity: the rarities the card can have
         :param order_by: in which order to sort the result
+        :param supertypes: supertypes the card must have
         :param kwargs: additional garbage arguments
         :return: list of cards containing dictionaries with fields {"id", "normal", "foil"}
         """
@@ -391,6 +393,10 @@ class Metacard(Model):
             )
             kwargs["block"] = block
 
+        if supertypes:
+            query_parameters = add_to_parameters(query_parameters, "%(supertypes)s IN (metacard.supertypes)")
+            kwargs["supertypes"] = supertypes
+
         if format:
             query_parameters = add_to_parameters(
                     query_parameters,
@@ -474,16 +480,6 @@ class Metacard(Model):
     def _primary_key(self) -> str:
         """ This is a value allowing to uniquely identify an instance of Metacard """
         return self.__name
-
-    @classmethod
-    def get_collection(cls, user_id: int) -> typing.List[typing.Dict[str, str]]:
-        """
-        returns all cards in the collection for the given user_id
-
-        :param user_id: the user for which to get the collection
-        :return list of cards
-        """
-        return cls._get(sql.Card.collection(), user_id=user_id)
 
 
 class Card(Model):
@@ -584,6 +580,16 @@ class Card(Model):
     def rarities(cls) -> typing.List[str]:
         """ returns all the different rarity a card can have """
         return [card["rarity"].pop() for card in cls._get(sql.Card.rarities())]
+
+    @classmethod
+    def get_collection(cls, user_id: int) -> typing.List[typing.Dict[str, str]]:
+        """
+        returns all cards in the collection for the given user_id
+
+        :param user_id: the user for which to get the collection
+        :return list of cards
+        """
+        return cls._get(sql.Card.collection(), user_id=user_id)
 
 
 class Format(Model):

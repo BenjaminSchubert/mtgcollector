@@ -103,6 +103,10 @@ class SearchForm(Form):
     edition = SelectField("Edition", choices=[("", "")], default="")
     block = SelectField("Bloc", choices=[("", "")], default="")
     format = SelectField("Format", choices=[("", "")], default="")
+    supertypes = SelectField(
+            "Supertypes", default="",
+            choices=[(choice, choice) for choice in ["", "Legendary", "Snow", "World", "Basic", "Ongoing"]]
+    )
     rarity = MultiCheckboxField("Rarity")
     in_collection = BooleanField('Only cards in collection')
 
