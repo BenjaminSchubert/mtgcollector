@@ -41,7 +41,6 @@ function createDeckList(data) {
         );
 
         deckList.append(deckRow);
-        console.log(deckRow.find('.deck-name'));
 
         createName(deckRow.find('.deck-name'), deck["name"]);
         createUserIndex(deckRow.find('.deck-user-index'), deck["user_index"]);
@@ -52,7 +51,7 @@ function createDeckList(data) {
 
 function createName(parent, origDeckName) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p class="editable">' + origDeckName + '</p>');
+    var editable = $('<a class="editable">' + origDeckName + '</a>');
 
     editable.click(function () {
 
@@ -86,7 +85,7 @@ function createName(parent, origDeckName) {
 
 function createUserIndex(parent, origUserIndex) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p class="editable">' + origUserIndex + '</p>');
+    var editable = $('<a class="editable">' + origUserIndex + '</a>');
 
     editable.click(function () {
 
