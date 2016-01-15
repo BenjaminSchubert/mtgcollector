@@ -36,7 +36,7 @@ function createPopover(node, buttonOkFunc) {
     var nodeContainer = $('<div class="popover-node-container"></div>');
     nodeContainer.append(node);
 
-    var buttonSubmit = $(
+    var buttonOk = $(
         '<button type="submit" class="btn btn-primary">' +
             '<i class="glyphicon glyphicon-ok"></i>' +
         '</button>'
@@ -48,7 +48,7 @@ function createPopover(node, buttonOkFunc) {
         '</button>'
     );
 
-    buttonSubmit.click(function () {
+    buttonOk.click(function () {
         buttonOkFunc();
         $('.popover-main-container').remove();
     });
@@ -65,9 +65,17 @@ function createPopover(node, buttonOkFunc) {
         '</div>'
     );
 
-    buttons.find('.row').append(buttonSubmit, buttonCancel);
+    buttons.find('.row').append(buttonOk, buttonCancel);
 
     var container = $('<div class="popover-main-container container-fluid"></div>');
     container.append(nodeContainer, buttons);
+
+    // bond enter key to submit button
+    $(document).keypress(function(e){
+        if (e.which == 13){
+            buttonOk.click();
+        }
+    });
+
     return container;
 }
