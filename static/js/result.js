@@ -3,14 +3,8 @@ var imgPath = "/api/images/";
 var detailsPath = "/api/cards/";
 var defaultImgPath = imgPath + "default.png";
 var numCardPostPath = "/api/collection/";
-var deckGetPath = "api/decks";
-var deckPostPath = "api/decks/";
-
-// TODO change once api/decks ok
-var existingDecks = [
-    {id: 31, name: "Test", user_index: 1, colors:[], n_cards: 42, n_side: 4},
-    {id: 22, name: "Deck temp", user_index: 2, colors: [], n_cards: 33, n_side: 10}
-];
+var deckGetPath = "/api/decks";
+var deckPostPath = "/api/decks/";
 
 // contains ids of elements which are currently in view port
 var loadedIds = [];
@@ -24,6 +18,9 @@ var lockInfo = {
 
 // Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
 var detailsFetched = {};
+
+// existing decks, initialized at start
+var existingDecks;
 
 // Allows a callback to be called only when the scroll stops (better performances than just
 // calling the callback at each scroll, for example).
@@ -355,7 +352,7 @@ function createButtonAddToDeck(id, parentDiv) {
 
             // create popover
             var popover = createPopover($(content), function () {
-                var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-name');
+                var deckName = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-name');
 
                 var postData = {
                     card_id: id,
@@ -363,7 +360,7 @@ function createButtonAddToDeck(id, parentDiv) {
                     side: $('#add-to-side').is(':checked')
                 };
 
-                $.post(deckPostPath + deckId, postData, function (data) {
+                $.post(deckPostPath + deckName, postData, function (data) {
                     console.log(data);
                 });
             });

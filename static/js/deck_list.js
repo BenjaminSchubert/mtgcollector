@@ -1,5 +1,4 @@
-var getDeckPath = "api/decks";
-var deckPostPath = "api/decks";
+var apiDecksPath = "api/decks";
 
 $(document).ready(function () {
     setupPost();
@@ -8,7 +7,7 @@ $(document).ready(function () {
 });
 
 function fetchJson(callback) {
-    $.get(getDeckPath, function (data) {
+    $.get(apiDecksPath, function (data) {
         callback(data);
     });
 }
@@ -39,20 +38,32 @@ function createDeckList(data) {
                 '<td class="deck-colors">' + colorsHTML + '</td>' +
                 '<td class="deck-n-deck">' + deck["n_deck"] + '</td>' +
                 '<td class="deck-n-side">' + deck["n_side"] + '/15</td>' +
-                '<td class="button-go-deck">' +
-                    '<button class="btn btn-primary">Go to deck</button>' +
+                '<td class="text-right">' +
+                    '<button class="button-go-deck btn btn-primary">Go to deck</button>' +
+                    '<button class="button-delete btn">Delete</button>' +
                 '</td>' +
             '</tr>'
         );
     });
 
-    bindButtonGoDeck();
+    bindButtons();
     bindEditable();
 }
 
-function bindButtonGoDeck() {
+function bindButtons() {
     $('.button-go-deck').click(function () {
-        document.location = "decks/" + $(this).parent().attr('deck-name');
+        document.location = "decks/" + $(this).parent().parent().attr('deck-name');
+    });
+
+    $('.button-delete').click(function () {
+
+        var deckName = $(this).parent().parent().attr('deck-name');
+
+        $.ajax({
+            url: apiDecksPath + '/' + deckName,
+            type: 'delete',
+            success: location.reload
+        });
     });
 }
 
@@ -64,7 +75,7 @@ function bindEditable() {
         title: 'Enter new number',
         placement: 'right',
 
-        url: deckPostPath,
+        url: apiDecksPath,
         name: "user_index"
     });
 
@@ -73,7 +84,7 @@ function bindEditable() {
         title: 'Enter new name',
         placement: 'right',
 
-        url: deckPostPath,
+        url: apiDecksPath,
         name: "name"
     });
 }
@@ -87,11 +98,11 @@ function bindModalButton() {
         if (postData.name === "") {
             $('#modal-form').addClass('has-error');
         } else {
-            $.post(deckPostPath, postData, function (data) {
+            $.post(apiDecksPath, postData, function (data) {
                 // TODO page should not be refreshed
                 //$('#modal-create-deck').modal('hide');
                 //$('#modal-form').removeClass('has-error');
-                document.location = "decks";
+                location.reload();
             });
         }
     });

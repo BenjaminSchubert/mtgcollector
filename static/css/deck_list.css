@@ -2,10 +2,10 @@
     margin-top: 30px;
 }
 
-.deck-row > button {
-    padding: 0;
-}
-
 .deck-row a {
     color: black;
+}
+
+.button-go-deck {
+    margin-right: 10px;
 }
