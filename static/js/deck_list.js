@@ -1,6 +1,6 @@
 // paths
-var decksPath = "/api/decks";
-var deckPostPath = decksPath + "/";
+var decksGetPath = "/api/decks";
+var decksPath = "/api/decks/";
 
 // executed when DOM ready
 $(document).ready(function () {
@@ -10,7 +10,7 @@ $(document).ready(function () {
 });
 
 function fetchJson(callback) {
-    $.get(decksPath, function (data) {
+    $.get(decksGetPath, function (data) {
         callback(data);
     });
 }
@@ -54,7 +54,7 @@ function createDeckList(data) {
 
 function createName(parent, deckName) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p>' + deckName + '</p>');
+    var editable = $('<p class="editable">' + deckName + '</p>');
 
     editable.click(function () {
 
@@ -63,7 +63,7 @@ function createName(parent, deckName) {
             '<input id="new-name" type="text" class="form-control" value="' + deckName + '">';
 
         var popover = createPopover($(content), function () {
-            var path = deckPostPath + deckName + "/rename";
+            var path = decksPath + deckName + "/rename";
             var postData = {
                 name: $('#new-name').val()
             };
@@ -85,17 +85,17 @@ function createName(parent, deckName) {
 
 function createUserIndex(parent, deckName, userIndex) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p>' + userIndex + '</p>');
+    var editable = $('<p class="editable">' + userIndex + '</p>');
 
     editable.click(function () {
 
         var content = $(
             '<label>Enter new value</label>' +
-            '<input id="new-user-index" type="number" class="form-control" value="' + userIndex + '">'
+            '<input id="new-user-index" type="number" class="form-control" min="0" value="' + userIndex + '">'
         );
 
         var popover = createPopover($(content), function () {
-            var path = deckPostPath + deckName + "/index";
+            var path = decksPath + deckName + "/index";
             var postData = {
                 user_index: $('#new-user-index').val()
             };
@@ -126,7 +126,7 @@ function bindButtons() {
 
         if (deleteOk) {
             $.ajax({
-                url: apiDecksPath + '/' + deckName,
+                url: decksPath + deckName,
                 type: 'delete',
                 success: function () {
                     location.reload();
@@ -138,15 +138,13 @@ function bindButtons() {
 
 function bindModalButton() {
     $('#modal-submit-button').click(function () {
-        var postData = {
-            name: $('#deck-name').val()
-        };
+        var deckName = $('#deck-name').val();
 
-        if (postData.name === "") {
+        if (deckName.name === "") {
             $('#modal-form').addClass('has-error');
         } else {
-            $.post(apiDecksPath, postData, function (data) {
-                // TODO page should not be refreshed
+            $.post(decksPath + deckName, {}, function () {
+                // TODO page should not just be refreshed
                 //$('#modal-create-deck').modal('hide');
                 //$('#modal-form').removeClass('has-error');
                 location.reload();

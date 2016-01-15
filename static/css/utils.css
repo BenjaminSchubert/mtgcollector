@@ -20,5 +20,9 @@
 }
 
 .popover-buttons button {
-    margin: 0 3px;
+    margin: 3px;
+}
+
+.editable {
+    cursor: pointer;
 }
