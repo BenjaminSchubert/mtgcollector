@@ -94,7 +94,7 @@ def add_to_collection(card_id: int) -> werkzeug.wrappers.Response:
 @login_required
 def list_decks() -> werkzeug.wrappers.Response:
     """ Gets the list of decks a given user has """
-    return flask.jsonify(*current_user.decks.list())
+    return flask.jsonify(decks=current_user.decks.list())
 
 
 @mtgcollector.app.route("/api/decks", methods=["POST"])

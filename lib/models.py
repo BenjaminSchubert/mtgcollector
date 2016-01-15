@@ -548,15 +548,16 @@ class Card(Model):
         return cls._get(sql.Card.get(), card_id=card_id)
 
     @classmethod
-    def get_image_url(cls, card_id: int, logger: logging.Logger) -> str:
+    def get_image_url(cls, card_id: int, logger: logging.Logger, connection=None) -> str:
         """
         gets the url of the image for the given card
 
         :param card_id: card id for which to get the image
         :param logger: logger instance to save errors
+        :param connection: connection to the database
         :return: the url to the requested card's image
         """
-        cards = cls._get(sql.Card.get_multiverseid(), card_id=card_id)
+        cards = cls._get(sql.Card.get_multiverseid(), card_id=card_id, connection=connection)
         if len(cards):
             return "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={}&type=card".format(
                     cards[0]["multiverseid"]
