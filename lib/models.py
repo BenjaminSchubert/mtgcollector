@@ -583,6 +583,19 @@ class Card(Model):
         )
 
     @classmethod
+    def get_versions(cls, name, user_id=None):
+        """
+        Gets all different versions from the same card
+
+        :param name: name of the card
+        :param user_id: id of the user connected. If set, will show how much of each he has
+        """
+        if user_id:
+            return cls._get(sql.Card.get_versions_with_collection_information(), user_id=user_id, name=name)
+        else:
+            return cls._get(sql.Card.get_versions(), name=name)
+
+    @classmethod
     def rarities(cls) -> typing.List[str]:
         """ returns all the different rarity a card can have """
         return [card["rarity"].pop() for card in cls._get(sql.Card.rarities())]

@@ -17,7 +17,7 @@ import views.api
 import views.auth
 import views.conf
 from lib.forms import SearchForm
-from lib.models import Metacard
+from lib.models import Metacard, Card
 from mtgcollector import app, lib
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
@@ -69,7 +69,7 @@ def index() -> werkzeug.wrappers.Response:
 def search() -> werkzeug.wrappers.Response:
     """ Search page """
     form = SearchForm(current_user.is_authenticated, flask.request.args)
-    form.csrf_enabled = False
+    form.csrf_enabled = False  # TODO : investigate why this is needed
 
     if form.validate() and flask.request.args:
         return flask.render_template("result.html", cards=Metacard.get_ids_where(
@@ -81,12 +81,22 @@ def search() -> werkzeug.wrappers.Response:
     )
 
 
+@app.route("/card/<name>")
+def card_versions(name: str) -> werkzeug.wrappers.Response:
+    """
+    version page
+
+    :param name: card's name
+    """
+    return flask.render_template("result.html", cards=Card.get_versions(user_id=current_user.get_id(), name=name))
+
+
 @app.route("/collection")
 @login_required
 def collection() -> werkzeug.wrappers.Response:
     """ Collection page"""
     return flask.render_template(
-            "result.html", active_page="collection", cards=Metacard.get_collection(user_id=current_user.get_id())
+            "result.html", active_page="collection", cards=Card.get_collection(user_id=current_user.get_id())
     )
 
 

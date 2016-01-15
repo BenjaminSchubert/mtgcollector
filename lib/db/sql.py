@@ -228,6 +228,23 @@ class Card:
         """
 
     @classmethod
+    def get_versions(cls):
+        """ command to get all versions of the same card """
+        return """ SELECT card_id FROM card WHERE name = %(name)s """
+
+    @classmethod
+    def get_versions_with_collection_information(cls):
+        """ get all versions of the same card with the number owned by the given user """
+        return """
+            SELECT card.card_id,
+                IFNULL(card_in_collection.normal, 0) AS normal,
+                IFNULL(card_in_collection.foil, 0) AS foil
+            FROM card
+            LEFT OUTER JOIN card_in_collection ON card.card_id = card_in_collection.card_id
+            WHERE name = %(name)s
+        """
+
+    @classmethod
     def get_multiverseid(cls):
         """ get the multiverseid for the given card id """
         return """ SELECT multiverseid FROM card WHERE card_id=%(card_id)s """
