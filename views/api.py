@@ -101,16 +101,16 @@ def add_deck() -> werkzeug.wrappers.Response:
     return flask.jsonify(dict(deck=current_user.decks.add(flask.request.form["name"])))
 
 
-@mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
+@mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
 @login_required
-def add_card_to_deck(name) -> werkzeug.wrappers.Response:
+def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
     """
     Adds a new card to the given deck
 
     :param name: name of the deck to which to add the card
+    :param card_id: id of the card to add
     :return: the number of card of this id now in the deck
     """
-    card_id = flask.request.form.get("card_id", type=int)
     number = flask.request.form.get('n_cards', type=int)
     side = bool(flask.request.form.get("side", type=int))
 
