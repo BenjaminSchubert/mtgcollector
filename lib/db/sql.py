@@ -394,8 +394,8 @@ class Deck:
                 user_id,
                 name,
                 user_index,
-                CAST(IFNULL(SUM(card_in_deck.number), 0) AS INT) AS n_deck,
-                CAST(IFNULL(SUM(card_in_side.number), 0) AS INT) AS n_side
+                IFNULL(SUM(card_in_deck.number), 0) AS n_deck,
+                IFNULL(SUM(card_in_side.number), 0) AS n_side
             FROM deck
             LEFT JOIN card_in_deck
                 ON card_in_deck.deck_id = deck.deck_id
