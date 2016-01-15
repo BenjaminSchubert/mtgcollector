@@ -77,7 +77,7 @@ def search() -> werkzeug.wrappers.Response:
         ))
     return flask.render_template(
         "search.html", form=form, id_="form-search", title="Search", method="get",
-        css_classes="col-md-10 col-md-offset-1"
+        css_classes="col-md-10 col-md-offset-1", active_page="search"
     )
 
 
@@ -85,14 +85,16 @@ def search() -> werkzeug.wrappers.Response:
 @login_required
 def collection() -> werkzeug.wrappers.Response:
     """ Collection page"""
-    return flask.render_template("result.html", cards=Metacard.get_collection(user_id=current_user.get_id()))
+    return flask.render_template(
+            "result.html", active_page="collection", cards=Metacard.get_collection(user_id=current_user.get_id())
+    )
 
 
 @app.route("/decks")
 @login_required
-def deck_list() -> werkzeug.wrappers.Response:
+def decks() -> werkzeug.wrappers.Response:
     """ Decks page """
-    return flask.render_template("deck_list.html")
+    return flask.render_template("deck_list.html", active_page="decks")
 
 
 @app.route("/updates")
