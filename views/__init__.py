@@ -97,6 +97,17 @@ def decks() -> werkzeug.wrappers.Response:
     return flask.render_template("deck_list.html", active_page="decks")
 
 
+@app.route("/decks/<name>")
+@login_required
+def deck(name) -> werkzeug.wrappers.Response:
+    """
+    displays a deck
+
+    :param name: the name of the deck to display
+    """
+    return flask.render_template("deck_information.html", active_page="decks", cards=current_user.decks.get_cards(name))
+
+
 @app.route("/updates")
 def send_updates() -> werkzeug.wrappers.Response:
     """
