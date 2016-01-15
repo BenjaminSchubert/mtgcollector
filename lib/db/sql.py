@@ -440,7 +440,7 @@ class Deck:
             LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_side GROUP BY deck_id) AS side
                 ON side.deck_id = decks.deck_id
             WHERE user_id=%(user_id)s
-            GROUP BY deck.deck_id
+            GROUP BY decks.deck_id
         """
 
     @classmethod
