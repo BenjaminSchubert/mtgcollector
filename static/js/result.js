@@ -157,6 +157,10 @@ function unloadNotInViewPort() {
 
 function createStrip(curDiv) {
 
+    if (curDiv.find('.strip').length > 0) {
+        return;
+    }
+
     var nNormal = parseInt(curDiv.attr('data-normal'));
     var nFoil = parseInt(curDiv.attr('data-foil'));
     var tot = nNormal + nFoil;
@@ -309,7 +313,12 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
 
             $.post(numCardPostPath, postData, function (data) {
                 console.log(data);
-                link.text(data);
+                link.text(isNormal ? data.normal : data.foil);
+
+                var cardDiv = $('#' + id);
+                cardDiv.attr('data-normal', data.normal);
+                cardDiv.attr('data-foil', data.foil);
+                createStrip(cardDiv);
             });
         });
 
