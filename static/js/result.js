@@ -236,8 +236,8 @@ function createDetailsUpper(id) {
     var cardDiv = $('#' + id);
 
     parentDiv.append('<p>In collection</p>');
-    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), false);
-    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), true);
+    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), true);
+    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), false);
     createButtonAddToDeck(id, parentDiv);
 
     var details = detailsFetched[id];
@@ -261,10 +261,16 @@ function createDetailsLower(details) {
 }
 
 // Creates and editable input for number of cards of a type (normal or foil for example).
-function createRowNumCards(parentDiv, id, labelVal, num, isFoil) {
+function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
     var row = $('<div class="row popover-wrapper"></div>');
     var label = $('<label class="col-md-9">' + labelVal  + '</label>');
     var link = $('<a class="col-md-3">' + num + '</a>');
+
+    if (isNormal) {
+        link.attr('id', 'n-normal');
+    } else {
+        link.attr('id', 'n-foil');
+    }
 
     row.append(label);
     row.append(link);
@@ -278,13 +284,24 @@ function createRowNumCards(parentDiv, id, labelVal, num, isFoil) {
 
         // create popover
         var popover = createPopover(content, function () {
+
+            var n_normal, n_foil;
+
+            if (isNormal) {
+                n_normal = $('#num-cards-to-add').val();
+                n_foil = $('#n-foil').text();
+            } else {
+                n_normal = $('#n-foil').text();
+                n_foil = $('#num-cards-to-add').val()
+            }
+
             var postData = {
                 id: id,
-                n_cards: $('#num-cards-to-add').val(),
-                foil: isFoil
+                n_normal: n_normal,
+                n_foil: n_foil
             };
 
-            $.post(numCardPostPath + id, postData, function (data) {
+            $.post(numCardPostPath, postData, function (data) {
                 console.log(data);
                 link.text(data);
             });
