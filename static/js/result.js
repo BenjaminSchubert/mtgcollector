@@ -59,7 +59,7 @@ $(document).ready(function () {
 
 function fetchExistingDecks() {
     $.get(deckGetPath, function (data) {
-        existingDecks = data;
+        existingDecks = data.decks;
     });
 }
 
@@ -305,30 +305,47 @@ function createButtonAddToDeck(id, parentDiv) {
 
     button.click(function () {
 
-        // create popover content
-        var content = '<select id="deck-selection" data-card-id="' +  + '">';
-        existingDecks.forEach(function (deck) {
-            content += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
-        });
-        content +=
-            '</select>' +
-            '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
-            '<input id="add-to-side" type="checkbox">';
+        // if no decks yet
+        if (existingDecks.length == 0) {
 
-        // create popover
-        var popover = createPopover($(content), function () {
-            var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-id');
+            var content = '<p>No deck found. Do you want to create one ?</p>';
 
-            var postData = {
-                card_id: id,
-                n_cards: $('#number-cards-to-add').val(),
-                side : $('#add-to-side').is(':checked')
-            };
-
-            $.post(deckPostPath + deckId, postData, function (data) {
-                console.log(data);
+            // create popover
+            var popover = createPopover($(content), function () {
+                document.location = "decks";
             });
-        });
+        }
+
+        // decks exist
+        else {
+
+            // create popover content
+            var content = '<select id="deck-selection" data-card-id="' + id +'">';
+            existingDecks.forEach(function (deck) {
+                console.log(deck);
+                content += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
+            });
+            content +=
+                '</select>' +
+                '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
+                '<input id="add-to-side" type="checkbox">';
+
+            // create popover
+            var popover = createPopover($(content), function () {
+                var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-id');
+
+                var postData = {
+                    card_id: id,
+                    n_cards: $('#number-cards-to-add').val(),
+                    side: $('#add-to-side').is(':checked')
+                };
+
+                $.post(deckPostPath + deckId, postData, function (data) {
+                    console.log(data);
+                });
+            });
+
+        }
 
         buttonDiv.append(popover);
     });

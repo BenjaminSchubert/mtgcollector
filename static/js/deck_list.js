@@ -102,9 +102,10 @@ function bindModalButton() {
             $('#modal-form').addClass('has-error');
         } else {
             $.post(deckPostPath, postData, function (data) {
-                console.log(data);
-                $('#modal-add-to-deck').modal('hide');
-                $('#modal-form').removeClass('has-error');
+                // TODO page should not be refreshed
+                //$('#modal-create-deck').modal('hide');
+                //$('#modal-form').removeClass('has-error');
+                document.location = "decks";
             });
         }
     });
