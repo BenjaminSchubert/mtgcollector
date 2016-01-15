@@ -10,7 +10,7 @@ from flask.ext.login import login_required, login_user
 
 import lib.db
 import lib.db.maintenance
-import lib.forms.install
+import lib.forms
 import lib.models
 from lib.conf import update_conf
 from mtgcollector import app

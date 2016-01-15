@@ -8,7 +8,7 @@ Views for user authentication, registration and login
 import flask
 from flask_login import login_user, login_required, logout_user, current_user
 
-from lib.forms.auth import LoginForm, RegisterForm
+from lib.forms import LoginForm, RegisterForm
 from mtgcollector import app, lib
 
 

@@ -101,6 +101,29 @@ def add_deck() -> werkzeug.wrappers.Response:
     return flask.jsonify(dict(deck=current_user.decks.add(flask.request.form["name"])))
 
 
+@mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
+@login_required
+def modify_deck(name: str) -> werkzeug.wrappers.Response:
+    """
+    Allows the user to customize its deck
+
+    The following POST data are checked :
+        name : the new name for the deck
+        index : the new user_index to give to the deck
+
+    :param name: name of the deck to rename
+    """
+    new_name = flask.request.form.get("name")
+    index = flask.request.form.get("index")
+
+    if new_name:
+        current_user.decks.rename(name, new_name)
+    if index:
+        current_user.decks.set_index(name, index)
+
+    return ('', 200)
+
+
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
 @login_required
 def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:

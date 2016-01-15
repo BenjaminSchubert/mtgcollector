@@ -16,7 +16,7 @@ import lib.db.maintenance
 import views.api
 import views.auth
 import views.conf
-from lib.forms.search import SearchForm
+from lib.forms import SearchForm
 from lib.models import Metacard
 from mtgcollector import app, lib
 

@@ -9,7 +9,6 @@ import abc
 
 import mysql.connector
 import mysql.connector.conversion
-import typing
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
@@ -391,6 +390,24 @@ class Deck:
     def delete(cls):
         """ command to remove the given deck """
         return """ DELETE FROM deck WHERE name = %(name)s AND user_id = %(user_id)s """
+
+    @classmethod
+    def rename(cls) -> str:
+        """ command to rename a deck """
+        return """
+            UPDATE deck
+            SET name = %(new_name)s
+            WHERE name = %(name)s AND user_id = %(user_id)s
+        """
+
+    @classmethod
+    def set_index(cls) -> str:
+        """ command to change the id of a deck """
+        return """
+            UPDATE deck
+            SET user_index = %(index)s
+            WHERE name = %(name)s AND user_id = %(user_id)s
+        """
 
     @classmethod
     def list(cls):
