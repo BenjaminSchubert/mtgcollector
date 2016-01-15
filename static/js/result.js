@@ -340,7 +340,7 @@ function createButtonAddToDeck(id, parentDiv) {
             var content = '<select id="deck-selection" data-card-id="' + id +'">';
             existingDecks.forEach(function (deck) {
                 console.log(deck);
-                content += '<option deck-id="' + deck.id + '">' + deck.name + '</option>';
+                content += '<option deck-id="' + deck["deck_id"] + '">' + deck["name"] + '</option>';
             });
             content +=
                 '</select>' +
