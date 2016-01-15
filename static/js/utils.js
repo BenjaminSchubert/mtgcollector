@@ -33,7 +33,7 @@ function createPopover(node, buttonOkFunc) {
     // close other popovers
     $('.popover-main-container').remove();
 
-    var nodeContainer = $('<div class="col-md-7 popover-node-container"></div>');
+    var nodeContainer = $('<div class="popover-node-container"></div>');
     nodeContainer.append(node);
 
     var buttonSubmit = $(
@@ -58,7 +58,7 @@ function createPopover(node, buttonOkFunc) {
     });
 
     var buttons = $(
-        '<div class="col-md-5 popover-buttons">' +
+        '<div class="popover-buttons">' +
             '<div class="container-fluid">' +
                 '<div class="row"></div>' +
             '</div>' +
@@ -68,10 +68,6 @@ function createPopover(node, buttonOkFunc) {
     buttons.find('.row').append(buttonSubmit, buttonCancel);
 
     var container = $('<div class="popover-main-container container-fluid"></div>');
-    var containerRow = $('<div class="row"></div>');
-
-    containerRow.append(nodeContainer, buttons);
-    container.append(containerRow);
-
+    container.append(nodeContainer, buttons);
     return container;
 }

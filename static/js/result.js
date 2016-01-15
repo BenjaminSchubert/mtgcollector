@@ -278,8 +278,8 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
     link.click(function () {
         // create popover content
         var content = $(
-            '<label>Num cards</label>' +
-            '<input id="num-cards-to-add" type="number" class="form-control">'
+            '<label>Number of cards</label>' +
+            '<input id="num-cards-to-add" type="number" min="0" class="form-control">'
         );
 
         // create popover
@@ -337,14 +337,20 @@ function createButtonAddToDeck(id, parentDiv) {
         else {
 
             // create popover content
-            var content = '<select id="deck-selection" data-card-id="' + id +'">';
+            var options = "";
             existingDecks.forEach(function (deck) {
                 console.log(deck);
-                content += '<option deck-id="' + deck["deck_id"] + '">' + deck["name"] + '</option>';
+                options += '<option deck-id="' + deck["deck_id"] + '">' + deck["name"] + '</option>';
             });
-            content +=
+
+            var content =
+                '<label>Select a deck</label>' +
+                '<select id="deck-selection" data-card-id="' + id +'">' +
+                    options +
                 '</select>' +
+                '<label>Number of cards to add</label>' +
                 '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
+                '<label>Add card to side</label>' +
                 '<input id="add-to-side" type="checkbox">';
 
             // create popover
