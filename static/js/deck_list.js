@@ -21,15 +21,13 @@ function createDeckList(data) {
 
     decks.forEach(function (deck) {
 
-        var deckName = deck["name"];
-
         var colorsHTML = "";
         if (deck["colors"] !== undefined && deck["colors"] !== null) {
             colorsHTML = insertImagesInText(deck["colors"].toString());
         }
 
         var deckRow = $(
-            '<tr deck-name="' + deckName + '" class="deck-row">' +
+            '<tr deck-name="' + deck["name"] + '" class="deck-row">' +
                 '<th class="deck-user-index" scope="row"></th>' +
                 '<td class="deck-name"></td>' +
                 '<td class="deck-colors">' + colorsHTML + '</td>' +
@@ -45,18 +43,20 @@ function createDeckList(data) {
         deckList.append(deckRow);
         console.log(deckRow.find('.deck-name'));
 
-        createName(deckRow.find('.deck-name'), deckName);
-        createUserIndex(deckRow.find('.deck-user-index'), deckName, deck["user_index"]);
+        createName(deckRow.find('.deck-name'), deck["name"]);
+        createUserIndex(deckRow.find('.deck-user-index'), deck["user_index"]);
     });
 
     bindButtons();
 }
 
-function createName(parent, deckName) {
+function createName(parent, origDeckName) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p class="editable">' + deckName + '</p>');
+    var editable = $('<p class="editable">' + origDeckName + '</p>');
 
     editable.click(function () {
+
+        var deckName = wrapper.parent().parent().attr('deck-name');
 
         var content =
             '<label>Enter new value</label>' +
@@ -64,15 +64,16 @@ function createName(parent, deckName) {
 
         var popover = createPopover($(content), function () {
             var path = decksPath + deckName + "/rename";
+            var newName = $('#new-name').val();
+
             var postData = {
-                name: $('#new-name').val()
+                name: newName
             };
-            console.log(postData);
 
             $.post(path, postData, function () {
-                $.get(path, function (data) {
-                    editable.text(data.name);
-                });
+                //success
+                editable.text(newName);
+                wrapper.parent().parent().attr('deck-name', newName);
             });
         });
 
@@ -83,11 +84,14 @@ function createName(parent, deckName) {
     parent.append(wrapper);
 }
 
-function createUserIndex(parent, deckName, userIndex) {
+function createUserIndex(parent, origUserIndex) {
     var wrapper = $('<div class="popover-wrapper"></div>');
-    var editable = $('<p class="editable">' + userIndex + '</p>');
+    var editable = $('<p class="editable">' + origUserIndex + '</p>');
 
     editable.click(function () {
+
+        var deckName = wrapper.parent().parent().attr('deck-name');
+        var userIndex = wrapper.parent().siblings('.deck-user-index').text();
 
         var content = $(
             '<label>Enter new value</label>' +
@@ -96,14 +100,15 @@ function createUserIndex(parent, deckName, userIndex) {
 
         var popover = createPopover($(content), function () {
             var path = decksPath + deckName + "/index";
+            var newIndex = $('#new-user-index').val();
+
             var postData = {
-                user_index: $('#new-user-index').val()
+                index: newIndex
             };
 
             $.post(path, postData, function () {
-                $.get(path, function (data) {
-                    editable.text(data.name);
-                });
+                // success
+                editable.text(newIndex);
             });
         });
 
