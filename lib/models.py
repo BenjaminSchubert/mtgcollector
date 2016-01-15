@@ -688,15 +688,70 @@ class Deck(Model):
         """ command to insert a new deck """
         sql.Deck.insert()
 
-    @classmethod
-    def list(cls, user_id: int) -> typing.List[typing.Dict[str, str]]:
-        """
-        Gets a list of decks for the given user_id
+    def list(self) -> typing.List[typing.Dict[str, str]]:
+        """ Gets a list of decks for the given user_id """
+        return self._get(sql.Deck.list(), user_id=self.user_id)
 
-        :param user_id: the id of the user for which to get decks
-        :return: list of Decks
+    def add(self, name: str):
         """
-        return cls._get(sql.Deck.list(), user_id=user_id)
+        adds a new deck to the user's collection
+
+        :param name: name of the deck
+        :return: the new created deck
+        """
+        self._modify(sql.Deck.insert(), user_id=self.user_id, name=name)
+        return self._get(sql.Deck.get(), user_id=self.user_id, name=name)[0]
+
+    def delete(self, name: str):
+        """
+        Deletes the deck given in parameter
+
+        :param name: name of the deck
+        """
+        self._modify(sql.Deck.delete(), user_id=self.user_id, name=name)
+
+    def rename(self, name: str, new_name: str):
+        """
+        Gives a new name to a deck
+
+        :param name: name of the old deck to rename
+        :param new_name: new name for the deck
+        """
+        self._modify(sql.Deck.rename(), user_id=self.user_id, name=name, new_name=new_name)
+
+    def set_index(self, name: str, index: int):
+        """
+        sets a new index to the given deck
+
+        :param name: name of the deck for which to change the index
+        :param index: new index to give to the deck
+        """
+        self._modify(sql.Deck.set_index(), user_id=self.user_id, name=name, index=index)
+
+    def add_card(self, deck_name: str, card_id: int, number: int, side: bool):
+        """
+        add a card to the deck identified by the given name
+
+        :param deck_name: name of the deck to which to add the card
+        :param card_id: id of the card to add
+        :param number: number of time to add the card
+        :param side: whether to add the card in the side or in the deck
+        """
+        if side:
+            return CardInSide.add(self.user_id, deck_name, card_id, number)
+        return CardInDeck.add(self.user_id, deck_name, card_id, number)
+
+    def get_cards(self, deck_name: str, side: bool=False) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+        """
+        gets the cards that are in the given deck
+        :param deck_name: identifier of the deck
+        :param side: whether the cards in the side are asked or the others
+        :return: list of cards in the asked deck
+        """
+        if side:
+            return CardInSide.get_cards(self.user_id, deck_name)
+        else:
+            return CardInDeck.get_cards(self.user_id, deck_name)
 
     def _primary_key(self) -> dict:
         """ unused """
@@ -705,58 +760,6 @@ class Deck(Model):
     def _as_database_object(self) -> dict:
         """ unused """
         raise NotImplementedError()
-
-    @classmethod
-    def add(cls, user_id: int, name: str):
-        """
-        adds a new deck to the user's collection
-
-        :param user_id: user owning the deck
-        :param name: name of the deck
-        :return: the new created deck
-        """
-        cls._modify(sql.Deck.insert(), user_id=user_id, name=name)
-        return cls._get(sql.Deck.get(), user_id=user_id, name=name)[0]
-
-    @classmethod
-    def delete(cls, user_id: int, name: str):
-        """
-        Deletes the deck given in parameter
-
-        :param user_id: id of the user owning the deck
-        :param name: name of the deck
-        """
-        cls._modify(sql.Deck.delete(), user_id=user_id, name=name)
-
-    @classmethod
-    def add_card(cls, user_id: int, deck_name: str, card_id: int, number: int, side: bool):
-        """
-        add a card to the deck identified by the given name
-
-        :param user_id: id of the user owning the deck
-        :param deck_name: name of the deck to which to add the card
-        :param card_id: id of the card to add
-        :param number: number of time to add the card
-        :param side: whether to add the card in the side or in the deck
-        """
-        if side:
-            return CardInSide.add(user_id, deck_name, card_id, number)
-        return CardInDeck.add(user_id, deck_name, card_id, number)
-
-    @classmethod
-    def get_cards(cls, user_id: int, deck_name: str, side: bool=False)\
-            -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
-        """
-        gets the cards that are in the given deck
-        :param user_id: user owning the deck
-        :param deck_name: identifier of the deck
-        :param side: whether the cards in the side are asked or the others
-        :return: list of cards in the asked deck
-        """
-        if side:
-            return CardInSide.get_cards(user_id, deck_name)
-        else:
-            return CardInDeck.get_cards(user_id, deck_name)
 
 
 class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
@@ -879,60 +882,6 @@ class LegalInFormat(Model):
         return sql.LegalInFormat.insert()
 
 
-class DeckList:
-    """
-    Proxy to obtain lists for a
-
-    :param user_id: id of the user owning the decklist
-    """
-    def __init__(self, user_id: int):
-        self.user_id = user_id
-
-    def list(self) -> typing.List[typing.Dict[str, str]]:
-        """
-        Returns the list of decks
-
-        :return: list of deck
-        """
-        return Deck.list(self.user_id)
-
-    def add(self, name: str) -> typing.Dict[str, str]:
-        """
-        Creates a new deck for the current user
-
-        :param name: the name for the new deck
-        :return: the new deck information
-        """
-        return Deck.add(self.user_id, name)
-
-    def delete(self, name: str):
-        """
-        Deletes the deck given in parameter
-
-        :param name: name of the deck to delete
-        """
-        Deck.delete(self.user_id, name)
-
-    def add_card(self, deck_name: str, card_id: int, number: int, side: bool):
-        """
-        add a card to the deck identified by the given name
-
-        :param deck_name: name of the deck to which to add the card
-        :param card_id: id of the card to add
-        :param number: number of time to add the card
-        :param side: whether to add the card in the side or in the deck
-        """
-        return Deck.add_card(self.user_id, deck_name, card_id, number, side)
-
-    def get_cards(self, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
-        """
-        get all cards in the
-        :param deck_name: name of the deck for which to get the cards
-        :return: list of cards in the deck
-        """
-        return Deck.get_cards(self.user_id, deck_name)
-
-
 class User(Model):
     """
     User model
@@ -950,7 +899,7 @@ class User(Model):
         self.__password = password
         self.__is_admin = is_admin
         self.collection = Collection(self.__user_id)
-        self.decks = DeckList(self.__user_id)
+        self.decks = Deck(self.__user_id)
 
     @classmethod
     def _insertion_command(cls) -> str:
