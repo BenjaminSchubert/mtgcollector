@@ -34,24 +34,33 @@ $.fn.scrollStopped = function(callback) {
 
 // Executed at loading
 $(document).ready(function () {
-    $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
-    $(window).resize(initView);
 
-    fetchExistingDecks();
-    setImagesErrorPath();
-    initView();
+    // if no result found
+    if ($('#cards').children().length == 0) {
+        $('#cards').append('<p id="no-result-text">No result found</p>');
+    }
 
-    // what to do when clicking on card image
-    $('#cards > div').click(lockCardDetails);
+    else {
 
-    // what to do when hovering on card image
-    $('#cards img').hover(function () {
-        if (!lockInfo.locked) {
-            displayCardDetails($(this).parent().parent().attr('id'));
-        }
-    });
+        $(window).scrollStopped(loadImagesInViewport); // sets the action to take when scrolling stops
+        $(window).resize(initView);
 
-    setupPost();
+        fetchExistingDecks();
+        setImagesErrorPath();
+        initView();
+
+        // what to do when clicking on card image
+        $('#cards > div').click(lockCardDetails);
+
+        // what to do when hovering on card image
+        $('#cards img').hover(function () {
+            if (!lockInfo.locked) {
+                displayCardDetails($(this).parent().parent().attr('id'));
+            }
+        });
+
+        setupPost();
+    }
 });
 
 function fetchExistingDecks() {
