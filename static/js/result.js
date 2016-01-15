@@ -345,17 +345,16 @@ function createButtonAddToDeck(id, parentDiv) {
             // create popover content
             var options = "";
             existingDecks.forEach(function (deck) {
-                console.log(deck);
                 options += '<option deck-name="' + deck["name"] + '">' + deck["name"] + '</option>';
             });
 
             var content =
-                '<label>Select a deck</label>' +
-                '<select id="deck-selection" data-card-id="' + id +'">' +
+                '<label>Deck</label>' +
+                '<select id="deck-selection" class="form-control" data-card-id="' + id +'">' +
                     options +
                 '</select>' +
-                '<label>Number of cards to add</label>' +
-                '<input id="number-cards-to-add" type="number" min="0" class="form-control">' +
+                '<label>Number of cards in deck</label>' +
+                '<input id="new-number-of-cards" type="number" min="0" class="form-control">' +
                 '<label>Add card to side</label>' +
                 '<input id="add-to-side" type="checkbox">';
 
@@ -365,7 +364,7 @@ function createButtonAddToDeck(id, parentDiv) {
 
                 var postData = {
                     card_id: id,
-                    n_cards: $('#number-cards-to-add').val(),
+                    n_cards: $('#new-number-of-cards').val(),
                     side: $('#add-to-side').is(':checked')
                 };
 

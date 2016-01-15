@@ -58,12 +58,15 @@ function bindButtons() {
     $('.button-delete').click(function () {
 
         var deckName = $(this).parent().parent().attr('deck-name');
+        var deleteOk = confirm("Do you really want to delete deck '" + deckName + " ?");
 
-        $.ajax({
-            url: apiDecksPath + '/' + deckName,
-            type: 'delete',
-            success: location.reload
-        });
+        if (deleteOk) {
+            $.ajax({
+                url: apiDecksPath + '/' + deckName,
+                type: 'delete',
+                success: location.reload
+            });
+        }
     });
 }
 
