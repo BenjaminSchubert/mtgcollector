@@ -1,5 +1,8 @@
-var apiDecksPath = "/api/decks";
+// paths
+var decksPath = "/api/decks";
+var deckPostPath = decksPath + "/";
 
+// executed when DOM ready
 $(document).ready(function () {
     setupPost();
     fetchJson(createDeckList);
@@ -7,7 +10,7 @@ $(document).ready(function () {
 });
 
 function fetchJson(callback) {
-    $.get(apiDecksPath, function (data) {
+    $.get(decksPath, function (data) {
         callback(data);
     });
 }
@@ -18,23 +21,17 @@ function createDeckList(data) {
 
     decks.forEach(function (deck) {
 
+        var deckName = deck["name"];
+
         var colorsHTML = "";
         if (deck["colors"] !== undefined && deck["colors"] !== null) {
             colorsHTML = insertImagesInText(deck["colors"].toString());
         }
 
-        deckList.append(
-            '<tr deck-name="' + deck["name"] + '" class="deck-row">' +
-                '<th class="deck-user-index" scope="row">' +
-                    '<a href="#" value="' + deck["user_index"] + '" data-pk="' + deck["deck-id"] + '">' +
-                        deck["user_index"] +
-                    '</a>' +
-                '</th>' +
-                '<td class="deck-name">' +
-                    '<a href="#" value="' + deck["name"] + '" data-pk="' + deck["deck-id"] + '">' +
-                        deck["name"] +
-                    '</a>' +
-                '</td>' +
+        var deckRow = $(
+            '<tr deck-name="' + deckName + '" class="deck-row">' +
+                '<th class="deck-user-index" scope="row"></th>' +
+                '<td class="deck-name"></td>' +
                 '<td class="deck-colors">' + colorsHTML + '</td>' +
                 '<td class="deck-n-deck">' + deck["n_deck"] + '</td>' +
                 '<td class="deck-n-side">' + deck["n_side"] + '/15</td>' +
@@ -44,10 +41,77 @@ function createDeckList(data) {
                 '</td>' +
             '</tr>'
         );
+
+        deckList.append(deckRow);
+        console.log(deckRow.find('.deck-name'));
+
+        createName(deckRow.find('.deck-name'), deckName);
+        createUserIndex(deckRow.find('.deck-user-index'), deckName, deck["user_index"]);
     });
 
     bindButtons();
-    bindEditable();
+}
+
+function createName(parent, deckName) {
+    var wrapper = $('<div class="popover-wrapper"></div>');
+    var editable = $('<p>' + deckName + '</p>');
+
+    editable.click(function () {
+
+        var content =
+            '<label>Enter new value</label>' +
+            '<input id="new-name" type="text" class="form-control" value="' + deckName + '">';
+
+        var popover = createPopover($(content), function () {
+            var path = deckPostPath + deckName + "/rename";
+            var postData = {
+                name: $('#new-name').val()
+            };
+            console.log(postData);
+
+            $.post(path, postData, function () {
+                $.get(path, function (data) {
+                    editable.text(data.name);
+                });
+            });
+        });
+
+        wrapper.append(popover);
+    });
+
+    wrapper.append(editable);
+    parent.append(wrapper);
+}
+
+function createUserIndex(parent, deckName, userIndex) {
+    var wrapper = $('<div class="popover-wrapper"></div>');
+    var editable = $('<p>' + userIndex + '</p>');
+
+    editable.click(function () {
+
+        var content = $(
+            '<label>Enter new value</label>' +
+            '<input id="new-user-index" type="number" class="form-control" value="' + userIndex + '">'
+        );
+
+        var popover = createPopover($(content), function () {
+            var path = deckPostPath + deckName + "/index";
+            var postData = {
+                user_index: $('#new-user-index').val()
+            };
+
+            $.post(path, postData, function () {
+                $.get(path, function (data) {
+                    editable.text(data.name);
+                });
+            });
+        });
+
+        wrapper.append(popover);
+    });
+
+    wrapper.append(editable);
+    parent.append(wrapper);
 }
 
 function bindButtons() {
@@ -69,28 +133,6 @@ function bindButtons() {
                 }
             });
         }
-    });
-}
-
-function bindEditable() {
-    $.fn.editable.defaults.mode = 'popup';
-
-    $('.deck-user-index > a').editable({
-        type: 'text',
-        title: 'Enter new number',
-        placement: 'right',
-
-        url: apiDecksPath,
-        name: "user_index"
-    });
-
-    $('.deck-name > a').editable({
-        type: 'text',
-        title: 'Enter new name',
-        placement: 'right',
-
-        url: apiDecksPath,
-        name: "name"
     });
 }
 
