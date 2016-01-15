@@ -79,7 +79,7 @@ class SearchForm(Form):
     separator1 = StartSeparatorField()
 
     name = StringField("Name")
-    types = StringField("Types")
+    subtypes = StringField("Subtypes")
     text = TextAreaField("Card text")
     context = TextAreaField("Context")
     number = StringField("Card number")
@@ -106,6 +106,14 @@ class SearchForm(Form):
     supertypes = SelectField(
             "Supertypes", default="",
             choices=[(choice, choice) for choice in ["", "Legendary", "Snow", "World", "Basic", "Ongoing"]]
+    )
+    types = SelectField(
+        "Types", default="",
+        choices=[
+            (choice, choice) for choice in
+            ["", "Land", "Creature", "Sorcery", "Instant", "Artifact", "Planeswalker", "Enchantment", "Tribal", "Scheme",
+             "Enchant", "Vanguard", "Plane", "Conspiracy", "Phenomenon", "Token"]
+        ]
     )
     rarity = MultiCheckboxField("Rarity")
     in_collection = BooleanField('Only cards in collection')

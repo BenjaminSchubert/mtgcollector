@@ -244,11 +244,11 @@ class Metacard(Model):
 
     # noinspection PyShadowingBuiltins
     @classmethod
-    def get_ids_where(cls, user_id: int=None, name: str= "", types: str= "", text: str= "", context: str= "",
+    def get_ids_where(cls, user_id: int=None, name: str= "", subtypes: str= "", text: str= "", context: str= "",
                       number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
                       cmc: str="", colors: str="", only_selected_colors: bool=False, all_selected_colors: bool=False,
                       edition: str="", block: str="", format: str="", rarity: str="", order_by="metacard.name",
-                      supertypes: str="", **kwargs: typing.Dict)\
+                      supertypes: str="", types: str="", **kwargs: typing.Dict)\
             -> typing.List[typing.Dict[str, typing.Dict[str, str]]]:
         """
         This allows for extensive filtering and complex queries on the cards. It will return all ids of cards
@@ -257,7 +257,8 @@ class Metacard(Model):
         :param user_id: if this is given, will add to the answer the number of each card owned by the player identified
                         by the id
         :param name: MySQL regex to be matched against the name of the card. wildcards will be added between each word
-        :param types: types the card must have. This will be matched against the card type with MySQL regex as for name
+        :param subtypes: types the card must have. This will be matched against the card type with MySQL regex as for
+                        name
         :param text: text that must be on the card. Will also be matched as a MySQL regex as for name
         :param context: text that must be in the context field of the card. MySQL regex as for name
         :param number: the number that each cards has in its edition
@@ -278,6 +279,7 @@ class Metacard(Model):
         :param rarity: the rarities the card can have
         :param order_by: in which order to sort the result
         :param supertypes: supertypes the card must have
+        :param types: the types the card must have
         :param kwargs: additional garbage arguments
         :return: list of cards containing dictionaries with fields {"id", "normal", "foil"}
         """
@@ -359,9 +361,9 @@ class Metacard(Model):
             query_parameters = add_to_parameters(query_parameters, "metacard.name LIKE %(name)s")
             kwargs["name"] = add_wildcard(name)
 
-        if types:
+        if subtypes:
             query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
-            kwargs["type"] = add_wildcard(types)
+            kwargs["type"] = add_wildcard(subtypes)
 
         if text:
             query_parameters = add_to_parameters(query_parameters, "metacard.orig_text LIKE %(card_text)s")
@@ -396,6 +398,10 @@ class Metacard(Model):
         if supertypes:
             query_parameters = add_to_parameters(query_parameters, "%(supertypes)s IN (metacard.supertypes)")
             kwargs["supertypes"] = supertypes
+
+        if types:
+            query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(types)s")
+            kwargs["types"] = types + "%"
 
         if format:
             query_parameters = add_to_parameters(
