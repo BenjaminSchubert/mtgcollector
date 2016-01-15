@@ -30,6 +30,11 @@ class Model(metaclass=abc.ABCMeta):
         """ Defines the sql command used to create the table for the model """
 
     @classmethod
+    def _triggers(cls) -> typing.List[str]:
+        """ list of triggers to add to the table """
+        return []
+
+    @classmethod
     @abc.abstractmethod
     def _insertion_command(cls) -> str:
         """ Saves the current object to the database. Should return the same user """
@@ -79,13 +84,15 @@ class Model(metaclass=abc.ABCMeta):
         return cursor.fetchall()
 
     @classmethod
-    def create_table(cls, connection=None) -> None:
+    def setup_table(cls, connection=None) -> None:
         """
         Creates the table to be used with this model
 
         :param connection: the database connection to use. If None, will use flask.g.db
         """
         cls.__execute(cls._table_creation_command(), connection)
+        for trigger in cls._triggers():
+            cls.__execute(trigger, connection)
 
     @classmethod
     def __execute(cls, command: str, connection=None, **kwargs):
@@ -646,7 +653,10 @@ class Collection(Model):
         :param normal: number of normal copy
         :param foil: number of foil copy
         """
-        self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=normal, foil=foil)
+        if normal == foil == 0:
+            self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
+        else:
+            self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=normal, foil=foil)
 
     def _as_database_object(self) -> dict:
         """ this is never used """
@@ -775,7 +785,10 @@ class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
         :param card_id: id of the card
         :param number: number of time to add the card
         """
-        cls._modify(cls.sql_class().add(), user_id=user_id, deck_name=deck_name, card_id=card_id, number=number)
+        if number == 0:
+            cls._modify(cls.sql_class().delete(), user_id=user_id, name=deck_name, card_id=card_id)
+        else:
+            cls._modify(cls.sql_class().add(), user_id=user_id, deck_name=deck_name, card_id=card_id, number=number)
 
     @classmethod
     def get_cards(cls, user_id: int, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:

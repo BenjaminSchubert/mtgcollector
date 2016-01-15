@@ -82,9 +82,6 @@ def add_to_collection() -> werkzeug.wrappers.Response:
     normal = flask.request.form.get('n_normal', type=int)
     foil = flask.request.form.get('n_foil', type=int)
 
-    if normal == foil == 0:  # TODO remove if trigger is decided
-        current_user.collection.delete(card_id=card_id)
-
     current_user.collection.insert(card_id=card_id, normal=normal, foil=foil)
 
     return flask.jsonify(card_id=card_id, normal=normal, foil=foil)

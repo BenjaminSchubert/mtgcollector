@@ -53,7 +53,7 @@ class MaintenanceDB:
         else:
             with self.DBManager(self.app) as connection:
                 for model in sorted(lib.get_subclasses(lib.models.Model), key=lambda x: x.index):
-                    model.create_table(connection=connection)
+                    model.setup_table(connection=connection)
         finally:
             conn.close()
 

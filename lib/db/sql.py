@@ -9,6 +9,7 @@ import abc
 
 import mysql.connector
 import mysql.connector.conversion
+import typing
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
@@ -331,8 +332,8 @@ class Collection:
             CREATE TABLE card_in_collection (
                 user_id INT NOT NULL,
                 card_id INT NOT NULL,
-                normal INT NOT NULL DEFAULT 0,
-                foil INT NOT NULL DEFAULT 0,
+                normal INT UNSIGNED NOT NULL DEFAULT 0,
+                foil INT UNSIGNED NOT NULL DEFAULT 0,
 
                 FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE RESTRICT,
                 FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -435,7 +436,7 @@ class CardInDeckEntity(abc.ABCMeta):
             CREATE TABLE {table_name} (
                 deck_id INT NOT NULL,
                 card_id INT NOT NULL,
-                number SMALLINT NOT NULL,
+                number SMALLINT UNSIGNED NOT NULL,
 
                 FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE ON UPDATE CASCADE,
                 FOREIGN KEY (card_id) REFERENCES card(card_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -463,6 +464,17 @@ class CardInDeckEntity(abc.ABCMeta):
             INNER JOIN deck
             ON card_in_deck.decK_id = deck.deck_id
             WHERE user_id = %(user_id)s AND deck.name = %(deck_name)s
+        """.format(table_name=mcs.table_name())
+
+    @classmethod
+    def delete(mcs):
+        """ delete the given entry """
+        return """
+            DELETE FROM {table_name}
+            WHERE deck_id=(
+                    SELECT deck_id FROM deck WHERE name = %(name)s AND user_id=%(user_id)s
+                )
+                AND card_id=%(card_id)s
         """.format(table_name=mcs.table_name())
 
 
