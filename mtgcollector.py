@@ -43,6 +43,8 @@ def setup_app(_app):
 app = Flask(__name__)
 
 login_manager = flask_login.LoginManager()
+login_manager.login_view = 'login'
+
 csrf = flask_wtf.CsrfProtect()
 
 

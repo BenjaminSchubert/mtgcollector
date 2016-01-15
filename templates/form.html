@@ -17,7 +17,8 @@
                 <h3 class="panel-title">{{ title }}</h3>
             </div>
             {{ render_form(form, id_=id_, _class="form-horizontal", action=action, method=method) }}
-
+            {% block additional %}{% endblock %}
         </div>
     </div>
+
 {% endblock %}
