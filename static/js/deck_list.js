@@ -1,4 +1,4 @@
-var apiDecksPath = "api/decks";
+var apiDecksPath = "/api/decks";
 
 $(document).ready(function () {
     setupPost();

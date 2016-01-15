@@ -3,9 +3,6 @@ var numCardPostPath = "/api/collection/";
 var deckGetPath = "/api/decks";
 var deckPostPath = "/api/decks/";
 
-// Contains as keys the ids of the cards whose details are already fetched and as values the details as json.
-var detailsFetched = {};
-
 // existing decks, initialized at start
 var existingDecks;
 
@@ -172,44 +169,4 @@ function createButtonAddToDeck(id, parentDiv) {
     });
 
     parentDiv.append(buttonDiv);
-}
-
-// Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.
-function createStringFromValue(details, key) {
-    return insertImagesInText(("" + details[key]));
-}
-
-// Create a string from a value (in json) which is an array. The resulting string has the \n replaced by <br>.
-function createStringFromArrayValue(details, key) {
-    var res = "";
-    if (details[key].length > 0) {
-        res = details[key][0];
-        for (var i = 1; i < details[key].length; ++i) {
-            res += ", " + details[key][i];
-        }
-    }
-    return res;
-}
-
-/**
- * Creates a field corresponding to a detail value.
- *
- * Params :
- * parentDiv : the div to which attach the created element
- * details : object containing values
- * key : the key to access the value which will be displayed
- * name : value of the label
- * createStringFunction : function which will create a string from the value. Useful to define behaviour related to the
- * value type (for example arrays).
- */
-function createDetailsField(parentDiv, details, key, name, createStringFunction) {
-    // if value at 'key' is set and a key 'key' exists, create the elements
-    if (details[key] !== null && details[key] !== undefined) {
-
-        var newDetail = $('<div class="row"></div>');
-        newDetail.append('<label class="col-md-6">' + name + '</label>');
-        newDetail.append('<div class="col-md-6">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
-
-        parentDiv.append(newDetail);
-    }
 }
