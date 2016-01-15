@@ -340,7 +340,7 @@ function createButtonAddToDeck(id, parentDiv) {
             var options = "";
             existingDecks.forEach(function (deck) {
                 console.log(deck);
-                options += '<option deck-id="' + deck["deck_id"] + '">' + deck["name"] + '</option>';
+                options += '<option deck-name="' + deck["name"] + '">' + deck["name"] + '</option>';
             });
 
             var content =
@@ -355,7 +355,7 @@ function createButtonAddToDeck(id, parentDiv) {
 
             // create popover
             var popover = createPopover($(content), function () {
-                var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-id');
+                var deckId = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-name');
 
                 var postData = {
                     card_id: id,

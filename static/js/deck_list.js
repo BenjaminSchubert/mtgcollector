@@ -1,20 +1,6 @@
 var getDeckPath = "api/decks";
 var deckPostPath = "api/decks";
 
-// TODO
-var test = {
-    "decks": [
-        {
-            "deck_id": 1,
-            "n_deck": 0,
-            "n_side": 0,
-            "name": "Test deck 2",
-            "user_id": 1,
-            "user_index": 0
-        }
-    ]
-};
-
 $(document).ready(function () {
     setupPost();
     fetchJson(createDeckList);
@@ -39,7 +25,7 @@ function createDeckList(data) {
         }
 
         deckList.append(
-            '<tr id="' + deck["deck_id"] + '" class="deck-row">' +
+            '<tr deck-name="' + deck["name"] + '" class="deck-row">' +
                 '<th class="deck-user-index" scope="row">' +
                     '<a href="#" value="' + deck["user_index"] + '" data-pk="' + deck["deck-id"] + '">' +
                         deck["user_index"] +
@@ -66,7 +52,7 @@ function createDeckList(data) {
 
 function bindButtonGoDeck() {
     $('.button-go-deck').click(function () {
-        document.location = "decks/" + $(this).parent().attr('id');
+        document.location = "decks/" + $(this).parent().attr('deck-name');
     });
 }
 
