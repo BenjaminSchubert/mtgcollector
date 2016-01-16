@@ -281,16 +281,18 @@ function createStringFromArrayValue(details, key) {
  * details : object containing values
  * key : the key to access the value which will be displayed
  * name : value of the label
+ * colWidthLabel: col width of label
+ * colWidthDiv: col width of the div
  * createStringFunction : function which will create a string from the value. Useful to define behaviour related to the
  * value type (for example arrays).
  */
-function createDetailsField(parentDiv, details, key, name, createStringFunction) {
+function createDetailsField(parentDiv, details, key, name, colWidthLabel, colWidthDiv, createStringFunction) {
     // if value at 'key' is set and a key 'key' exists, create the elements
     if (details[key] !== null && details[key] !== undefined) {
 
         var newDetail = $('<div class="row"></div>');
-        newDetail.append('<label class="col-md-6">' + name + '</label>');
-        newDetail.append('<div class="col-md-6">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
+        newDetail.append('<label class="col-md-' + colWidthLabel + '">' + name + '</label>');
+        newDetail.append('<div class="col-md-' + colWidthDiv + '">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');
 
         parentDiv.append(newDetail);
     }

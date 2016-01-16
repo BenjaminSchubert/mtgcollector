@@ -43,7 +43,7 @@
     overflow: auto;
 }
 
-#card-details .row {
+#card-details > .row {
     margin-top: 3px;
     margin-bottom: 3px;
 }
@@ -57,13 +57,8 @@
     margin-bottom: 30px;
 }
 
-#n-normal, #n-foil {
-    color: black;
-}
-
-#card-details-upper a {
-    cursor: pointer;
-    color: black;
+#button-add-to-deck {
+    margin-bottom: 20px;
 }
 
 #button-add-to-deck {
@@ -91,13 +86,10 @@
 
 .strip-values {
     position: absolute;
-
     top: 10%;
     right: 17%;
-
-    font-size: 25px;
+    font-size: 1vw;
     color: white;
-
     z-index: 10;
 }
 

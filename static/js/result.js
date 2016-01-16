@@ -32,11 +32,11 @@ function createDetailsUpper(id) {
     createButtonAddToDeck(id, parentDiv);
 
     if (details["types"][0] !== "Land") {
-        createDetailsField(parentDiv, details, "manaCost", "Mana Cost", createStringFromValue);
-        createDetailsField(parentDiv, details, "cmc", "Cmc", createStringFromValue);
+        createDetailsField(parentDiv, details, "manaCost", "Mana Cost", 6, 6, createStringFromValue);
+        createDetailsField(parentDiv, details, "cmc", "Cmc", 6, 6, createStringFromValue);
     }
-    createDetailsField(parentDiv, details, "types", "Types", createStringFromArrayValue);
-    createDetailsField(parentDiv, details, "rarity", "Rarity", createStringFromValue);
+    createDetailsField(parentDiv, details, "types", "Types", 6, 6, createStringFromArrayValue);
+    createDetailsField(parentDiv, details, "rarity", "Rarity", 6, 6, createStringFromValue);
 
 }
 
@@ -45,11 +45,11 @@ function createDetailsLower(id) {
     var details = detailsFetched[id];
     var parentDiv = $('#card-details-lower');
 
-    createDetailsField(parentDiv, details, "orig_text", "Card Text", createStringFromValue);
-    createDetailsField(parentDiv, details, "flavor", "Flavor Text", createStringFromValue);
-    createDetailsField(parentDiv, details, "edition", "Edition", createStringFromValue);
-    createDetailsField(parentDiv, details, "number", "Card Number", createStringFromValue);
-    createDetailsField(parentDiv, details, "artist", "Artist", createStringFromValue);
+    createDetailsField(parentDiv, details, "orig_text", "Card Text", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "flavor", "Flavor Text", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "edition", "Edition", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "number", "Card Number", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "artist", "Artist", 4, 8, createStringFromValue);
 }
 
 // Creates and editable input for number of cards of a type (normal or foil for example).
@@ -69,9 +69,11 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
 
     link.click(function () {
         // create popover content
+        var value = isNormal ? $('#n-normal').text() : $('#n-foil').text();
+
         var content = $(
             '<label>Number of cards</label>' +
-            '<input id="num-cards-to-add" type="number" min="0" class="form-control">'
+            '<input id="num-cards-to-add" class="form-control" type="number" min="0" value="' + value + '">'
         );
 
         // create popover
@@ -112,7 +114,7 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
 // Creates the button to add the current card to a deck.
 function createButtonAddToDeck(id, parentDiv) {
 
-    var button = $('<button class="btn btn-primary" data-card-id="' + id + '">Add to deck</button>');
+    var button = $('<button id="button-add-to-deck" class="btn btn-primary" data-card-id="' + id + '">Add to deck</button>');
     var buttonDiv = $('<div class="popover-wrapper"></div>');
     buttonDiv.append(button);
 
@@ -144,7 +146,7 @@ function createButtonAddToDeck(id, parentDiv) {
                     options +
                 '</select>' +
                 '<label>Number of cards in deck</label>' +
-                '<input id="new-number-of-cards" type="number" min="0" class="form-control">' +
+                '<input id="new-number-of-cards" class="form-control" type="number" min="0" value="0">' +
                 '<label>Add card to side</label>' +
                 '<input id="add-to-side" type="checkbox">';
 

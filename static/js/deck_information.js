@@ -18,11 +18,11 @@ function createDetailsUpper(id) {
     createButtonRemoveFromDeck(id, parentDiv);
 
     if (details["types"][0] !== "Land") {
-        createDetailsField(parentDiv, details, "manaCost", "Mana Cost", createStringFromValue);
-        createDetailsField(parentDiv, details, "cmc", "Cmc", createStringFromValue);
+        createDetailsField(parentDiv, details, "manaCost", "Mana Cost", 6, 6, createStringFromValue);
+        createDetailsField(parentDiv, details, "cmc", "Cmc", 6, 6, createStringFromValue);
     }
-    createDetailsField(parentDiv, details, "types", "Types", createStringFromArrayValue);
-    createDetailsField(parentDiv, details, "rarity", "Rarity", createStringFromValue);
+    createDetailsField(parentDiv, details, "types", "Types", 6, 6, createStringFromArrayValue);
+    createDetailsField(parentDiv, details, "rarity", "Rarity", 6, 6, createStringFromValue);
 
 }
 
@@ -31,11 +31,11 @@ function createDetailsLower(id) {
     var details = detailsFetched[id];
     var parentDiv = $('#card-details-lower');
 
-    createDetailsField(parentDiv, details, "orig_text", "Card Text", createStringFromValue);
-    createDetailsField(parentDiv, details, "flavor", "Flavor Text", createStringFromValue);
-    createDetailsField(parentDiv, details, "edition", "Edition", createStringFromValue);
-    createDetailsField(parentDiv, details, "number", "Card Number", createStringFromValue);
-    createDetailsField(parentDiv, details, "artist", "Artist", createStringFromValue);
+    createDetailsField(parentDiv, details, "orig_text", "Card Text", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "flavor", "Flavor Text", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "edition", "Edition", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "number", "Card Number", 4, 8, createStringFromValue);
+    createDetailsField(parentDiv, details, "artist", "Artist", 4, 8, createStringFromValue);
 }
 
 // Creates the button to add the current card to a deck.
