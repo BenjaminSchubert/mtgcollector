@@ -44,7 +44,8 @@ class User:
                 user_id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(255) NOT NULL UNIQUE,
                 email VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
+                password BINARY(64) NOT NULL,
+                salt BINARY(255) NOT NULL,
                 is_admin BOOLEAN NOT NULL DEFAULT FALSE
             )
         """
@@ -52,7 +53,10 @@ class User:
     @classmethod
     def insert(cls):
         """ command to insert a user in the table"""
-        return """ INSERT INTO user (username, email, password) VALUES (%(username)s, %(email)s, %(password)s) """
+        return """
+            INSERT INTO user (username, email, password, salt)
+            VALUES (%(username)s, %(email)s, %(password)s, %(salt)s)
+        """
 
     @classmethod
     def set_admin(cls):

@@ -6,16 +6,17 @@ Models for MtgCollector
 """
 
 import abc
+import datetime
+import hashlib
 import logging
+import os
 import shlex
 
 import flask
-import datetime
-
 import typing
 
-from lib.exceptions import IntegrityException
 from lib.db import sql_commands as sql
+from lib.exceptions import IntegrityException
 
 
 class Model(metaclass=abc.ABCMeta):
@@ -917,12 +918,21 @@ class User(Model):
     :param password: the user password
     :param is_admin: true if the user is an admin
     :param user_id: user's unique identifier
+    :param salt: salt used to encrypt the user password
     """
-    def __init__(self, username: str, email: str, password: str, is_admin: bool=False, user_id: int=None):
+    def __init__(self, username: str, email: str, password: str, is_admin: bool=False, user_id: int=None,
+                 salt: bytes=None):
         self.__user_id = user_id
         self.__username = username
         self.__email = email
-        self.__password = password
+
+        if salt is None:  # this is a new user, we encode the password
+            self.__salt = os.urandom(255)
+            self.__password = hashlib.pbkdf2_hmac('sha512', password.encode("utf-8"), self.__salt, 1000000)
+        else:
+            self.__salt = salt
+            self.__password = password
+
         self.__is_admin = is_admin
         self.collection = Collection(self.__user_id)
         self.decks = Deck(self.__user_id)
@@ -1026,7 +1036,7 @@ class User(Model):
         :param password: password to check against
         :return: True if the password is valid
         """
-        return self.__password == password
+        return self.__password == hashlib.pbkdf2_hmac('sha512', password.encode("utf-8"), self.__salt, 1000000)
 
     def create(self):
         """
@@ -1063,7 +1073,8 @@ class User(Model):
         return {
             "username": self.__username,
             "email": self.__email,
-            "password": self.__password
+            "password": self.__password,
+            "salt": self.__salt
         }
 
     @property
