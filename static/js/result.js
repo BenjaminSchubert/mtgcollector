@@ -149,7 +149,7 @@ function createButtonAddToDeck(id, parentDiv) {
                     options +
                 '</select>' +
                 '<label>Number of cards in deck</label>' +
-                '<input id="new-number-of-cards" class="form-control" type="number" min="0" value="0">' +
+                '<input id="new-number-of-cards" class="form-control" type="number" min="0" placeholder="0" autofocus>' +
                 '<label>Add card to side</label>' +
                 '<input id="add-to-side" type="checkbox">';
 
