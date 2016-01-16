@@ -26,10 +26,13 @@ function createDetailsUpper(id) {
     var parentDiv = $('#card-details-upper-right');
     var cardDiv = $('#' + id); // TODO: can be changed when cards as json
 
-    parentDiv.append('<p>In collection</p>');
-    createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), true);
-    createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), false);
-    createButtonAddToDeck(id, parentDiv);
+    // if decks could be fetched (user logged in)
+    if (existingDecks !== undefined) {
+        parentDiv.append('<p>In collection</p>');
+        createRowNumCards(parentDiv, id, "Normal", cardDiv.attr('data-normal'), true);
+        createRowNumCards(parentDiv, id, "Foil", cardDiv.attr('data-foil'), false);
+        createButtonAddToDeck(id, parentDiv);
+    }
 
     if (details["types"][0] !== "Land") {
         createDetailsField(parentDiv, details, "manaCost", "Mana Cost", 6, 6, createStringFromValue);
@@ -155,12 +158,11 @@ function createButtonAddToDeck(id, parentDiv) {
                 var deckName = $('.popover-main-container').find('#deck-selection').find(":selected").attr('deck-name');
 
                 var postData = {
-                    card_id: id,
                     n_cards: $('#new-number-of-cards').val(),
                     side: $('#add-to-side').is(':checked') ? 1 : 0
                 };
 
-                $.post(deckPostPath + deckName, postData, function (data) {
+                $.post(deckPostPath + deckName + "/" + id, postData, function (data) {
                     console.log(data);
                 });
             });
