@@ -159,15 +159,25 @@ function createStrip(curDiv) {
     var nFoil = parseInt(curDiv.attr('data-foil'));
     var tot = nNormal + nFoil;
 
-    // if already created, update number
-    if (curDiv.find('.strip').length > 0) {
-        curDiv.find('.strip-values').text(tot);
+    // if tot not a valid number
+    if (isNaN(tot)) {
         return;
     }
 
-    var innerDiv = curDiv.children('.card-inner');
+    // if strip already existing, update number or remove it if tot = 0
+    if (curDiv.find('.strip').length > 0) {
+        if (tot == 0) {
+            curDiv.find('.strip').remove();
+            curDiv.find('.strip-values').remove();
+        } else {
+            curDiv.find('.strip-values').text(tot);
+        }
+        return;
+    }
 
-    if (tot !== undefined && tot > 0) {
+    // strip not yet existing
+    var innerDiv = curDiv.children('.card-inner');
+    if (tot > 0) {
         innerDiv.append(
             '<div class="strip"></div>' +
             '<div class="strip-values">' + tot + '</div>'

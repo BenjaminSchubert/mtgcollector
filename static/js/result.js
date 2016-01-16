@@ -88,17 +88,17 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
             }
 
             var postData = {
-                id: id,
                 n_normal: n_normal,
                 n_foil: n_foil
             };
 
-            $.post(numCardPostPath, postData, function (data) {
-                link.text(isNormal ? data.normal : data.foil);
+            $.post(numCardPostPath + id, postData, function (data) {
+                // TODO
+                link.text(isNormal ? postData.n_normal : postData.n_foil);
 
                 var cardDiv = $('#' + id);
-                cardDiv.attr('data-normal', data.normal);
-                cardDiv.attr('data-foil', data.foil);
+                cardDiv.attr('data-normal', postData.n_normal);
+                cardDiv.attr('data-foil', postData.n_foil);
                 createStrip(cardDiv);
             });
         });
