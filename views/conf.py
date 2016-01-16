@@ -74,7 +74,9 @@ def get_database_form() -> werkzeug.wrappers.Response:
         app.update_db.set()
         return redirect(url_for("install"))
 
-    return render_template('form.html', form=form, id_="form-database", action=flask.url_for("install"))
+    return render_template(
+            'form.html', form=form, id_="form-database", action=flask.url_for("install"), title="Database Setup"
+    )
 
 
 def get_user_form():

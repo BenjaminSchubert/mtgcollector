@@ -12,6 +12,7 @@ import selenium.webdriver
 from tests import LiveServerTestCase, DBConnectionMixin
 from tests.forms import InstallForm, AdminForm
 
+
 class IntegrationTest(LiveServerTestCase):
     def drop_database(self):
         conn = mysql.connector.connect(

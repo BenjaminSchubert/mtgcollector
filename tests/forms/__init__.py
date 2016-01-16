@@ -98,9 +98,11 @@ class InstallForm(BaseForm):
         :param test_instance: allows access to asserts
         :param browser: where to run the tests
         """
+        test_instance.assertNotEqual("", browser.find_element_by_class_name("panel-title").text, "Blank title found")
         self.fill_form(browser, host="HelloWorld")
         self.check_errors(test_instance, browser, "host", r".*ip.*or.*hostname")
 
+        test_instance.assertNotEqual("", browser.find_element_by_class_name("panel-title").text, "Blank title found")
         self.fill_form(browser, host="127.0.0.1")
         self.check_errors(test_instance, browser, "host", r"^Could not connect*")
 
@@ -149,4 +151,6 @@ class AdminForm(BaseForm):
         :param test_instance: unittest instance for assert access
         :param browser: the browser on which to conduct the tests
         """
+        test_instance.assertNotEqual("", browser.find_element_by_class_name("panel-title").text, "Blank title found")
+
         self.fill_form(browser)
