@@ -288,8 +288,7 @@ function createStringFromArrayValue(details, key) {
  */
 function createDetailsField(parentDiv, details, key, name, colWidthLabel, colWidthDiv, createStringFunction) {
     // if value at 'key' is set and a key 'key' exists, create the elements
-    if (details[key] !== null && details[key] !== undefined) {
-
+    if (details[key] !== null && details[key] !== undefined && details[key] != 0) {
         var newDetail = $('<div class="row"></div>');
         newDetail.append('<label class="col-md-' + colWidthLabel + '">' + name + '</label>');
         newDetail.append('<div class="col-md-' + colWidthDiv + '">' + formatTextToHTMLContent(createStringFunction(details, key)) + '</div>');

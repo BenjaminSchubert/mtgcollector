@@ -8,6 +8,7 @@ Views for user authentication, registration and login
 import flask
 from flask_login import login_user, login_required, logout_user, current_user
 
+from lib.exceptions import DataManipulationException
 from lib.forms import LoginForm, RegisterForm
 from mtgcollector import app, lib
 
@@ -48,8 +49,14 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        user = lib.models.User(username=form.username.data, email=form.email.data, password=form.password.data).create()
-        login_user(user)
-        return flask.redirect(flask.request.referrer or "index")
+        try:
+            user = lib.models.User(
+                    username=form.username.data, email=form.email.data, password=form.password.data
+            ).create()
+        except DataManipulationException:
+            form.username.errors.append("A user with the same name or email already exists")
+        else:
+            login_user(user)
+            return flask.redirect(flask.request.referrer or "index")
 
     return flask.render_template('form.html', form=form, id_="form-registration", title="Registration")
