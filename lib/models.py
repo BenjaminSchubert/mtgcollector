@@ -13,10 +13,11 @@ import os
 import shlex
 
 import flask
+import mysql.connector.errors
 import typing
 
 from lib.db import sql_commands as sql
-from lib.exceptions import IntegrityException
+from lib.exceptions import DataManipulationException
 
 
 class Model(metaclass=abc.ABCMeta):
@@ -744,7 +745,12 @@ class Deck(Model):
         :param name: name of the old deck to rename
         :param new_name: new name for the deck
         """
-        self._modify(sql.Deck.rename(), user_id=self.user_id, name=name, new_name=new_name)
+        try:
+            self._modify(sql.Deck.rename(), user_id=self.user_id, name=name, new_name=new_name)
+        except mysql.connector.errors.IntegrityError as e:
+            if e.errno == 1062:
+                raise DataManipulationException("Cannot give the same name to two different decks")
+            raise
 
     def set_index(self, name: str, index: int):
         """
@@ -1045,7 +1051,7 @@ class User(Model):
         :return: the newly created user
         """
         if User.get_user_by_name_or_mail(self.__email) or User.get_user_by_name_or_mail(self.__username):
-            raise IntegrityException()
+            raise DataManipulationException(error="cannot add a user with the same name or email as another one")
 
         new_user_id = self._modify(sql.User.insert(), **self.__as_new_database_object())
         new_user = self.get_user_by_id(new_user_id)

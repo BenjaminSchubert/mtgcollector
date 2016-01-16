@@ -14,6 +14,7 @@ from flask.ext.login import login_required, current_user
 
 import mtgcollector
 from lib import models
+from lib.exceptions import DataManipulationException
 from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
@@ -109,8 +110,11 @@ def rename_deck(name: str) -> werkzeug.wrappers.Response:
     """
     form = RenameDeck()
     if form.validate_on_submit():
-        current_user.decks.rename(name, form.data["name"])
-        return ('', 200)
+        try:
+            current_user.decks.rename(name, form.data["name"])
+            return ('', 200)
+        except DataManipulationException as e:
+            return (flask.jsonify(error=e.error), 400)
     return (flask.jsonify(form.errors), 400)
 
 

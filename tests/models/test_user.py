@@ -6,7 +6,6 @@ Tests for the User model. These tests are critical as they are our only guarante
 safely kept in our application
 """
 
-import mysql.connector.errors
 import unittest
 from typing import Iterable
 
@@ -85,23 +84,23 @@ class TestUser(TestCaseWithDB, unittest.TestCase):
 
     def test_no_same_username(self):
         """ Checks that two users with the same username cannot be created """
-        with self.assertRaises(lib.exceptions.IntegrityException):
+        with self.assertRaises(lib.exceptions.DataManipulationException):
             User("goatsy", "impersonator@goatsy.com", "1234").create()
 
     def test_no_same_emails(self):
         """ Checks that two users with the same email cannot be created """
-        with self.assertRaises(lib.exceptions.IntegrityException):
+        with self.assertRaises(lib.exceptions.DataManipulationException):
             User("goat", "goatsy@tdd.com", "no").create()
 
     def test_no_email_and_username_same_on_two_users(self):
         """
         Checks that a username cannot be the same as the email as another user. This is a requirement for our login
         """
-        with self.assertRaises(lib.exceptions.IntegrityException):
+        with self.assertRaises(lib.exceptions.DataManipulationException):
             User("goatsy@tdd.com", "goat@tsy.com", "hello").create()
 
         User("goat@tsy.com", "tdd@goat.com", "hello").create()
-        with self.assertRaises(lib.exceptions.IntegrityException):
+        with self.assertRaises(lib.exceptions.DataManipulationException):
             User("goat", "goat@tsy.com", "no").create()
 
     def test_user_can_have_same_name_and_email(self):
