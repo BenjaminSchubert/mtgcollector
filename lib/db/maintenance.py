@@ -58,7 +58,7 @@ class MaintenanceDB:
             conn.close()
 
     def update(self) -> None:
-        self.app.notifier.set_value("Database update started at {}".format(datetime.datetime.now()))
+        self.app.notifier.set_value("Database update started on {}".format(datetime.datetime.now().strftime("%c")))
         self.app.notifier.clear()
         self.app.logger.info("Starting database update")
         card_parser = JSonCardParser(self.app)
@@ -73,5 +73,5 @@ class MaintenanceDB:
                 raise
         else:
             self.app.logger.info("Finished database update")
-            self.app.notifier.set_value("Database update finished at {}".format(datetime.datetime.now()))
+            self.app.notifier.set_value("Database update finished on {}".format(datetime.datetime.now().strftime("%c")))
             self.app.notifier.clear()
