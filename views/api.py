@@ -77,7 +77,7 @@ def add_to_collection(card_id) -> werkzeug.wrappers.Response:
         current_user.collection.insert(card_id=card_id, **form.data)
         return ('', 200)
     else:
-        return (form.errors, 400)
+        return (flask.jsonify(form.errors), 400)
 
 
 @mtgcollector.app.route("/api/decks", methods=["GET"])
@@ -111,7 +111,7 @@ def rename_deck(name: str) -> werkzeug.wrappers.Response:
     if form.validate_on_submit():
         current_user.decks.rename(name, form.data["name"])
         return ('', 200)
-    return (form.errors, 400)
+    return (flask.jsonify(form.errors), 400)
 
 
 @mtgcollector.app.route("/api/decks/<name>/index", methods=["POST"])
@@ -126,7 +126,7 @@ def change_deck_index(name: str) -> werkzeug.wrappers.Response:
     if form.validate_on_submit():
         current_user.decks.set_index(name, form.data["index"])
         return ('', 200)
-    return (form.errors, 400)
+    return (flask.jsonify(form.errors), 400)
 
 
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
@@ -143,7 +143,7 @@ def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
     if form.validate_on_submit():
         current_user.decks.add_card(name, card_id, **form.data)
         return ('', 200)
-    return (form.errors, 400)
+    return (flask.jsonify(form.errors), 400)
 
 
 @mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])

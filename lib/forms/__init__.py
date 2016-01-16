@@ -160,5 +160,5 @@ class AddToDeckForm(Form):
     """
     Form to add a card to a deck
     """
-    number = IntegerField(validators=[InputRequired(), NumberRange(min=0)])
+    n_cards = IntegerField(validators=[InputRequired(), NumberRange(min=0)], default=False)
     side = BooleanField()

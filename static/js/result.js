@@ -159,7 +159,7 @@ function createButtonAddToDeck(id, parentDiv) {
 
                 var postData = {
                     n_cards: $('#new-number-of-cards').val(),
-                    side: $('#add-to-side').is(':checked') ? 1 : 0
+                    side: $('#add-to-side').is(':checked') ? true : null
                 };
 
                 $.post(deckPostPath + deckName + "/" + id, postData, function (data) {

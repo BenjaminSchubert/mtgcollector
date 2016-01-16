@@ -755,18 +755,18 @@ class Deck(Model):
         """
         self._modify(sql.Deck.set_index(), user_id=self.user_id, name=name, index=index)
 
-    def add_card(self, deck_name: str, card_id: int, number: int, side: bool):
+    def add_card(self, deck_name: str, card_id: int, n_cards: int, side: bool):
         """
         add a card to the deck identified by the given name
 
         :param deck_name: name of the deck to which to add the card
         :param card_id: id of the card to add
-        :param number: number of time to add the card
+        :param n_cards: number of time to add the card
         :param side: whether to add the card in the side or in the deck
         """
         if side:
-            return CardInSide.add(self.user_id, deck_name, card_id, number)
-        return CardInDeck.add(self.user_id, deck_name, card_id, number)
+            return CardInSide.add(self.user_id, deck_name, card_id, n_cards)
+        return CardInDeck.add(self.user_id, deck_name, card_id, n_cards)
 
     def get_cards(self, deck_name: str, side: bool=False) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
         """
