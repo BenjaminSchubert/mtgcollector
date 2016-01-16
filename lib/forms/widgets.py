@@ -5,7 +5,7 @@
 Widgets to control the display of forms
 """
 
-from wtforms.widgets import html_params, HTMLString, Input
+from wtforms.widgets import html_params, HTMLString, Input, CheckboxInput
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
@@ -16,10 +16,18 @@ class GroupWidget:
     """
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
-        html = ['<%s %s>' % ("div", html_params(**kwargs))]
+        html = ['<%s %s>' % ("div", html_params(**kwargs)), '<div class="row">']
+
+        counter = 0
         for subfield in field:
-            html.append('<span>%s %s</span>' % (subfield(), subfield.label))
-        html.append('</%s>' % "div")
+            counter += subfield.size
+            if counter > 12:
+                counter = subfield.size
+                html.extend(["</div>", '<div class="row">'])
+
+            html.append('<span class="col-md-%s">%s %s</span>' % (subfield.size, subfield(), subfield.label))
+
+        html.extend(['</div>', '</%s>' % "div"])
         return HTMLString(''.join(html))
 
 

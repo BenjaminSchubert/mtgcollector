@@ -248,9 +248,8 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, name: str= "", subtypes: str= "", text: str= "", context: str= "",
                       number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
-                      cmc: str="", colors: str="", only_selected_colors: bool=False, all_selected_colors: bool=False,
-                      edition: str="", block: str="", format: str="", rarity: str="", order_by="metacard.name",
-                      supertypes: str="", types: str="", **kwargs: typing.Dict)\
+                      cmc: str="", colors: typing.List[str]=[], edition: str="", block: str="", format: str="",
+                      rarity: str="", order_by="metacard.name", supertypes: str="", types: str="", **kwargs)\
             -> typing.List[typing.Dict[str, typing.Dict[str, str]]]:
         """
         This allows for extensive filtering and complex queries on the cards. It will return all ids of cards
@@ -273,8 +272,6 @@ class Metacard(Model):
         :param colors: the colors the card must/can have. This behavior will depend on `only_selected_colors` and
                         `all_selected_colors`. If both are unchecked, this means that the card must have at least one
                         of the specified colors in its cost
-        :param only_selected_colors: if set to True, the cards cannot have other colors than the ones checked
-        :param all_selected_colors: if set to True, the cards must have at least all the colors checked
         :param edition: the edition in which the card must be
         :param block: the block of editions in which the card must be
         :param format: the playable format in which the card must be legal
@@ -282,7 +279,7 @@ class Metacard(Model):
         :param order_by: in which order to sort the result
         :param supertypes: supertypes the card must have
         :param types: the types the card must have
-        :param kwargs: additional garbage arguments
+        :param kwargs: garbage arguments
         :return: list of cards containing dictionaries with fields {"id", "normal", "foil"}
         """
         def add_to_parameters(params: str, value: str) -> str:
@@ -421,6 +418,14 @@ class Metacard(Model):
                 kwargs["rarity_{}".format(counter)] = rarity_
             rarity_subquery = rarity_subquery[:-1] + ")"
             query_parameters = add_to_parameters(query_parameters, rarity_subquery)
+
+        all_selected_colors = "all_selected" in colors
+        only_selected_colors = "only_selected" in colors
+
+        if all_selected_colors:
+            colors.remove("all_selected")
+        if only_selected_colors:
+            colors.remove("only_selected")
 
         if "Colorless" in colors and len(colors) == 1:
             query_parameters = add_to_parameters(query_parameters, "metacard.colors IS NULL")

@@ -50,6 +50,17 @@ class MultiCheckboxField(SelectMultipleField):
     widget = GroupWidget()
     option_widget = widgets.CheckboxInput()
 
+    def __iter__(self):
+        opts = dict(widget=self.option_widget, _name=self.name, _form=None, _meta=self.meta)
+        i = 0
+        for value, label, size in self.choices:
+            checked = self.data is not None and self.coerce(value) in self.data
+            opt = self._Option(label=label, id='%s-%d' % (self.id, i), **opts)
+            opt.process(None, value)
+            opt.checked = checked
+            opt.size = size
+            yield opt
+
 
 class StartSeparatorField(Field):
     """

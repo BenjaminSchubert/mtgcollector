@@ -92,10 +92,10 @@ class SearchForm(Form):
     toughness = SliderField("Toughness", min_value=-1, max_value=10)
     cmc = SliderField("Mana Cost", min_value=0, max_value=10)
     colors = MultiCheckboxField("Colors", choices=[
-            ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("Blue", "{U}"), ("Black", "{B}"), ("Colorless", "{C}")
+            ("Red", "{R}", 4), ("Green", "{G}", 4), ("White", "{W}", 4), ("Blue", "{U}", 4), ("Black", "{B}", 4),
+            ("Colorless", "{C}", 4), ("all_selected", "All", 4), ("only_selected", "Only selected", 8)
         ])
-    only_selected_colors = BooleanField("Only selected")
-    all_selected_colors = BooleanField("All Selected")
+    rarity = MultiCheckboxField("Rarity")
 
     separator4 = StopSeparatorField()
     separator5 = StartSeparatorField()
@@ -115,7 +115,6 @@ class SearchForm(Form):
              "Enchant", "Vanguard", "Plane", "Conspiracy", "Phenomenon", "Token"]
         ]
     )
-    rarity = MultiCheckboxField("Rarity")
     in_collection = BooleanField('Only cards in collection')
 
     separator6 = StopSeparatorField()
@@ -128,7 +127,7 @@ class SearchForm(Form):
         self.edition.choices.extend([(edition["code"], edition["name"]) for edition in Edition.list()])
         self.block.choices.extend([(block["block"], block["block"]) for block in Edition.blocks()])
         self.format.choices.extend([(form["name"], form["name"]) for form in Format.list()])
-        self.rarity.choices = [(rarity, rarity) for rarity in Card.rarities()]
+        self.rarity.choices = [(rarity, rarity, 6) for rarity in Card.rarities()]
 
         if not user_authenticated:
             del self.in_collection
