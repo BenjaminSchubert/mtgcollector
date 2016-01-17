@@ -16,7 +16,7 @@ import lib.db.maintenance
 import views.api
 import views.auth
 import views.conf
-from lib.forms import SearchForm
+from lib.forms import SearchForm, ImportDeckForm
 from lib.models import Metacard, Card
 from mtgcollector import app, lib
 
@@ -104,7 +104,7 @@ def collection() -> werkzeug.wrappers.Response:
 @login_required
 def decks() -> werkzeug.wrappers.Response:
     """ Decks page """
-    return flask.render_template("deck_list.html", active_page="decks")
+    return flask.render_template("deck_list.html", active_page="decks", form=ImportDeckForm("Deck save"))
 
 
 @app.route("/decks/<name>")

@@ -4,7 +4,8 @@
 """
 RESTful API for mtgcollector
 """
-
+import io
+import json
 import os
 
 import flask
@@ -14,7 +15,7 @@ from flask.ext.login import login_required, current_user
 import mtgcollector
 from lib import models
 from lib.exceptions import DataManipulationException
-from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm
+from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm, ImportDeckForm
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
@@ -176,7 +177,7 @@ def remove_card_from_deck(name: str, card_id: int):
     return ('', 200)
 
 
-@mtgcollector.app.route("/api/decks/<name>/export")
+@mtgcollector.app.route("/api/export/decks/<name>")
 @login_required
 def export_deck(name: str):
     """
@@ -188,3 +189,20 @@ def export_deck(name: str):
     response = flask.jsonify(current_user.decks.export(name))
     response.headers["Content-Disposition"] = 'attachment;filename={}.json'.format(name)
     return response
+
+
+@mtgcollector.app.route("/api/import/deck", methods=["POST"])
+@login_required
+def import_deck():
+    """ Import the deck posted as attachment in the database """
+    form = ImportDeckForm()
+
+    if form.validate_on_submit():
+        try:
+            current_user.decks.load(json.load(io.TextIOWrapper(form.deck_data.data)))
+        except DataManipulationException as e:
+            return (flask.jsonify(error=e.error), 400)
+        else:
+            return flask.redirect(flask.url_for("decks"))
+
+    return (flask.jsonify(form.errors), 400)

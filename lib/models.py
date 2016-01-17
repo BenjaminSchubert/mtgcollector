@@ -58,7 +58,7 @@ class Model(metaclass=abc.ABCMeta):
         """ This is a value that can uniquely identify any object (primary key) """
 
     @classmethod
-    def bulk_insert(cls, models: typing.List, connection=None) -> None:
+    def bulk_insert(cls, models: typing.Iterable, connection=None) -> None:
         """
         Inserts many models into the database
 
@@ -823,6 +823,23 @@ class Deck(Model):
             "side": CardInSide.export_cards(self.user_id, deck_name)
         }
 
+    def load(self, data: typing.Dict):
+        """
+        Saves the deck given into the database
+
+        :param data: dictionary containing the deck
+        """
+        for key in data.keys():
+            if key not in ['main', 'side', 'name']:
+                raise DataManipulationException("Incorrectly formatted data. Got {} as key".format(key))
+
+        if data["name"] in [obj["name"] for obj in self.list()]:
+            raise DataManipulationException("A deck with the same name exists")
+
+        self.add(data["name"])
+        CardInDeck.bulk_insert(CardInDeck(self.user_id, data["name"], data["main"]))
+        CardInSide.bulk_insert(CardInSide(self.user_id, data["name"], data["side"]))
+
     def _primary_key(self) -> typing.Dict:
         """ unused """
         raise NotImplementedError()
@@ -837,6 +854,21 @@ class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
     Represents a card in a deck, either side or not
     """
     index = 3
+
+    class DBProxy:
+        def __init__(self, user_id, deck_name, data):
+            self.data = data
+            self.data["user_id"] = user_id
+            self.data["deck_name"] = deck_name
+
+        @property
+        def _as_database_object(self):
+            return self.data
+
+    def __init__(self, user_id: int, deck_name: str, data: typing.Dict):
+        self.user_id = user_id
+        self.deck_name = deck_name
+        self.data = data
 
     @classmethod
     @abc.abstractmethod
@@ -891,11 +923,15 @@ class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
     @classmethod
     def _insertion_command(cls) -> str:
         """ this is never used """
-        raise NotImplementedError()
+        return cls.sql_class().insert()
 
     def _primary_key(self) -> dict:
         """ this is never used """
         raise NotImplementedError()
+
+    def __iter__(self):
+        for obj in self.data:
+            yield self.DBProxy(self.user_id, self.deck_name, obj)
 
 
 # noinspection PyAbstractClass

@@ -494,7 +494,7 @@ class Deck:
             LEFT JOIN (
                 SELECT DISTINCT card_id,
                 normal + foil AS number
-                FROM card_in_collection WHERE user_id = 1
+                FROM card_in_collection WHERE user_id = %(user_id)s
             ) AS owned
                 ON owned.card_id = deck_entity.card_id
             WHERE name = %(deck_name)s AND user_id = %(user_id)s
@@ -571,6 +571,17 @@ class CardInDeckEntity(abc.ABCMeta):
             INNER JOIN card
                 ON {table_name}.card_id = card.card_id
             WHERE deck.user_id = %(user_id)s AND deck.name = %(deck_name)s
+        """.format(table_name=mcs.table_name())
+
+    @classmethod
+    def insert(mcs):
+        """ insert a card in the object """
+        return """
+            INSERT INTO {table_name} (deck_id, card_id, number)
+            SELECT deck_id, card_id, %(number)s
+            FROM
+                (SELECT deck_id FROM deck WHERE user_id = %(user_id)s AND name = %(deck_name)s) AS deck,
+                (SELECT card_id FROM card WHERE name = %(name)s AND edition=%(edition)s AND number=%(ed_number)s) AS card
         """.format(table_name=mcs.table_name())
 
 

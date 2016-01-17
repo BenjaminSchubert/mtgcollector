@@ -43,9 +43,9 @@
 {%- endmacro %}
 
 
-{%  macro render_form(form, id_, method="post", action=".", action_text="Submit",
+{%  macro render_form(form, id_, method="post", action=".", action_text="Submit", enctype="",
                       _class="", btn_class="btn btn-primary", submit_id="button_submit") -%}
-    <form id="{{ id_ }}" method="{{ method }}" action="{{ action }}" class="{{  _class }}">
+    <form id="{{ id_ }}" method="{{ method }}" action="{{ action }}" {% if class %}class="{{  _class }}"{% endif %} {% if enctype %}enctype="{{ enctype }}"{% endif %}>
         <div class="row">
             {% if method != "get" %}
                 {{ form.hidden_tag() }}

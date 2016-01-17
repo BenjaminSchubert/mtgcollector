@@ -9,3 +9,12 @@
 .button-go-deck {
     margin-right: 10px;
 }
+
+.text-right {
+    padding-top: 15px;
+    padding-right: 15px;
+}
+
+#create-deck-button {
+    margin-left: 10px;
+}

@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros.html" import render_form %}
 
 {% block head %}
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/utils.css') }}" />
@@ -15,13 +16,16 @@
                     <th>Colors</th>
                     <th>Number of cards</th>
                     <th>Side</th>
-                    <th></th>
+                    <th>
+                        <button id="create-deck-button" class="btn btn-primary pull-right" type="button" data-toggle="modal" data-target="#modal-create-deck">Create new deck</button>
+                        <button type="button" data-toggle="modal" data-target="#import-modal" class="btn btn-primary pull-right">Import</button>
+                    </th>
                 </tr>
             </thead>
 
             <tbody></tbody>
         </table>
-        <button id="create-deck-button" class="btn btn-primary" type="button" data-toggle="modal" data-target="#modal-create-deck">Create new deck</button>
+
     </div>
 
     <!-- Modal -->
@@ -49,6 +53,26 @@
                             <button id="modal-submit-button" type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="Create new deck" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Import a deck</h4>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    {{ render_form(form, id_="import-form", action="/api/import/deck", method="POST", enctype="multipart/form-data") }}
                 </div>
             </div>
         </div>

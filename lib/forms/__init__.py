@@ -6,9 +6,10 @@ Forms used across the application
 """
 
 from flask.ext.wtf import Form
+from flask.ext.wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, IntegerField, PasswordField, TextAreaField, BooleanField, SelectField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, NumberRange, InputRequired, Optional
+from wtforms.validators import DataRequired, NumberRange, InputRequired
 
 from lib.forms.fields import StartSeparatorField, StopSeparatorField, SliderField, MultiCheckboxField
 from lib.forms.validators import validate_port, validate_host
@@ -161,3 +162,14 @@ class AddToDeckForm(Form):
     """
     n_cards = IntegerField(validators=[InputRequired(), NumberRange(min=0)], default=False)
     side = BooleanField()
+
+
+class ImportDeckForm(Form):
+    """
+    Form to import a deck to the application
+    """
+    deck_data = FileField(validators=[FileRequired(), FileAllowed(["json", "Json Format only !"])])
+
+    def __init__(self, label=None):
+        super().__init__()
+        self.deck_data.label = label
