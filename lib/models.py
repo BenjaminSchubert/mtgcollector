@@ -11,6 +11,7 @@ import hashlib
 import logging
 import os
 import shlex
+from collections import OrderedDict
 
 import flask
 import mysql.connector.errors
@@ -18,6 +19,11 @@ import typing
 
 from lib.db import sql_commands as sql
 from lib.exceptions import DataManipulationException
+
+
+colors = OrderedDict()
+for color, code in ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("Blue", "{U}"), ("Black", "{B}"):
+    colors[color] = code
 
 
 class Model(metaclass=abc.ABCMeta):
@@ -723,7 +729,12 @@ class Deck(Model):
 
     def list(self) -> typing.List[typing.Dict[str, str]]:
         """ Gets a list of decks for the given user_id """
-        return self._get(sql.Deck.list(), user_id=self.user_id)
+        decks = self._get(sql.Deck.list(), user_id=self.user_id)
+        for deck in decks:
+            deck_colors = deck["colors"].split(",")
+            deck["colors"] = [colors[color] for color in colors if color in deck_colors]
+
+        return decks
 
     def add(self, name: str):
         """

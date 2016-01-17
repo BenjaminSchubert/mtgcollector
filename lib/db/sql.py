@@ -437,14 +437,29 @@ class Deck:
             SELECT name,
                 user_index,
                 IFNULL(deck.card_sum, 0) AS n_deck,
-                IFNULL(side.card_sum, 0) AS n_side
+                IFNULL(side.card_sum, 0) AS n_side,
+                colors.colors
             FROM deck AS decks
             LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_deck GROUP BY deck_id) AS deck
                 ON deck.deck_id = decks.deck_id
             LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_side GROUP BY deck_id) AS side
                 ON side.deck_id = decks.deck_id
-            WHERE user_id=%(user_id)s
-            GROUP BY decks.deck_id
+            INNER JOIN (
+                SELECT GROUP_CONCAT(DISTINCT colors) AS colors, deck_id
+                FROM metacard
+                    INNER JOIN card
+                        ON metacard.name = card.name
+                    INNER JOIN (
+                        SELECT card_id, deck_id
+                              FROM card_in_deck
+                        UNION SELECT card_id, deck_id
+                              FROM card_in_side
+                    ) AS cards
+                      ON cards.card_id = card.card_id
+                  GROUP BY deck_id) AS colors
+              ON decks.deck_id = colors.deck_id
+            WHERE user_id=1
+                GROUP BY decks.deck_id
         """
 
     @classmethod
