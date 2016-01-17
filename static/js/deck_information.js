@@ -24,6 +24,9 @@ function createDetailsUpper(id) {
     createDetailsField(parentDiv, details, "types", "Types", 6, 6, createStringFromArrayValue);
     createDetailsField(parentDiv, details, "rarity", "Rarity", 6, 6, createStringFromValue);
 
+    if (details.versions > 1) {
+        parentDiv.append('<a href="/card/' + id + '">See other versions (' + details.versions + ')</a>');
+    }
 }
 
 // Creates lower parts of card details
