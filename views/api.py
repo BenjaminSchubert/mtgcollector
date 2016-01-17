@@ -133,6 +133,19 @@ def change_deck_index(name: str) -> werkzeug.wrappers.Response:
     return (flask.jsonify(form.errors), 400)
 
 
+@mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])
+@login_required
+def delete_deck(name) -> werkzeug.wrappers.Response:
+    """
+    deletes the given deck
+
+    :param name: name of the deck to delete
+    :return: 200 OK on completion
+    """
+    current_user.decks.delete(name)
+    return ('', 200)
+
+
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
 @login_required
 def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
@@ -150,14 +163,15 @@ def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
     return (flask.jsonify(form.errors), 400)
 
 
-@mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])
+@mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["DELETE"])
 @login_required
-def delete_deck(name) -> werkzeug.wrappers.Response:
+def remove_card_from_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
     """
-    deletes the given deck
+    removes a card from the given deck
 
-    :param name: name of the deck to delete
-    :return: 200 OK on completion
+    :param name: name of the deck from which to remove the card
+    :param card_id: id of the card to remove
+    :return: 200 OK
     """
-    current_user.decks.delete(name)
+    current_user.decks.remove_card(name, card_id, flask.request.args.get("side", False))
     return ('', 200)

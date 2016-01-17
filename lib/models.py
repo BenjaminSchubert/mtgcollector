@@ -787,6 +787,16 @@ class Deck(Model):
             return CardInSide.add(self.user_id, deck_name, card_id, n_cards)
         return CardInDeck.add(self.user_id, deck_name, card_id, n_cards)
 
+    def remove_card(self, deck_name: str, card_id: int, side: bool):
+        """
+        Removes a card from a deck
+
+        :param deck_name: name of the deck from which to remove the card
+        :param card_id: id of the card to remove
+        :param side: whether the card is in the side or not
+        """
+        self.add_card(deck_name, card_id, 0, side)
+
     def get_cards(self, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
         """
         gets the cards that are in the given deck
