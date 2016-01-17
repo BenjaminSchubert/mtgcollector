@@ -15,7 +15,7 @@
         </ul>
         <div class="tab-content card-container">
             {% for key in cards.keys() %}
-                <div id="{{ key }}" class="row">
+                <div id="{{ key }}" class="row tab-pane {% if key == "main" %}active{% endif %}">
                     {% for card in cards[key] %}
                         <div id="{{ card['card_id'] }}" data-number="{{ card['number'] }}" class="card col-md-2 col-sm-3 col-xs-4">
                             <div class="card-inner">
