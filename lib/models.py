@@ -787,16 +787,17 @@ class Deck(Model):
             return CardInSide.add(self.user_id, deck_name, card_id, n_cards)
         return CardInDeck.add(self.user_id, deck_name, card_id, n_cards)
 
-    def get_cards(self, deck_name: str, side: bool=False) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+    def get_cards(self, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
         """
         gets the cards that are in the given deck
+
         :param deck_name: identifier of the deck
-        :param side: whether the cards in the side are asked or the others
         :return: list of cards in the asked deck
         """
         return {
             "main": CardInDeck.get_cards(self.user_id, deck_name),
-            "side": CardInSide.get_cards(self.user_id, deck_name)
+            "side": CardInSide.get_cards(self.user_id, deck_name),
+            "missing": []
         }
 
     def _primary_key(self) -> dict:
