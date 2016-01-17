@@ -1,20 +1,12 @@
 var deckName = document.location.href.match(/.+\/(.*)$/)[1]; // current deck name
 var modifyNumCardPath = "/api/decks/" + deckName + "/";
 
-
-// executed at loading
-displayDeckName();
-
 // Executed when DOM ready
 $(document).ready(function () {
     setupPost();
     setCreateDetailsFunctions(createDetailsUpper, createDetailsLower);
     loadAllImages();
 });
-
-function displayDeckName() {
-    $('#deck-name').text(deckName);
-}
 
 function loadAllImages() {
     $('.card').each(function() {
