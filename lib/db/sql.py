@@ -502,6 +502,7 @@ class Deck:
               ON decks.deck_id = colors.deck_id
             WHERE user_id=%(user_id)s
                 GROUP BY decks.deck_id
+            ORDER BY user_index ASC
         """
 
     @classmethod
