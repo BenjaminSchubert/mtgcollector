@@ -6,7 +6,7 @@ var modifyNumCardPath = "/api/decks/" + deckName + "/";
 $(document).ready(function () {
     setupPost();
     setCreateDetailsFunctions(createDetailsUpper, createDetailsLower);
-    loadTabContent();
+    //loadTabContent();
 });
 
 // loads all images in a tab-content

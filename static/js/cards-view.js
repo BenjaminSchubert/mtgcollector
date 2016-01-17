@@ -40,8 +40,8 @@ $.fn.scrollStopped = function(callback) {
 $(document).ready(function () {
 
     // if no result found
-    if ($('#cards').children().length == 0) {
-        $('#cards').append('<p id="no-result-text">No result found</p>');
+    if ($('.card-container').children().length == 0) {
+        $('.card-container').append('<p id="no-result-text">No result found</p>');
     }
 
     else {
@@ -52,11 +52,11 @@ $(document).ready(function () {
         setImagesErrorPath();
         initView();
 
-        // what to do when clicking on card image
-        $('#cards > div').click(lockCardDetails);
+        // what cardsto do when clicking on card image
+        $('.card').click(lockCardDetails);
 
         // what to do when hovering on card image
-        $('#cards img').hover(function () {
+        $('.card img').hover(function () {
             if (!lockInfo.locked) {
                 displayCardDetails($(this).parent().parent().attr('id'));
             }
@@ -88,12 +88,12 @@ function setPreloadMargin(nPixels) {
 
 // Resizes all div to image size.
 function resizeDivHeights() {
-    $('#cards > div').height(findImageHeight());
+    $('.card').height(findImageHeight());
 }
 
 // Finds the current height of a card.
 function findImageHeight() {
-    return $('#cards > div').first().width() * 310 / 223; // 310 : card height, 223 : card width
+    return $('.card').first().width() * 310 / 223; // 310 : card height, 223 : card width
 }
 
 // Unloads each div of #cards not in viewport.
@@ -102,7 +102,7 @@ function findImageHeight() {
 // Once the image is loaded, sets the 'src' attribute to the image path.
 function loadImagesInViewport() {
 
-    $('#cards > div').withinviewport().each(function () {
+    $('.card').withinviewport().each(function () {
         loadImage($(this).attr('id'));
     });
 
