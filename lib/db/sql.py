@@ -142,11 +142,13 @@ class Metacard:
         """ command to get card ids for metacards with the number owned by the given user """
         return """
             SELECT card.card_id,
-                IFNULL(SUM(card_in_collection.normal), 0) AS normal,
-                IFNULL(SUM(card_in_collection.foil), 0) AS foil
+                IFNULL(SUM(collection.normal), 0) AS normal,
+                IFNULL(SUM(collection.foil), 0) AS foil
             FROM metacard
-            INNER JOIN card ON card.name = metacard.name
-            LEFT OUTER JOIN card_in_collection ON card_in_collection.card_id = card.card_id
+            INNER JOIN card
+                ON card.name = metacard.name
+            LEFT OUTER JOIN (SELECT * FROM card_in_collection WHERE user_id = %(user_id)s) AS collection
+                ON collection.card_id = card.card_id
             {selection}
             GROUP BY metacard.name
             {having}
@@ -240,10 +242,11 @@ class Card:
         """ get all versions of the same card with the number owned by the given user """
         return """
             SELECT card.card_id,
-                IFNULL(card_in_collection.normal, 0) AS normal,
-                IFNULL(card_in_collection.foil, 0) AS foil
+                IFNULL(collection.normal, 0) AS normal,
+                IFNULL(collection.foil, 0) AS foil
             FROM card
-            LEFT OUTER JOIN card_in_collection ON card.card_id = card_in_collection.card_id
+            LEFT OUTER JOIN (SELECT * FROM card_in_collection WHERE user_id = %(user_id)s) AS collection
+                ON card.card_id = collection.card_id
             WHERE name = %(name)s
         """
 

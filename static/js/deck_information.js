@@ -25,7 +25,7 @@ function createDetailsUpper(id) {
     createDetailsField(parentDiv, details, "rarity", "Rarity", 6, 6, createStringFromValue);
 
     if (details.versions > 1) {
-        parentDiv.append('<a href="/card/' + id + '">See other versions (' + details.versions + ')</a>');
+        parentDiv.append('<a href="/card/' + details["name"] + '">See other versions (' + details.versions + ')</a>');
     }
 }
 
