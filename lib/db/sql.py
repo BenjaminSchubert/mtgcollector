@@ -560,6 +560,19 @@ class CardInDeckEntity(abc.ABCMeta):
                 AND card_id=%(card_id)s
         """.format(table_name=mcs.table_name())
 
+    @classmethod
+    def export(mcs):
+        """ data information about the deck """
+        return """
+            SELECT card.name, edition, card.number AS ed_number, {table_name}.number
+            FROM {table_name}
+            INNER JOIN deck
+                ON deck.deck_id = {table_name}.deck_id
+            INNER JOIN card
+                ON {table_name}.card_id = card.card_id
+            WHERE deck.user_id = %(user_id)s AND deck.name = %(deck_name)s
+        """.format(table_name=mcs.table_name())
+
 
 class CardInDeck(CardInDeckEntity):
     """

@@ -810,11 +810,24 @@ class Deck(Model):
             "missing": self._get(sql.Deck.get_missing(), user_id=self.user_id, deck_name=deck_name)
         }
 
-    def _primary_key(self) -> dict:
+    def export(self, deck_name) -> typing.Dict:
+        """
+        exports all data necessary to allow the user to import the in another instance
+
+        :param deck_name: name of the deck to export
+        :return: dictionary of all information concerning the deck
+        """
+        return {
+            "name": deck_name,
+            "main": CardInDeck.export_cards(self.user_id, deck_name),
+            "side": CardInSide.export_cards(self.user_id, deck_name)
+        }
+
+    def _primary_key(self) -> typing.Dict:
         """ unused """
         raise NotImplementedError()
 
-    def _as_database_object(self) -> dict:
+    def _as_database_object(self) -> typing.Dict:
         """ unused """
         raise NotImplementedError()
 
@@ -859,6 +872,17 @@ class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
         :return: cards in the given deck
         """
         return cls._get(cls.sql_class().get_cards(), user_id=user_id, deck_name=deck_name)
+
+    @classmethod
+    def export_cards(cls, user_id: int, deck_name: str):
+        """
+        Return all information allowing to reconstruct the entries for the corresponding deck
+
+        :param user_id: id of the user owning the deck
+        :param deck_name: name of the deck
+        :return: list of cards in the deck
+        """
+        return cls._get(cls.sql_class().export(), user_id=user_id, deck_name=deck_name)
 
     def _as_database_object(self) -> dict:
         """ this is never used """

@@ -8,7 +8,6 @@ RESTful API for mtgcollector
 import os
 
 import flask
-import werkzeug.wrappers
 from flask import send_from_directory
 from flask.ext.login import login_required, current_user
 
@@ -21,7 +20,7 @@ __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
 
 @mtgcollector.app.route("/api/images/<card_id>")
-def get_image(card_id: int) -> werkzeug.wrappers.Response:
+def get_image(card_id: int):
     """
     Get image for the given card
 
@@ -36,7 +35,7 @@ def get_image(card_id: int) -> werkzeug.wrappers.Response:
 
 
 @mtgcollector.app.route("/api/icons/<icon>")
-def get_icon(icon: str) -> werkzeug.wrappers.Response:
+def get_icon(icon: str):
     """
     Returns the image icon corresponding to the given name
 
@@ -51,7 +50,7 @@ def get_icon(icon: str) -> werkzeug.wrappers.Response:
 
 
 @mtgcollector.app.route("/api/cards/<card_id>")
-def get_card_info(card_id: int) -> werkzeug.wrappers.Response:
+def get_card_info(card_id: int):
     """
     Gets information about the given card
 
@@ -63,7 +62,7 @@ def get_card_info(card_id: int) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/collection/<card_id>", methods=["POST"])
 @login_required
-def add_to_collection(card_id) -> werkzeug.wrappers.Response:
+def add_to_collection(card_id):
     """
     adds the given card to the collection.
 
@@ -83,14 +82,14 @@ def add_to_collection(card_id) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks", methods=["GET"])
 @login_required
-def list_decks() -> werkzeug.wrappers.Response:
+def list_decks():
     """ Gets the list of decks a given user has """
     return flask.jsonify(decks=current_user.decks.list())
 
 
 @mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
 @login_required
-def create_deck(name: str) -> werkzeug.wrappers.Response:
+def create_deck(name: str):
     """
     Creates a new deck for the authenticated user
 
@@ -102,7 +101,7 @@ def create_deck(name: str) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks/<name>/rename", methods=["POST"])
 @login_required
-def rename_deck(name: str) -> werkzeug.wrappers.Response:
+def rename_deck(name: str):
     """
     Renames the deck given in the url with the new name given in POST parameters
 
@@ -120,7 +119,7 @@ def rename_deck(name: str) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks/<name>/index", methods=["POST"])
 @login_required
-def change_deck_index(name: str) -> werkzeug.wrappers.Response:
+def change_deck_index(name: str):
     """
     Changes the deck user index to the given value
 
@@ -135,7 +134,7 @@ def change_deck_index(name: str) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks/<name>", methods=["DELETE"])
 @login_required
-def delete_deck(name) -> werkzeug.wrappers.Response:
+def delete_deck(name):
     """
     deletes the given deck
 
@@ -148,7 +147,7 @@ def delete_deck(name) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["POST"])
 @login_required
-def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
+def add_card_to_deck(name: str, card_id: int):
     """
     Adds a new card to the given deck
 
@@ -165,7 +164,7 @@ def add_card_to_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
 
 @mtgcollector.app.route("/api/decks/<name>/<card_id>", methods=["DELETE"])
 @login_required
-def remove_card_from_deck(name: str, card_id: int) -> werkzeug.wrappers.Response:
+def remove_card_from_deck(name: str, card_id: int):
     """
     removes a card from the given deck
 
@@ -175,3 +174,17 @@ def remove_card_from_deck(name: str, card_id: int) -> werkzeug.wrappers.Response
     """
     current_user.decks.remove_card(name, card_id, flask.request.args.get("side", False))
     return ('', 200)
+
+
+@mtgcollector.app.route("/api/decks/<name>/export")
+@login_required
+def export_deck(name: str):
+    """
+    exports the deck from the database
+
+    :param name: name of the deck to export
+    :return: downloadable json formatted file with the deck's information
+    """
+    response = flask.jsonify(current_user.decks.export(name))
+    response.headers["Content-Disposition"] = 'attachment;filename={}.json'.format(name)
+    return response

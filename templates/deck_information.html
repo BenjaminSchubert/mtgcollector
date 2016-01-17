@@ -14,6 +14,7 @@
             <li class="active"><a data-toggle="tab" href="#main">Main Deck</a></li>
             <li><a data-toggle="tab" href="#side">Side Deck</a></li>
             <li><a data-toggle="tab" href="#missing">Missing Cards</a></li>
+            <li id="export" class="pull-right"><a href="{{ url_for('export_deck', name=name) }}">Export</a></li>
         </ul>
         <div class="tab-content card-container">
             {% for key in cards.keys() %}
