@@ -235,7 +235,13 @@ class Card:
     @classmethod
     def get_versions(cls):
         """ command to get all versions of the same card """
-        return """ SELECT card_id FROM card WHERE name = %(name)s """
+        return """
+            SELECT card_id, edition.releaseDate
+            FROM card
+            INNER JOIN edition ON card.edition = edition.code
+            WHERE card.name = %(name)s
+            ORDER BY edition.releaseDate DESC
+        """
 
     @classmethod
     def get_versions_with_collection_information(cls):
@@ -245,9 +251,12 @@ class Card:
                 IFNULL(collection.normal, 0) AS normal,
                 IFNULL(collection.foil, 0) AS foil
             FROM card
+            INNER JOIN edition
+                ON card.edition = edition.code
             LEFT OUTER JOIN (SELECT * FROM card_in_collection WHERE user_id = %(user_id)s) AS collection
                 ON card.card_id = collection.card_id
-            WHERE name = %(name)s
+            WHERE card.name = %(name)s
+            ORDER BY edition.releaseDate DESC
         """
 
     @classmethod
