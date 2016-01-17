@@ -58,7 +58,12 @@ $(document).ready(function () {
         // what to do when hovering on card image
         $('.card img').hover(function () {
             if (!lockInfo.locked) {
-                displayCardDetails($(this).parent().parent().attr('id'));
+                var id = $(this).parent().parent().attr('id');
+                // in case of tabs (card id is main-6680 instead of 6880 for ex)
+                if (id.indexOf('-') != -1) {
+                    id = id.split('-')[1];
+                }
+                displayCardDetails(id);
             }
         });
     }
@@ -113,6 +118,11 @@ function loadImagesInViewport() {
 function loadImage(id) {
     var curDiv = $('#' + id);
     var curImg = curDiv.find('img');
+
+    // in case of tabs (card id is main-6680 instead of 6880 for ex)
+    if (id.indexOf('-') != -1) {
+        id = id.split('-')[1];
+    }
 
     if (!curDiv.hasClass('loaded')) {
 
@@ -192,20 +202,25 @@ function createStrip(curDiv) {
 // If a card was already locked and the one clicked at this moment is the same, unlock it, else lock the current one.
 function lockCardDetails() {
 
-    var curId = $(this).attr('id');
+    var id = $(this).attr('id');
+
+    // in case of tabs (card id is main-6680 instead of 6880 for ex)
+    if (id.indexOf('-') != -1) {
+        id = id.split('-')[1];
+    }
 
     // lock if no card is clicked
     if (!lockInfo.locked) {
         lockInfo.locked = true;
-        lockInfo.lastId = curId;
+        lockInfo.lastId = id;
     } else {
 
         // unlock if click on same card, otherwise display the current card details
-        if (lockInfo.lastId === curId) {
+        if (lockInfo.lastId === id) {
             lockInfo.locked = false;
         } else {
-            lockInfo.lastId = curId;
-            displayCardDetails(curId);
+            lockInfo.lastId = id;
+            displayCardDetails(id);
         }
     }
 }

@@ -6,21 +6,13 @@ var modifyNumCardPath = "/api/decks/" + deckName + "/";
 $(document).ready(function () {
     setupPost();
     setCreateDetailsFunctions(createDetailsUpper, createDetailsLower);
-    //loadTabContent();
+    loadAllImages();
 });
 
-// loads all images in a tab-content
-function loadTabContent() {
-    loadImagesInContainer('main');
-    loadImagesInContainer('side');
-    loadImagesInContainer('missing');
-}
-
-// load cards in a tab which has id 'id' (for example 'main').
-function loadImagesInContainer(id) {
-    $('#' + id + ' > div').each(function () {
-       loadImage($(this).attr('id'));
-    });
+function loadAllImages() {
+    $('.card').each(function() {
+        loadImage($(this).attr('id'));
+    })
 }
 
 // Creates upper part of the card details
