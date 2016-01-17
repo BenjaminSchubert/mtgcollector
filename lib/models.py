@@ -665,8 +665,21 @@ class Collection(Model):
     """
     index = 2
 
+    class InsertionProxy:
+        """
+        Proxy to add a card in a collection
+        """
+        def __init__(self, data, user_id):
+            self.data = data
+            self.data["user_id"] = user_id
+
+        @property
+        def _as_database_object(self):
+            return self.data
+
     def __init__(self, user_id: int):
         self.user_id = user_id
+        self.data = []
 
     @classmethod
     def _table_creation_command(cls) -> str:
@@ -676,7 +689,7 @@ class Collection(Model):
     @classmethod
     def _insertion_command(cls) -> str:
         """ command to add a card to a collection """
-        return sql.Collection.insert()
+        return sql.Collection.bulk_insert()
 
     # noinspection PyShadowingBuiltins
     def insert(self, card_id: int, n_normal: int, n_foil: int) -> None:
@@ -691,11 +704,21 @@ class Collection(Model):
         if n_normal == n_foil == 0:
             self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
         else:
-            self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=n_normal, foil=n_foil)
+            self._modify(sql.Collection.insert(), user_id=self.user_id, card_id=card_id, normal=n_normal, foil=n_foil)
 
     def export(self) -> typing.List:
         """ exports user's cards """
         return self._get(sql.Collection.export(), user_id=self.user_id)
+
+    def load(self, data: typing.Dict):
+        """
+        imports user's cards
+
+        :param data: cards to import, json formatted
+        """
+        self.data = data
+        self.bulk_insert(self)
+        self.data = []
 
     def _as_database_object(self) -> dict:
         """ this is never used """
@@ -704,6 +727,10 @@ class Collection(Model):
     def _primary_key(self) -> dict:
         """ this is never used """
         raise NotImplementedError()
+
+    def __iter__(self):
+        for data in self.data:
+            yield self.InsertionProxy(data, self.user_id)
 
 
 class Deck(Model):
@@ -1197,6 +1224,25 @@ class User(Model):
             "collection": self.collection.export()
         }
         return data
+
+    def load(self, data: typing.Dict):
+        """
+        load the user's collection
+
+        :param data: dictionary containing all the collection's information
+        """
+        for key in data.keys():
+            if key not in ["collection", "decks"]:
+                raise DataManipulationException("Incorrectly formatted data. Got {} as key".format(key))
+
+        for entry in data.get("decks", []):
+            for key in entry.keys():
+                if key not in ["main", "side", "name"]:
+                    raise DataManipulationException("Incorrectly formatted deck. Got {} as key".format(key))
+
+        self.collection.load(data["collection"])
+        for deck in data.get("decks", []):
+            self.decks.load(deck)
 
     def __hash_password(self):
         """ hashes the user's password and set a new salt """

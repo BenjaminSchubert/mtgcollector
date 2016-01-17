@@ -15,7 +15,7 @@ from flask.ext.login import login_required, current_user
 import mtgcollector
 from lib import models
 from lib.exceptions import DataManipulationException
-from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm, ImportDeckForm
+from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm, ImportJSonForm
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
@@ -195,11 +195,11 @@ def export_deck(name: str):
 @login_required
 def import_deck():
     """ Import the deck posted as attachment in the database """
-    form = ImportDeckForm()
+    form = ImportJSonForm()
 
     if form.validate_on_submit():
         try:
-            current_user.decks.load(json.load(io.TextIOWrapper(form.deck_data.data)))
+            current_user.decks.load(json.load(io.TextIOWrapper(form.file.data)))
         except DataManipulationException as e:
             return (flask.jsonify(error=e.error), 400)
         else:
@@ -215,3 +215,19 @@ def download_collection():
     response = flask.jsonify(current_user.export())
     response.headers["Content-Disposition"] = 'attachment;filename=collection_{}.json'.format(current_user.username)
     return response
+
+
+@mtgcollector.app.route("/api/import", methods=["POST"])
+@login_required
+def upload_collection():
+    """ upload's the user's collection to the server"""
+    form = ImportJSonForm()
+
+    if form.validate_on_submit():
+        try:
+            current_user.load(json.load(io.TextIOWrapper(form.file.data)))
+        except DataManipulationException as e:
+            return (flask.jsonify(error=e.error), 400)
+        else:
+            return flask.redirect(flask.url_for("collection"))
+    return (flask.jsonify(form.errors), 400)

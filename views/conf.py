@@ -118,8 +118,9 @@ def update():
 def parameters():
     """ user parameters """
     form = lib.forms.RegisterForm()
+    import_form = lib.forms.ImportJSonForm()
     form.prepopulate(current_user.username, current_user.email)
-    return render_template('parameters.html', active_page="parameters", form=form)
+    return render_template('parameters.html', active_page="parameters", form=form, import_form=import_form)
 
 
 @app.route("/parameters", methods=['POST'])
@@ -127,8 +128,9 @@ def parameters():
 def change_parameters():
     """ update user parameters """
     form = lib.forms.RegisterForm()
+    import_form = lib.forms.ImportJSonForm()
     form.set_defaults(current_user.username, current_user.email, False)
 
     if form.validate_on_submit():
         current_user.update(form.username.data, form.email.data, form.password.data)
-    return render_template('parameters.html', active_page="parameters", form=form)
+    return render_template('parameters.html', active_page="parameters", form=form, import_form=import_form)

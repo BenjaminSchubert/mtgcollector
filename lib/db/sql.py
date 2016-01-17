@@ -13,7 +13,7 @@ import mysql.connector.conversion
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
 
-# We need to match mysql converter to be able to accept list and sets
+# Patches to make MySQL behave correctly
 mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
 mysql.connector.conversion.MySQLConverter._set_to_mysql = lambda self, value: ",".join(value).encode()
 mysql.connector.conversion.MySQLConverter._bytearray_to_mysql = lambda self, value: bytes(value)
@@ -409,6 +409,16 @@ class Collection:
             INNER JOIN card_in_collection
             ON card.card_id = card_in_collection.card_id
             WHERE user_id = %(user_id)s
+        """
+
+    @classmethod
+    def bulk_insert(cls):
+        """ insert a card in the collection """
+        return """
+            INSERT INTO card_in_collection (user_id, card_id, normal, foil)
+            SELECT %(user_id)s, card_id, %(normal)s, %(foil)s
+            FROM card
+            WHERE name = %(name)s AND edition = %(edition)s AND number = %(number)s
         """
 
 

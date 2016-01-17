@@ -186,12 +186,12 @@ class AddToDeckForm(Form):
     side = BooleanField()
 
 
-class ImportDeckForm(Form):
+class ImportJSonForm(Form):
     """
     Form to import a deck to the application
     """
-    deck_data = FileField(validators=[FileRequired(), FileAllowed(["json", "Json Format only !"])])
+    file = FileField(validators=[FileRequired(), FileAllowed(["json", "Json Format only !"])])
 
     def __init__(self, label=None):
         super().__init__()
-        self.deck_data.label = label
+        self.file.label = label
