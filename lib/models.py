@@ -309,7 +309,7 @@ class Metacard(Model):
             :param entry: the entry to which to add the wildcards
             :return: the new entry with wildcards
             """
-            return "%" + "%".join(shlex.split(entry.strip())) + "%"
+            return "%" + "%".join(shlex.split(entry.strip().replace("'", "\\\'"))) + "%"
 
         def treat_range(query_parameters_: str, value: str, entry_name: str) -> str:
             """
