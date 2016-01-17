@@ -108,22 +108,11 @@ class JSonCardParser:
                     text=metacard.get("originalText"),
                 ))
 
-                version = ""
-                counter = -1
-
-                while metacard.get("imageName")[counter].isdigit():
-                    version = metacard.get("imageName")[counter] + version
-                    counter -= 1
-
-                if counter == -1:
-                    version = 0
-
                 self.__cards.add(Card(
                     name=metacard.get("name"),
                     multiverseid=metacard.get("multiverseid"),
                     rarity=metacard.get("rarity"),
                     number=metacard.get("number", 0),
-                    version=version,
                     edition=edition.get("code"),
                     artist=metacard.get("artist"),
                     flavor=metacard.get("flavor")

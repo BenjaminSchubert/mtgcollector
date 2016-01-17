@@ -174,14 +174,13 @@ class Card:
                 edition VARCHAR(8) NOT NULL,
                 rarity SET ('Basic Land', 'Common', 'Uncommon', 'Rare', 'Mythic Rare', 'Special') NOT NULL,
                 number VARCHAR(4) NOT NULL,
-                version TINYINT NOT NULL,
                 artist VARCHAR(150) NOT NULL,
                 flavor TEXT,
                 price DECIMAL(7,2),
 
                 FOREIGN KEY (name) REFERENCES metacard(name) ON DELETE RESTRICT ON UPDATE RESTRICT,
                 FOREIGN KEY (edition) REFERENCES edition(code) ON DELETE RESTRICT ON UPDATE RESTRICT,
-                UNIQUE (multiverseid, edition, number, version)
+                UNIQUE (multiverseid, edition, number)
             )
         """
 
@@ -189,11 +188,11 @@ class Card:
     def insert(cls):
         """ command to insert a card """
         return """
-            INSERT INTO card (multiverseid, name, number, version, rarity, edition, artist, flavor)
+            INSERT INTO card (multiverseid, name, number, rarity, edition, artist, flavor)
             VALUES
-                (%(multiverseid)s, %(name)s, %(number)s, %(version)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
+                (%(multiverseid)s, %(name)s, %(number)s, %(rarity)s, %(edition)s, %(artist)s, %(flavor)s)
             ON DUPLICATE KEY UPDATE
-                version=VALUES(version), rarity=VALUES(version), edition=VALUES(edition), artist=VALUES(artist),
+                rarity=VALUES(rarity), edition=VALUES(edition), artist=VALUES(artist),
                 flavor=VALUES(flavor)
         """
 
@@ -444,7 +443,7 @@ class Deck:
                 ON deck.deck_id = decks.deck_id
             LEFT JOIN (SELECT deck_id, SUM(number) AS card_sum FROM card_in_side GROUP BY deck_id) AS side
                 ON side.deck_id = decks.deck_id
-            INNER JOIN (
+            LEFT JOIN (
                 SELECT GROUP_CONCAT(DISTINCT colors) AS colors, deck_id
                 FROM metacard
                     INNER JOIN card
@@ -458,7 +457,7 @@ class Deck:
                       ON cards.card_id = card.card_id
                   GROUP BY deck_id) AS colors
               ON decks.deck_id = colors.deck_id
-            WHERE user_id=1
+            WHERE user_id=%(user_id)s
                 GROUP BY decks.deck_id
         """
 

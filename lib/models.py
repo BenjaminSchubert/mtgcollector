@@ -254,7 +254,7 @@ class Metacard(Model):
     @classmethod
     def get_ids_where(cls, user_id: int=None, name: str= "", subtypes: str= "", text: str= "", context: str= "",
                       number: str= "", artist: str= "", in_collection: bool=False, power: str="", toughness: str="",
-                      cmc: str="", colors: typing.List[str]=[], edition: str="", block: str="", format: str="",
+                      cmc: str="", colors: typing.List[str]=list(), edition: str="", block: str="", format: str="",
                       rarity: str="", order_by="metacard.name", supertypes: str="", types: str="", **kwargs)\
             -> typing.List[typing.Dict[str, typing.Dict[str, str]]]:
         """
@@ -511,14 +511,12 @@ class Card(Model):
     :param edition: edition's code in which the card was released
     :param artist: artist that drew the card
     :param flavor: context text on the card
-    :param version: internally given version to identify cards that have the same name and edition when editions did not
-                    have numbering
     :param multiverseid: official card ID given by Wizards of The Coast, can be null for promotional cards
     """
     index = 1
 
     def __init__(
-            self, name: str, rarity: str, number: str, edition: str, artist: str, flavor: str, version: int,
+            self, name: str, rarity: str, number: str, edition: str, artist: str, flavor: str,
             multiverseid: int=None
     ):
         self.__name = name
@@ -527,7 +525,6 @@ class Card(Model):
         self.__edition = edition
         self.__artist = artist
         self.__flavor = flavor
-        self.__version = version
         self.__multiverseid = multiverseid
 
     @classmethod
@@ -550,14 +547,13 @@ class Card(Model):
             "number": self.__number,
             "edition": self.__edition,
             "artist": self.__artist,
-            "flavor": self.__flavor,
-            "version": self.__version
+            "flavor": self.__flavor
         }
 
     @property
     def _primary_key(self) -> str:
         """ This is a value allowing to uniquely identify an instance of Card """
-        return self.__name, self.__edition, self.__number, self.__version
+        return self.__name, self.__edition, self.__number
 
     @classmethod
     def get(cls, card_id: int):
@@ -731,8 +727,9 @@ class Deck(Model):
         """ Gets a list of decks for the given user_id """
         decks = self._get(sql.Deck.list(), user_id=self.user_id)
         for deck in decks:
-            deck_colors = deck["colors"].split(",")
-            deck["colors"] = [colors[color] for color in colors if color in deck_colors]
+            if deck["colors"]:
+                deck_colors = deck["colors"].split(",")
+                deck["colors"] = [colors[color] for color in colors if color in deck_colors]
 
         return decks
 
