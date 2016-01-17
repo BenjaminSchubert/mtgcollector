@@ -103,35 +103,38 @@ function findImageHeight() {
 function loadImagesInViewport() {
 
     $('#cards > div').withinviewport().each(function () {
-        var curDiv = $(this);
-        var curId = curDiv.attr('id');
-        var curImg = curDiv.find('img');
-
-        if (!curDiv.hasClass('loaded')) {
-
-            curDiv.addClass('loaded');
-            loadedIds.push(curDiv.attr('id'));
-
-            curImg.attr('src', defaultImgPath);
-            createStrip(curDiv);
-
-            // Requests loading of the image
-            $.ajax(imgPath + curId)
-
-                // image loaded
-                .done(function () {
-                    curImg.attr('src', imgPath + curId);
-                })
-
-                // image failed to load
-                .fail(function () {
-                    console.log("failed to load image number " + curId);
-                });
-        }
-
+        loadImage($(this).attr('id'));
     });
 
     unloadNotInViewPort();
+}
+
+// Loads an image by setting its path once it is fetched.
+function loadImage(id) {
+    var curDiv = $('#' + id);
+    var curImg = curDiv.find('img');
+
+    if (!curDiv.hasClass('loaded')) {
+
+        curDiv.addClass('loaded');
+        loadedIds.push(curDiv.attr('id'));
+
+        curImg.attr('src', defaultImgPath);
+        createStrip(curDiv);
+
+        // Requests loading of the image
+        $.ajax(imgPath + id)
+
+            // image loaded
+            .done(function () {
+                curImg.attr('src', imgPath + id);
+            })
+
+            // image failed to load
+            .fail(function () {
+                console.log("failed to load image number " + id);
+            });
+    }
 }
 
 // "Unloads" the cards which are not in view port anymore by changing the 'src' attr of the img tag to "".
