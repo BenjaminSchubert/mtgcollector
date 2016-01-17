@@ -797,7 +797,7 @@ class Deck(Model):
         return {
             "main": CardInDeck.get_cards(self.user_id, deck_name),
             "side": CardInSide.get_cards(self.user_id, deck_name),
-            "missing": []
+            "missing": self._get(sql.Deck.get_missing(), user_id=self.user_id, deck_name=deck_name)
         }
 
     def _primary_key(self) -> dict:

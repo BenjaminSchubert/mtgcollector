@@ -474,6 +474,25 @@ class Deck:
             WHERE user_id = %(user_id)s AND name = %(name)s
         """
 
+    @classmethod
+    def get_missing(cls):
+        """ get all missing card from given deck """
+        return """
+            SELECT deck_entity.card_id, SUM(deck_entity.number) - IFNULL(owned.number, 0) AS number
+            FROM deck
+            INNER JOIN (SELECT * FROM card_in_deck UNION ALL SELECT * FROM card_in_side) AS deck_entity
+                ON deck_entity.deck_id = deck.deck_id
+            LEFT JOIN (
+                SELECT DISTINCT card_id,
+                normal + foil AS number
+                FROM card_in_collection WHERE user_id = 1
+            ) AS owned
+                ON owned.card_id = deck_entity.card_id
+            WHERE name = %(deck_name)s AND user_id = %(user_id)s
+            GROUP BY deck_entity.card_id, owned.number
+            HAVING owned.number IS NULL OR SUM(deck_entity.number) > owned.number
+        """
+
 
 class CardInDeckEntity(abc.ABCMeta):
     """
@@ -515,9 +534,9 @@ class CardInDeckEntity(abc.ABCMeta):
         """ list all cards in the deck"""
         return """
             SELECT number, card_id
-            FROM card_in_deck
+            FROM {table_name}
             INNER JOIN deck
-            ON card_in_deck.decK_id = deck.deck_id
+            ON {table_name}.deck_id = deck.deck_id
             WHERE user_id = %(user_id)s AND deck.name = %(deck_name)s
         """.format(table_name=mcs.table_name())
 
