@@ -16,6 +16,7 @@ __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 # We need to match mysql converter to be able to accept list and sets
 mysql.connector.conversion.MySQLConverter._list_to_mysql = lambda self, value: ",".join(value).encode()
 mysql.connector.conversion.MySQLConverter._set_to_mysql = lambda self, value: ",".join(value).encode()
+mysql.connector.conversion.MySQLConverter._bytearray_to_mysql = lambda self, value: bytes(value)
 
 
 def get_connection(app):
@@ -82,6 +83,15 @@ class User:
     def get_by_mail_or_username(cls):
         """ get user by email or username """
         return """ SELECT * FROM user WHERE username = %(identifier)s OR email = %(identifier)s """
+
+    @classmethod
+    def update(cls):
+        """ updates the user's information """
+        return """
+            UPDATE user
+            SET username = %(username)s, email = %(email)s, password = %(password)s, salt = %(salt)s
+            WHERE user_id = %(user_id)s
+        """
 
 
 class Metacard:
@@ -388,6 +398,17 @@ class Collection:
         return """
             DELETE FROM card_in_collection
             WHERE card_id=%(card_id)s AND user_id=%(user_id)s
+        """
+
+    @classmethod
+    def export(cls):
+        """ returns all cards owned by the given user """
+        return """
+            SELECT name, edition, number, foil, normal
+            FROM card
+            INNER JOIN card_in_collection
+            ON card.card_id = card_in_collection.card_id
+            WHERE user_id = %(user_id)s
         """
 
 

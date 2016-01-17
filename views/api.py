@@ -177,7 +177,7 @@ def remove_card_from_deck(name: str, card_id: int):
     return ('', 200)
 
 
-@mtgcollector.app.route("/api/export/decks/<name>")
+@mtgcollector.app.route("/api/export/<name>")
 @login_required
 def export_deck(name: str):
     """
@@ -206,3 +206,12 @@ def import_deck():
             return flask.redirect(flask.url_for("decks"))
 
     return (flask.jsonify(form.errors), 400)
+
+
+@mtgcollector.app.route("/api/export")
+@login_required
+def download_collection():
+    """ download user's collection """
+    response = flask.jsonify(current_user.export())
+    response.headers["Content-Disposition"] = 'attachment;filename=collection_{}.json'.format(current_user.username)
+    return response

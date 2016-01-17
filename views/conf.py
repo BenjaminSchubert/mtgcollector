@@ -113,8 +113,22 @@ def update():
     return redirect(url_for("index"))
 
 
-@app.route("/parameters", methods=['GET', 'POST'])
+@app.route("/parameters", methods=['GET'])
 @login_required
 def parameters():
     """ user parameters """
-    return render_template('parameters.html', active_page="parameters")
+    form = lib.forms.RegisterForm()
+    form.prepopulate(current_user.username, current_user.email)
+    return render_template('parameters.html', active_page="parameters", form=form)
+
+
+@app.route("/parameters", methods=['POST'])
+@login_required
+def change_parameters():
+    """ update user parameters """
+    form = lib.forms.RegisterForm()
+    form.set_defaults(current_user.username, current_user.email, False)
+
+    if form.validate_on_submit():
+        current_user.update(form.username.data, form.email.data, form.password.data)
+    return render_template('parameters.html', active_page="parameters", form=form)

@@ -1,4 +1,29 @@
 {% extends "layout.html" %}
+{% from "macros.html" import render_form %}
 
 {% block body %}
+    {% if admin %}
+        <ul class="nav nat-tabs">
+            <li class="active"><a data-toggle="tab" href="#information">Personal Information</a></li>
+            <li><a data-toggle="tab" href="#admin">Administration</a></li>
+        </ul>
+        <div class="tab-content">
+    {% endif %}
+    <div class="row tab-pane active" id="information">
+        <div class="col-md-3 col-md-offset-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">User information</h3>
+                </div>
+                {{ render_form(form, id_="change-info", action=url_for("parameters"), method="POST") }}
+            </div>
+        </div>
+        <div class="col-md3">
+            <a href="{{ url_for("download_collection") }}" role="button" class="btn btn-primary">Export Collection</a>
+        </div>
+    </div>
+
+    {% if admin %}
+        </div>
+    {% endif %}
 {% endblock %}

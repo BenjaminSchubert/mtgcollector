@@ -37,6 +37,28 @@ class RegisterForm(Form):
     email = EmailField("Email", [DataRequired()])
     password = PasswordField("Password", [DataRequired()])
 
+    def prepopulate(self, username: str, email: str):
+        """
+        prepopulates values into the form
+
+        :param username: username to show
+        :param email: email to show
+        """
+        self.username.data = username
+        self.email.data = email
+
+    def set_defaults(self, username: str, email: str, password_required=False):
+        """
+        Updates the default values for each entries
+        :param username: default username
+        :param email: default email
+        :param password_required: whether to still check if the password is set or not
+        """
+        self.username.default = username
+        self.email.default = email
+        if not password_required:
+            self.password.validators = []
+
 
 class LoginForm(Form):
     """

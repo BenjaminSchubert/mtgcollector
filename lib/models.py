@@ -693,6 +693,10 @@ class Collection(Model):
         else:
             self._modify(self._insertion_command(), user_id=self.user_id, card_id=card_id, normal=n_normal, foil=n_foil)
 
+    def export(self) -> typing.List:
+        """ exports user's cards """
+        return self._get(sql.Collection.export(), user_id=self.user_id)
+
     def _as_database_object(self) -> dict:
         """ this is never used """
         raise NotImplementedError()
@@ -1016,12 +1020,11 @@ class User(Model):
         self.__username = username
         self.__email = email
 
+        self.__salt = salt
+        self.__password = password
+
         if salt is None:  # this is a new user, we encode the password
-            self.__salt = os.urandom(255)
-            self.__password = hashlib.pbkdf2_hmac('sha512', password.encode("utf-8"), self.__salt, 1000000)
-        else:
-            self.__salt = salt
-            self.__password = password
+            self.__hash_password()
 
         self.__is_admin = is_admin
         self.collection = Collection(self.__user_id)
@@ -1113,6 +1116,16 @@ class User(Model):
         """ Determines if the user is an administrator or not """
         return self.__is_admin
 
+    @property
+    def username(self) -> str:
+        """ username of the user """
+        return self.__username
+
+    @property
+    def email(self) -> str:
+        """ user's email """
+        return self.__email
+
     def get_id(self) -> str:
         """
         :return: the user unique id
@@ -1143,6 +1156,30 @@ class User(Model):
         self.__is_admin = new_user.__is_admin
         return self
 
+    def update(self, username: str, email: str, password: str=None):
+        """
+        Updates the current user with the given values
+
+        :param username: new username
+        :param email: new email
+        :param password: new password
+        """
+        if (User.get_user_by_name_or_mail(email) and self.__email != email) \
+                or (User.get_user_by_name_or_mail(username) and self.__username != username):
+            raise DataManipulationException(error="cannot add a user with the same name or email as another one")
+
+        if password:
+            self.__password = password
+            self.__hash_password()
+
+        if username:
+            self.__username = username
+
+        if email:
+            self.__email = email
+
+        self._modify(sql.User.update(), **self._as_database_object())
+
     def set_admin(self, admin: bool=True) -> None:
         """
         Sets the user identified by user_id to be an admin if admin is True (default)
@@ -1152,6 +1189,19 @@ class User(Model):
         """
         self._modify(sql.User.set_admin(), user_id=self.get_id(), admin=admin)
         self.__is_admin = admin
+
+    def export(self):
+        """ export the whole user's collection """
+        data = {
+            "decks": [self.decks.export(deck["name"]) for deck in self.decks.list()],
+            "collection": self.collection.export()
+        }
+        return data
+
+    def __hash_password(self):
+        """ hashes the user's password and set a new salt """
+        self.__salt = os.urandom(255)
+        self.__password = hashlib.pbkdf2_hmac('sha512', self.__password.encode("utf-8"), self.__salt, 1000000)
 
     def _as_database_object(self) -> dict:
         """ View of the user as a dictionary """
