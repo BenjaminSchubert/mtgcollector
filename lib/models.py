@@ -794,10 +794,10 @@ class Deck(Model):
         :param side: whether the cards in the side are asked or the others
         :return: list of cards in the asked deck
         """
-        if side:
-            return CardInSide.get_cards(self.user_id, deck_name)
-        else:
-            return CardInDeck.get_cards(self.user_id, deck_name)
+        return {
+            "main": CardInDeck.get_cards(self.user_id, deck_name),
+            "side": CardInSide.get_cards(self.user_id, deck_name)
+        }
 
     def _primary_key(self) -> dict:
         """ unused """

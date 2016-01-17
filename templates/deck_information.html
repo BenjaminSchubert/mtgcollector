@@ -14,15 +14,17 @@
             <li><a data-toggle="tab" href="#missing">Missing Cards</a></li>
         </ul>
         <div class="tab-content">
-            <div id="cards" class="row">
-                {% for card in cards %}
-                    <div id="{{ card['card_id'] }}" data-number="{{ card['number'] }}" class="col-md-2 col-sm-3 col-xs-4">
-                        <div class="card-inner">
-                            <img>
+            {% for key in cards.keys() %}
+                <div id="{{ key }}" class="row">
+                    {% for card in cards[key] %}
+                        <div id="{{ card['card_id'] }}" data-number="{{ card['number'] }}" class="col-md-2 col-sm-3 col-xs-4">
+                            <div class="card-inner">
+                                <img>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
         </div>
     </div>
 
