@@ -107,7 +107,7 @@ function createRowNumCards(parentDiv, id, labelVal, num, isNormal) {
                 var cardDiv = $('#' + id);
                 cardDiv.attr('data-normal', postData.n_normal);
                 cardDiv.attr('data-foil', postData.n_foil);
-                createStrip(cardDiv);
+                createStrip(cardDiv, parseInt(postData.n_normal) + parseInt(postData.n_foil));
             });
         });
 

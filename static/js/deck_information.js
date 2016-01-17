@@ -18,7 +18,10 @@ function displayDeckName() {
 
 function loadAllImages() {
     $('.card').each(function() {
-        loadImage($(this).attr('id'));
+        var curDiv = $(this);
+
+        loadImage(curDiv.attr('id'));
+        createStrip(curDiv, curDiv.attr('data-number'));
     })
 }
 

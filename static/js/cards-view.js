@@ -130,7 +130,10 @@ function loadImage(id) {
         loadedIds.push(curDiv.attr('id'));
 
         curImg.attr('src', defaultImgPath);
-        createStrip(curDiv);
+
+        var nNormal = parseInt(curDiv.attr('data-normal'));
+        var nFoil = parseInt(curDiv.attr('data-foil'));
+        createStrip(curDiv, nNormal + nFoil);
 
         // Requests loading of the image
         $.ajax(imgPath + id)
@@ -166,34 +169,31 @@ function unloadNotInViewPort() {
 
 // Creates a strip on the current card.
 // 'curDiv' is the node which is the current div of the card.
-function createStrip(curDiv) {
-
-    var nNormal = parseInt(curDiv.attr('data-normal'));
-    var nFoil = parseInt(curDiv.attr('data-foil'));
-    var tot = nNormal + nFoil;
+// 'n' is the number to display on strip.
+function createStrip(curDiv, n) {
 
     // if tot not a valid number
-    if (isNaN(tot)) {
+    if (isNaN(n)) {
         return;
     }
 
     // if strip already existing, update number or remove it if tot = 0
     if (curDiv.find('.strip').length > 0) {
-        if (tot == 0) {
+        if (n == 0) {
             curDiv.find('.strip').remove();
             curDiv.find('.strip-values').remove();
         } else {
-            curDiv.find('.strip-values').text(tot);
+            curDiv.find('.strip-values').text(n);
         }
         return;
     }
 
     // strip not yet existing
     var innerDiv = curDiv.children('.card-inner');
-    if (tot > 0) {
+    if (n > 0) {
         innerDiv.append(
             '<div class="strip"></div>' +
-            '<div class="strip-values">' + tot + '</div>'
+            '<div class="strip-values">' + n + '</div>'
         );
     }
 }
