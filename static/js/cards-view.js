@@ -52,7 +52,7 @@ $(document).ready(function () {
         setImagesErrorPath();
         initView();
 
-        // what cardsto do when clicking on card image
+        // what to do when clicking on card image
         $('.card').click(lockCardDetails);
 
         // what to do when hovering on card image

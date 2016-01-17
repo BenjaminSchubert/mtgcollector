@@ -3,11 +3,13 @@
 {% block head %}
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/utils.css') }}" />
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/cards-view.css') }}" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/deck_information.css') }}" />
 {% endblock %}
 
 
 {% block body %}
     <div class="col-md-8 col-sm-8 col-xs-8">
+        <h2 id="deck-name">Deck</h2>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#main">Main Deck</a></li>
             <li><a data-toggle="tab" href="#side">Side Deck</a></li>
