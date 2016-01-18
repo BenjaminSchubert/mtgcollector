@@ -10,8 +10,16 @@ from decimal import Decimal
 import typing
 from flask.json import JSONEncoder
 
+from lib.models.collection import CardInCollection, CardInDeck
+
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
+class JSONDecodeError(Exception):
+    """
+    Error thrown when a json cannot be decoded
+    """
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -30,3 +38,20 @@ class CustomJSONEncoder(JSONEncoder):
         if isinstance(obj, Decimal):
             return int(obj)
         return JSONEncoder.default(self, obj)
+
+
+def collection_json_parser(parsed_dict):
+    # CardInCollection
+    if set(parsed_dict.keys()) == {"number", "name", "edition", "normal", "foil"}:
+        return CardInCollection(**parsed_dict)
+    # CardInDeck (or Side)
+    elif set(parsed_dict.keys()) == {"name", "edition", "number", "ed_number"}:
+        return CardInDeck(**parsed_dict)
+    # this is the list of decks
+    elif set(parsed_dict.keys()) == {"main", "side", "name"}:
+        return parsed_dict
+    # the deck is parsed
+    elif set(parsed_dict.keys()) == {"collection", "decks"}:
+        return parsed_dict
+    else:
+        raise JSONDecodeError("Unknown set of keys : {}".format(parsed_dict.keys()))

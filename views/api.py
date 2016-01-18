@@ -87,7 +87,7 @@ def add_to_collection(card_id):
 @login_required
 def list_decks():
     """ Gets the list of decks a given user has """
-    return flask.jsonify(decks=current_user.decks.list())
+    return flask.jsonify(decks=current_user.collection.decks.list())
 
 
 @mtgcollector.app.route("/api/decks/<name>", methods=["POST"])
@@ -227,7 +227,9 @@ def upload_collection():
 
     if form.validate_on_submit():
         try:
-            current_user.load(json.load(io.TextIOWrapper(form.file.data)))
+            current_user.collection.load(json.load(
+                    io.TextIOWrapper(form.file.data), object_hook=mtgcollector.lib.json.collection_json_parser
+            ))
         except DataManipulationException as e:
             return (flask.jsonify(error=e.error), 400)
         else:

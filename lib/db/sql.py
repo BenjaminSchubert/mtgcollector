@@ -362,7 +362,7 @@ class Format:
         return """ SELECT * FROM format """
 
 
-class Collection:
+class CardInCollection:
     """
     MySQL commands related to the collection table
     """
@@ -384,7 +384,7 @@ class Collection:
         """
 
     @classmethod
-    def insert(cls):
+    def insert_by_id(cls):
         """ command to insert a new card in collection """
         return """
             INSERT INTO card_in_collection (user_id, card_id, normal, foil)
@@ -412,7 +412,7 @@ class Collection:
         """
 
     @classmethod
-    def bulk_insert(cls):
+    def insert(cls):
         """ insert a card in the collection """
         return """
             INSERT INTO card_in_collection (user_id, card_id, normal, foil)

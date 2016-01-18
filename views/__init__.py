@@ -117,7 +117,7 @@ def deck(name) -> werkzeug.wrappers.Response:
     :param name: the name of the deck to display
     """
     return flask.render_template(
-            "deck_information.html", active_page="decks", cards=current_user.decks.get_cards(name), name=name
+            "deck_information.html", active_page="decks", cards=current_user.collection.decks.get_cards(name), name=name
     )
 
 

@@ -10,11 +10,10 @@ import logging
 import os
 
 import flask
-import typing
 
 from lib.db import sql
 from lib.exceptions import DataManipulationException
-from lib.models import Model, Collection, Deck
+from lib.models import Model, Collection
 
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
@@ -45,7 +44,6 @@ class User(Model):
 
         self.__is_admin = is_admin
         self.collection = Collection(self.__user_id)
-        self.decks = Deck(self.__user_id)
 
     @classmethod
     def _insertion_command(cls) -> str:
@@ -206,33 +204,6 @@ class User(Model):
         """
         self._modify(sql.User.set_admin(), user_id=self.get_id(), admin=admin)
         self.__is_admin = admin
-
-    def export(self):
-        """ export the whole user's collection """
-        data = {
-            "decks": [self.decks.export(deck["name"]) for deck in self.decks.list()],
-            "collection": self.collection.export()
-        }
-        return data
-
-    def load(self, data: typing.Dict):
-        """
-        load the user's collection
-
-        :param data: dictionary containing all the collection's information
-        """
-        for key in data.keys():
-            if key not in ["collection", "decks"]:
-                raise DataManipulationException("Incorrectly formatted data. Got {} as key".format(key))
-
-        for entry in data.get("decks", []):
-            for key in entry.keys():
-                if key not in ["main", "side", "name"]:
-                    raise DataManipulationException("Incorrectly formatted deck. Got {} as key".format(key))
-
-        self.collection.load(data["collection"])
-        for deck in data.get("decks", []):
-            self.decks.load(deck)
 
     def __hash_password(self):
         """ hashes the user's password and set a new salt """

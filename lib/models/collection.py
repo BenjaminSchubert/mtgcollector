@@ -5,7 +5,6 @@
 Models to handle collections
 """
 
-import abc
 from collections import OrderedDict
 
 import mysql.connector.errors
@@ -24,58 +23,171 @@ for color, color_code in ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("B
     color_list[color] = color_code
 
 
-class Collection(Model):
-    """
-    Collection model
-
-    :param user_id: the id of the user owning the collection
-    """
+class CardInCollection(Model):
     index = 2
 
-    class InsertionProxy:
-        """
-        Proxy to add a card in a collection
-        """
-        def __init__(self, data, user_id):
-            self.data = data
-            self.data["user_id"] = user_id
-
-        @property
-        def _as_database_object(self):
-            return self.data
-
-    def __init__(self, user_id: int):
-        self.user_id = user_id
-        self.data = []
+    def _primary_key(self) -> dict:
+        raise NotImplementedError()
 
     @classmethod
-    def _table_creation_command(cls) -> str:
-        """ command to create the Collection table """
-        return sql.Collection.create_table()
+    def export(cls, user_id: int) -> typing.List:
+        """
+        exports user's cards
 
-    @classmethod
-    def _insertion_command(cls) -> str:
-        """ command to add a card to a collection """
-        return sql.Collection.bulk_insert()
+        :param user_id: id of the user owning the cards
+        """
+        return cls._get(sql.CardInCollection.export(), user_id=user_id)
 
-    # noinspection PyShadowingBuiltins
-    def insert(self, card_id: int, n_normal: int, n_foil: int) -> None:
+    def __init__(self, name: str, edition: str, number: int, normal: int, foil: int):
+        self.__name = name  # type: str
+        self.__edition = edition  # type: str
+        self.__number = number  # type: int
+        self.__normal = normal  # type: int
+        self.__foil = foil  # type: int
+
+    def insert(self, user_id: int, card_id: int, n_normal: int, n_foil: int) -> None:
         """
         adds a new card to the collection.
 
         If both normal and foil are 0, will delete all instances of the card instead
+        :param user_id: user owning the card
         :param card_id: card to add to the collection
         :param n_normal: number of normal copy
         :param n_foil: number of foil copy
         """
         if n_normal == n_foil == 0:
-            self._modify(sql.Collection.delete(), user_id=self.user_id, card_id=card_id)
+            self._modify(sql.CardInCollection.delete(), user_id=user_id, card_id=card_id)
         else:
-            self._modify(sql.Collection.insert(), user_id=self.user_id, card_id=card_id, normal=n_normal, foil=n_foil)
+            self._modify(
+                    sql.CardInCollection.insert_by_id(), user_id=user_id, card_id=card_id, normal=n_normal, foil=n_foil
+            )
 
-    def export(self) -> typing.List:
-        """ exports user's cards """
-        return self._get(sql.Collection.export(), user_id=self.user_id)
+    @classmethod
+    def _insertion_command(cls) -> str:
+        return sql.CardInCollection.insert()
+
+    @classmethod
+    def _table_creation_command(cls) -> str:
+        return sql.CardInCollection.create_table()
+
+    @property
+    def _as_database_object(self) -> dict:
+        return {
+            "name": self.__name,
+            "edition": self.__edition,
+            "number": self.__number,
+            "normal": self.__normal,
+            "foil": self.__foil
+        }
+
+
+class CardInDeck(Model):
+    """
+    Represents a card in a deck, either side or not
+    """
+    index = 3
+
+    def __init__(self, name, edition, ed_number, number):
+        self.__name = name
+        self.__edition = edition
+        self.__ed_number = ed_number
+        self.__number = number
+
+    @classmethod
+    def sql_class(cls) -> sql.CardInDeckEntity:
+        """ the sql commands to the given entity """
+        return sql.CardInDeck
+
+    @classmethod
+    def _table_creation_command(cls) -> str:
+        """ command to create the database table """
+        return cls.sql_class().create_table()
+
+    @classmethod
+    def add(cls, user_id: int, deck_name: str, card_id: int, number: int):
+        """
+        add a card to a deck
+
+        :param user_id: user owning the deck
+        :param deck_name: name of the deck
+        :param card_id: id of the card
+        :param number: number of time to add the card
+        """
+        if number == 0:
+            cls._modify(cls.sql_class().delete(), user_id=user_id, name=deck_name, card_id=card_id)
+        else:
+            cls._modify(cls.sql_class().add(), user_id=user_id, deck_name=deck_name, card_id=card_id, number=number)
+
+    @classmethod
+    def get_cards(cls, user_id: int, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
+        """
+        return all cards matching the given deck
+        :param user_id: user owning the deck
+        :param deck_name: name of the deck
+        :return: cards in the given deck
+        """
+        return cls._get(cls.sql_class().get_cards(), user_id=user_id, deck_name=deck_name)
+
+    @classmethod
+    def export_cards(cls, user_id: int, deck_name: str):
+        """
+        Return all information allowing to reconstruct the entries for the corresponding deck
+
+        :param user_id: id of the user owning the deck
+        :param deck_name: name of the deck
+        :return: list of cards in the deck
+        """
+        return cls._get(cls.sql_class().export(), user_id=user_id, deck_name=deck_name)
+
+    @property
+    def _as_database_object(self) -> dict:
+        """ this is never used """
+        return {
+            "name": self.__name,
+            "edition": self.__edition,
+            "ed_number": self.__ed_number,
+            "number": self.__number
+        }
+
+    @classmethod
+    def _insertion_command(cls) -> str:
+        """ this is never used """
+        return cls.sql_class().insert()
+
+    def _primary_key(self) -> dict:
+        """ this is never used """
+        return self._as_database_object
+
+
+class CardInSideDeck(CardInDeck):
+    """
+    Represents a card in a side deck
+    """
+    index = 3
+
+    @classmethod
+    def sql_class(cls) -> sql.CardInSide:
+        """ gets the sql commands associated to this object """
+        return sql.CardInSide
+
+
+class Collection:
+    """
+    Collection model
+
+    :param user_id: the id of the user owning the collection
+    """
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+        self.decks = Deck(self.user_id)
+
+    def export(self):
+        """ export the whole user's collection """
+        data = {
+            "decks": [self.decks.export(deck["name"]) for deck in self.decks.list()],
+            "collection": CardInCollection.export(self.user_id)
+        }
+        return data
 
     def load(self, data: typing.Dict):
         """
@@ -83,21 +195,9 @@ class Collection(Model):
 
         :param data: cards to import, json formatted
         """
-        self.data = data
-        self.bulk_insert(self)
-        self.data = []
-
-    def _as_database_object(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
-
-    def _primary_key(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
-
-    def __iter__(self):
-        for data in self.data:
-            yield self.InsertionProxy(data, self.user_id)
+        CardInCollection.bulk_insert(data.get("collection", []), user_id=self.user_id)
+        for deck in data.get("decks", []):
+            self.decks.load(deck)
 
 
 class Deck(Model):
@@ -182,7 +282,7 @@ class Deck(Model):
         :param side: whether to add the card in the side or in the deck
         """
         if side:
-            return CardInSide.add(self.user_id, deck_name, card_id, n_cards)
+            return CardInSideDeck.add(self.user_id, deck_name, card_id, n_cards)
         return CardInDeck.add(self.user_id, deck_name, card_id, n_cards)
 
     def remove_card(self, deck_name: str, card_id: int, side: bool):
@@ -204,7 +304,7 @@ class Deck(Model):
         """
         return {
             "main": CardInDeck.get_cards(self.user_id, deck_name),
-            "side": CardInSide.get_cards(self.user_id, deck_name),
+            "side": CardInSideDeck.get_cards(self.user_id, deck_name),
             "missing": self._get(sql.Deck.get_missing(), user_id=self.user_id, deck_name=deck_name)
         }
 
@@ -218,7 +318,7 @@ class Deck(Model):
         return {
             "name": deck_name,
             "main": CardInDeck.export_cards(self.user_id, deck_name),
-            "side": CardInSide.export_cards(self.user_id, deck_name)
+            "side": CardInSideDeck.export_cards(self.user_id, deck_name)
         }
 
     def load(self, data: typing.Dict):
@@ -227,16 +327,9 @@ class Deck(Model):
 
         :param data: dictionary containing the deck
         """
-        for key in data.keys():
-            if key not in ['main', 'side', 'name']:
-                raise DataManipulationException("Incorrectly formatted data. Got {} as key".format(key))
-
-        if data["name"] in [obj["name"] for obj in self.list()]:
-            raise DataManipulationException("A deck with the same name exists")
-
         self.add(data["name"])
-        CardInDeck.bulk_insert(CardInDeck(self.user_id, data["name"], data["main"]))
-        CardInSide.bulk_insert(CardInSide(self.user_id, data["name"], data["side"]))
+        CardInDeck.bulk_insert(data["main"], deck_name=data["name"], user_id=self.user_id)
+        CardInSideDeck.bulk_insert(data["side"], deck_name=data["name"], user_id=self.user_id)
 
     def _primary_key(self) -> typing.Dict:
         """ unused """
@@ -245,116 +338,3 @@ class Deck(Model):
     def _as_database_object(self) -> typing.Dict:
         """ unused """
         raise NotImplementedError()
-
-
-class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
-    """
-    Represents a card in a deck, either side or not
-    """
-    index = 3
-
-    class DBProxy:
-        """
-        Proxy to insert cards in deck/side
-        """
-        def __init__(self, user_id, deck_name, data):
-            self.data = data
-            self.data["user_id"] = user_id
-            self.data["deck_name"] = deck_name
-
-        @property
-        def _as_database_object(self):
-            return self.data
-
-    def __init__(self, user_id: int, deck_name: str, data: typing.Dict):
-        self.user_id = user_id
-        self.deck_name = deck_name
-        self.data = data
-
-    @classmethod
-    @abc.abstractmethod
-    def sql_class(cls) -> sql.CardInDeckEntity:
-        """ the sql commands to the given entity """
-
-    @classmethod
-    def _table_creation_command(cls) -> str:
-        """ command to create the database table """
-        return cls.sql_class().create_table()
-
-    @classmethod
-    def add(cls, user_id: int, deck_name: str, card_id: int, number: int):
-        """
-        add a card to a deck
-
-        :param user_id: user owning the deck
-        :param deck_name: name of the deck
-        :param card_id: id of the card
-        :param number: number of time to add the card
-        """
-        if number == 0:
-            cls._modify(cls.sql_class().delete(), user_id=user_id, name=deck_name, card_id=card_id)
-        else:
-            cls._modify(cls.sql_class().add(), user_id=user_id, deck_name=deck_name, card_id=card_id, number=number)
-
-    @classmethod
-    def get_cards(cls, user_id: int, deck_name: str) -> typing.List[typing.Dict[str, typing.Union[str, int]]]:
-        """
-        return all cards matching the given deck
-        :param user_id: user owning the deck
-        :param deck_name: name of the deck
-        :return: cards in the given deck
-        """
-        return cls._get(cls.sql_class().get_cards(), user_id=user_id, deck_name=deck_name)
-
-    @classmethod
-    def export_cards(cls, user_id: int, deck_name: str):
-        """
-        Return all information allowing to reconstruct the entries for the corresponding deck
-
-        :param user_id: id of the user owning the deck
-        :param deck_name: name of the deck
-        :return: list of cards in the deck
-        """
-        return cls._get(cls.sql_class().export(), user_id=user_id, deck_name=deck_name)
-
-    def _as_database_object(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
-
-    @classmethod
-    def _insertion_command(cls) -> str:
-        """ this is never used """
-        return cls.sql_class().insert()
-
-    def _primary_key(self) -> dict:
-        """ this is never used """
-        raise NotImplementedError()
-
-    def __iter__(self):
-        for obj in self.data:
-            yield self.DBProxy(self.user_id, self.deck_name, obj)
-
-
-# noinspection PyAbstractClass
-class CardInDeck(CardInDeckMeta):
-    """
-    Represents a card in a deck, either side or not
-    """
-
-    @classmethod
-    def sql_class(cls) -> sql.CardInDeck:
-        """ gets the sql commands associated to this object """
-        return sql.CardInDeck
-
-
-# noinspection PyAbstractClass
-class CardInSide(CardInDeckMeta):
-    """
-    Represents a card in a side deck
-    """
-    index = 3
-
-    @classmethod
-    def sql_class(cls) -> sql.CardInSide:
-        """ gets the sql commands associated to this object """
-        return sql.CardInSide

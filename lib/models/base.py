@@ -46,7 +46,7 @@ class Model(metaclass=abc.ABCMeta):
         """ This is a value that can uniquely identify any object (primary key) """
 
     @classmethod
-    def bulk_insert(cls, models: typing.Iterable, connection=None) -> None:
+    def bulk_insert(cls, models: typing.Iterable, connection=None, **kwargs) -> None:
         """
         Inserts many models into the database
 
@@ -63,7 +63,7 @@ class Model(metaclass=abc.ABCMeta):
 
         for chunk in chunks:
             # noinspection PyProtectedMember
-            cursor.executemany(cls._insertion_command(), [model._as_database_object for model in chunk])
+            cursor.executemany(cls._insertion_command(), [dict(model._as_database_object, **kwargs) for model in chunk])
         connection.commit()
 
     @classmethod
