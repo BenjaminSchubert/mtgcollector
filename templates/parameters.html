@@ -14,7 +14,7 @@
         <div class="tab-content">
     {% endif %}
     <div class="row tab-pane active" id="information">
-        <div class="col-md-3 col-md-offset-3">
+        <div class="col-md-5 col-md-offset-3">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">User information</h3>
@@ -22,9 +22,13 @@
                 {{ render_form(form, id_="change-info", action=url_for("parameters"), method="POST") }}
             </div>
         </div>
-        <div class="col-md3">
-            <a href="{{ url_for("download_collection") }}" role="button" class="btn btn-primary">Export Collection</a>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#import-modal">Import Collection</button>
+        <div class="col-md-1" id="import-export">
+            <div>
+                <a href="{{ url_for("download_collection") }}" role="button" class="btn btn-primary">Export Collection</a>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#import-modal">Import Collection</button>
+            </div>
         </div>
     </div>
 

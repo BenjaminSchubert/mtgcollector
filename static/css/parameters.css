@@ -1,7 +1,23 @@
+#information {
+    margin-top: 50px;
+}
+
 #change-info {
-    padding: 10px;
+    padding: 15px;
 }
 
 #change-info > .row > .form-group > div {
+    margin-bottom: 10px;
+}
+
+#button_submit {
+    margin-right: 15px;
+}
+
+#import-export .btn {
+    padding: 2px 7px;
+}
+
+#import-export div:first-child {
     margin-bottom: 10px;
 }
