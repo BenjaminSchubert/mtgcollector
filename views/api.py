@@ -216,7 +216,7 @@ def import_deck():
 @login_required
 def download_collection():
     """ download user's collection """
-    response = flask.jsonify(current_user.export())
+    response = flask.jsonify(current_user.collection.export())
     response.headers["Content-Disposition"] = 'attachment;filename=collection_{}.json'.format(current_user.username)
     return response
 

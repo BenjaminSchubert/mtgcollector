@@ -112,10 +112,10 @@ class Metacard:
                 subtypes VARCHAR(80),
                 supertypes SET('Legendary', 'Snow', 'World', 'Basic', 'Ongoing'),
                 manaCost VARCHAR(50),
-                power FLOAT,
-                toughness FLOAT,
+                power DECIMAL(3,1),
+                toughness DECIMAL(3,1),
                 colors SET('Red', 'Green', 'White', 'Blue', 'Black'),
-                cmc FLOAT NOT NULL,
+                cmc DECIMAL(8,1) NOT NULL,
                 orig_text TEXT
             )
         """
