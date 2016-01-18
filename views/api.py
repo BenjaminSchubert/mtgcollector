@@ -113,7 +113,7 @@ def rename_deck(name: str):
     form = RenameDeck()
     if form.validate_on_submit():
         try:
-            current_user.decks.rename(name, form.data["name"])
+            current_user.collection.decks.rename(name, form.data["name"])
             return ('', 200)
         except DataManipulationException as e:
             return (flask.jsonify(error=e.error), 400)
@@ -130,7 +130,7 @@ def change_deck_index(name: str):
     """
     form = ChangeDeckIndex()
     if form.validate_on_submit():
-        current_user.decks.set_index(name, form.data["index"])
+        current_user.collection.decks.set_index(name, form.data["index"])
         return ('', 200)
     return (flask.jsonify(form.errors), 400)
 
@@ -144,7 +144,7 @@ def delete_deck(name):
     :param name: name of the deck to delete
     :return: 200 OK on completion
     """
-    current_user.decks.delete(name)
+    current_user.collection.decks.delete(name)
     return ('', 200)
 
 
@@ -188,7 +188,7 @@ def export_deck(name: str):
     :param name: name of the deck to export
     :return: downloadable json formatted file with the deck's information
     """
-    response = flask.jsonify(current_user.decks.export(name))
+    response = flask.jsonify(current_user.collection.decks.export(name))
     response.headers["Content-Disposition"] = 'attachment;filename={}.json'.format(name)
     return response
 
@@ -201,7 +201,9 @@ def import_deck():
 
     if form.validate_on_submit():
         try:
-            current_user.decks.load(json.load(io.TextIOWrapper(form.file.data)))
+            current_user.collection.decks.load(
+                    json.load(io.TextIOWrapper(form.file.data), object_hook=mtgcollector.lib.json.deck_parser
+            ))
         except DataManipulationException as e:
             return (flask.jsonify(error=e.error), 400)
         else:

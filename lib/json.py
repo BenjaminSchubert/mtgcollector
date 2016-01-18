@@ -40,18 +40,35 @@ class CustomJSONEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-def collection_json_parser(parsed_dict):
-    # CardInCollection
-    if set(parsed_dict.keys()) == {"number", "name", "edition", "normal", "foil"}:
-        return CardInCollection(**parsed_dict)
+def deck_parser(parsed_dict: typing.Dict):
+    """
+    try to convert a dictionary into a deck
+
+    :param parsed_dict: dictionary to parse
+    :return: a new CardInDeck object
+    """
     # CardInDeck (or Side)
-    elif set(parsed_dict.keys()) == {"name", "edition", "number", "ed_number"}:
+    if set(parsed_dict.keys()) == {"name", "edition", "number", "ed_number"}:
         return CardInDeck(**parsed_dict)
     # this is the list of decks
     elif set(parsed_dict.keys()) == {"main", "side", "name"}:
         return parsed_dict
+    else:
+        raise JSONDecodeError("Unknown set of keys : {}".format(parsed_dict.keys()))
+
+
+def collection_json_parser(parsed_dict: typing.Dict):
+    """
+    Try to parse the user's collection
+
+    :param parsed_dict: dictionary to parse
+    :return: user's collection
+    """
+    # CardInCollection
+    if set(parsed_dict.keys()) == {"number", "name", "edition", "normal", "foil"}:
+        return CardInCollection(**parsed_dict)
     # the deck is parsed
     elif set(parsed_dict.keys()) == {"collection", "decks"}:
         return parsed_dict
     else:
-        raise JSONDecodeError("Unknown set of keys : {}".format(parsed_dict.keys()))
+        return deck_parser(parsed_dict)
