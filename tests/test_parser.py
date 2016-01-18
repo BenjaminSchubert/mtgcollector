@@ -24,8 +24,16 @@ class TestJSonCardParser(unittest.TestCase):
         """
         A dummy Flask application having only a folder
         """
+        class DummyLogger:
+            """
+            A dummy logger for tests
+            """
+            def error(self, dummy):
+                pass
+
         def __init__(self, folder):
             self.static_folder = folder
+            self.logger = self.DummyLogger()
 
     def add_to_response_version_correct(self, response):
         """
