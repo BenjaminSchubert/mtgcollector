@@ -14,6 +14,7 @@ from tests import TestCaseWithDB
 from lib.models import User
 
 
+# noinspection SpellCheckingInspection
 class TestUser(TestCaseWithDB, unittest.TestCase):
     """
     Defines tests for our User model

@@ -23,6 +23,7 @@ function bindSubmitButton() {
     });
 }
 
+//noinspection JSUnusedLocalSymbols
 function filterNotDefaultInput(index, elem) {
     var jElem = $(elem);
     var value = jElem.val();
@@ -40,7 +41,7 @@ function filterNotDefaultInput(index, elem) {
 }
 
 function bindReplaceMinOneByStar() {
-    $('#form-search input.slider').change(replaceMinOneByStar);
+    $('#form-search').find('input.slider').change(replaceMinOneByStar);
 }
 
 function replaceMinOneByStar() {
@@ -50,7 +51,7 @@ function replaceMinOneByStar() {
 }
 
 function replaceIcons() {
-    $('#colors label').each(function () {
+    $('#colors').find('label').each(function () {
         var text = insertImagesInText($(this).text());
         $(this).empty();
         $(this).append(text)

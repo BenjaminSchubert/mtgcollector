@@ -18,6 +18,7 @@
     padding: 3%;
 }
 
+/*noinspection CssUnusedSymbol*/
 .form-horizontal .control-label {
     text-align: left;
     padding: 7px 0 0;
@@ -31,6 +32,7 @@
     margin-right: 7px;
 }
 
+/*noinspection CssUnusedSymbol*/
 #form-search {
     display: table;
     width: 100%;
@@ -48,6 +50,7 @@
     padding: 2%;
 }
 
+/*noinspection CssUnusedSymbol*/
 .form-container {
     padding-top: 2%;
     padding-left: 2%;
@@ -61,6 +64,7 @@
     margin-right: 0;
 }
 
+/*noinspection CssUnusedSymbol*/
 #button_submit {
     font-size: 20px;
     margin-top: 1%;
@@ -72,6 +76,7 @@
     height: auto;
 }
 
+/*noinspection CssUnusedSymbol*/
 #colors {
     text-align: center;
     vertical-align: middle;
@@ -86,6 +91,7 @@
     vertical-align: -2px;
 }
 
+/*noinspection CssUnusedSymbol*/
 #colors .col-md-4,
 #colors .col-sm-4,
 #rarity .col-md-6,
@@ -93,12 +99,14 @@
     padding: 0;
 }
 
+/*noinspection CssUnusedSymbol*/
 .slider.slider-horizontal {
     width: 90%;
     margin-left: 5%;
     margin-top: 6px;
 }
 
+/*noinspection CssUnusedSymbol*/
 .slider-handle {
     background: #333 linear-gradient(to bottom, #333 0, #444 100%);
 }

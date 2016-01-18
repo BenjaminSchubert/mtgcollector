@@ -22,7 +22,6 @@ function createDetailsUpper(id) {
 
     var details = detailsFetched[id];
     var parentDiv = $('#card-details-upper-right');
-    var cardDiv = $('#' + id); // TODO: can be changed when cards as json
 
     createButtonRemoveFromDeck(id, parentDiv);
 

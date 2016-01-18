@@ -23,7 +23,6 @@ from lib.models import LegalInFormat
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
-
 CardList = typing.Dict[str, typing.Dict[str, typing.Union[str, typing.List]]]
 
 
@@ -37,6 +36,7 @@ class JSonCardParser:
     """
     A parser for fetching card information from mtgjson.com
     """
+
     def __init__(self, app: flask.Flask):
         self.__app = app
         self.__editions = set()  # type: typing.Set[Edition]
@@ -87,11 +87,11 @@ class JSonCardParser:
     def __load_data(self):
         for edition in self.json.values():
             self.__editions.add(Edition(
-                code=edition.get("code"),
-                name=edition.get("name"),
-                type=edition.get("type"),
-                releaseDate=datetime.datetime.strptime(edition.get("releaseDate"), "%Y-%m-%d"),
-                block=edition.get("block", None)
+                    code=edition.get("code"),
+                    name=edition.get("name"),
+                    type=edition.get("type"),
+                    releaseDate=datetime.datetime.strptime(edition.get("releaseDate"), "%Y-%m-%d"),
+                    block=edition.get("block", None)
             ))
 
             for metacard in edition.get("cards"):
@@ -99,35 +99,35 @@ class JSonCardParser:
                     metacard["types"] = ["Token"]
 
                 self.__metacards.add(Metacard(
-                    name=metacard.get("name"),
-                    types=set(metacard.get("types")),
-                    subtypes=set(metacard.get("subtypes")) if metacard.get("subtypes") else None,
-                    supertypes=set(metacard.get("supertypes")) if metacard.get("supertypes") else None,
-                    manaCost=metacard.get("manaCost"),
-                    power=metacard.get("power"),
-                    toughness=metacard.get("toughness"),
-                    colors=metacard.get("colors"),
-                    cmc=metacard.get("cmc", 0),
-                    text=metacard.get("originalText"),
+                        name=metacard.get("name"),
+                        types=set(metacard.get("types")),
+                        subtypes=set(metacard.get("subtypes")) if metacard.get("subtypes") else None,
+                        supertypes=set(metacard.get("supertypes")) if metacard.get("supertypes") else None,
+                        manaCost=metacard.get("manaCost"),
+                        power=metacard.get("power"),
+                        toughness=metacard.get("toughness"),
+                        colors=metacard.get("colors"),
+                        cmc=metacard.get("cmc", 0),
+                        text=metacard.get("originalText"),
                 ))
 
                 self.__cards.add(Card(
-                    name=metacard.get("name"),
-                    multiverseid=metacard.get("multiverseid"),
-                    rarity=metacard.get("rarity"),
-                    number=metacard.get("number", 0),
-                    edition=edition.get("code"),
-                    artist=metacard.get("artist"),
-                    flavor=metacard.get("flavor")
+                        name=metacard.get("name"),
+                        multiverseid=metacard.get("multiverseid"),
+                        rarity=metacard.get("rarity"),
+                        number=metacard.get("number", 0),
+                        edition=edition.get("code"),
+                        artist=metacard.get("artist"),
+                        flavor=metacard.get("flavor")
                 ))
 
                 for legality in metacard.get("legalities", []):
                     if not legality["format"].endswith("Block"):
                         self.__formats.add(Format(
-                            legality["format"]
+                                legality["format"]
                         ))
                         self.__legal_in_format.add(LegalInFormat(
-                            metacard.get("name"), legality["format"], legality["legality"]
+                                metacard.get("name"), legality["format"], legality["legality"]
                         ))
 
     def __download_latest_version(self, version: str) -> str:

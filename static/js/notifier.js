@@ -1,5 +1,6 @@
+//noinspection JSUnresolvedFunction
 /**
- * Created by Benjamin Schubert on 1/6/16.
+ * Created by Basile Vu on 1/6/16.
  */
 
 var source = new EventSource('/updates');

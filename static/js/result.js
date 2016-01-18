@@ -15,6 +15,7 @@ $(document).ready(function () {
 
 function fetchExistingDecks() {
     $.get(deckGetPath, function (data) {
+        //noinspection JSUnresolvedVariable
         existingDecks = data.decks;
     });
 }

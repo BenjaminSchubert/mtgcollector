@@ -16,7 +16,8 @@ function fetchJson(callback) {
 }
 
 function createDeckList(data) {
-    var deckList = $('#deck-list > tbody');
+    var deckList = $('#deck-list').find('> tbody');
+    //noinspection JSUnresolvedVariable
     var decks = data.decks;
 
     decks.forEach(function (deck) {

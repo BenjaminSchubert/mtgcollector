@@ -1,13 +1,13 @@
 {% extends "form.html" %}
 
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-slider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/external/bootstrap-slider.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form.css') }}">
 {%- endblock  %}
 
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-slider.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/external/bootstrap-slider.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
 {%- endblock %}

@@ -347,7 +347,7 @@ class Metacard(Model):
             :param colors_: the colors for which to compute the value
             :return: the value of all the colors given
             """
-            return sum([color_translation[color] for color in colors_])
+            return sum([color_translation[color_] for color_ in colors_])
 
         color_translation = {"Red": 1, "Green": 2, "White": 4, "Blue": 8, "Black": 16}
         all_colors = {"Red", "Green", "White", "Blue", "Black"}
@@ -760,7 +760,7 @@ class Deck(Model):
         for deck in decks:
             if deck["colors"]:
                 deck_colors = deck["colors"].split(",")
-                deck["colors"] = [color_list[color] for color in color_list if color in deck_colors]
+                deck["colors"] = [color_list[color_] for color_ in color_list if color_ in deck_colors]
 
         return decks
 
@@ -887,6 +887,9 @@ class CardInDeckMeta(Model, metaclass=abc.ABCMeta):
     index = 3
 
     class DBProxy:
+        """
+        Proxy to insert cards in deck/side
+        """
         def __init__(self, user_id, deck_name, data):
             self.data = data
             self.data["user_id"] = user_id

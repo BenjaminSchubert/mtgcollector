@@ -72,7 +72,7 @@ class StartSeparatorField(Field):
 
 class StopSeparatorField(Field):
     """
-    Field used to create a subsection in a form. Determines the end of a subsection openned by a
+    Field used to create a subsection in a form. Determines the end of a subsection opened by a
     StartSeparatorField
     """
     widget = StopSeparatorWidget()

@@ -45,9 +45,9 @@ class TestJSonCardParser(unittest.TestCase):
         :param version: version of the file to add
         """
         with open(download_file_resources, "rb") as _zip:
-            with open(self.full_path_format.format(version), "wb") as dest:
+            with open(self.full_path_format.format(version), "wb") as destination:
                 zip_file = zipfile.ZipFile(_zip)
-                dest.write(zip_file.read(zip_file.namelist()[0]))
+                destination.write(zip_file.read(zip_file.namelist()[0]))
 
     def setUp(self):
         """ Isolates the running test in a new directory """

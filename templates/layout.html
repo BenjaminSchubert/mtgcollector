@@ -22,7 +22,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MTG-Collector</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/external/bootstrap.min.css') }}" />
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/layout.css') }}" />
 	{% block head %}{% endblock %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -58,9 +58,9 @@
         </div>
 	</div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/notify.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/external/jquery-2.1.4.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/external/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/external/notify.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/notifier.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>

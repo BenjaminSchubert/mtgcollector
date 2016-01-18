@@ -23,7 +23,7 @@ from lib.models import User
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
 
-def setup_app(_app: flask.Flask) -> None:
+def setup_app(_app: Flask) -> None:
     """
     setups flask application
 
@@ -68,6 +68,7 @@ def load_user(user_id: int) -> User:
     return User.get_user_by_id(user_id)
 
 
+# noinspection PyPep8
 from views import *
 
 if __name__ == '__main__':

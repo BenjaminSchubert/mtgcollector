@@ -32,6 +32,7 @@ var createDetailsUpperFunction, createDetailsLowerFunction;
 $.fn.scrollStopped = function(callback) {
     $(this).scroll(function (ev) {
         clearTimeout($(this).data('scrollTimeout'));
+        //noinspection JSCheckFunctionSignatures
         $(this).data('scrollTimeout', setTimeout(callback.bind(this), 150, ev));
     });
 };
@@ -40,6 +41,7 @@ $.fn.scrollStopped = function(callback) {
 $(document).ready(function () {
 
     // if no result found
+    //noinspection JSJQueryEfficiency
     if ($('.card-container').children().length == 0) {
         $('.card-container').append('<p id="no-result-text">No result found</p>');
     }
@@ -75,7 +77,7 @@ function setImagesErrorPath() {
 }
 
 
-// Resizes divs heights at the right size and loads images
+// Resize divs heights at the right size and loads images
 function initView() {
     resizeDivHeights();
     setPreloadMargin($(window).height());
@@ -91,7 +93,7 @@ function setPreloadMargin(nPixels) {
 }
 
 
-// Resizes all div to image size.
+// Resize all div to image size.
 function resizeDivHeights() {
     $('.card').height(findImageHeight());
 }
