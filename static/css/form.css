@@ -115,3 +115,17 @@
 .form-group label {
     padding-top: 7px;
 }
+
+/* login, register */
+#login-form, #form-registration {
+    margin: 0px;
+    padding: 20px 16px 0px 25px;
+}
+
+#register-link {
+    margin-left: 20px;
+}
+
+#form-registration .text-right {
+    margin-bottom: 16px;
+}

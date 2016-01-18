@@ -1,5 +1,7 @@
 {% extends "form.html" %}
 
 {% block additional %}
-    Not account yet ? <a href="{{ url_for("register") }}"> Register here !</a>
+    <p id="register-link">
+        Not account yet ? <a href="{{ url_for("register") }}"> Register here !</a>
+    </p>
 {% endblock %}

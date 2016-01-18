@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% from "macros.html" import render_form %}
 
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/parameters.css') }}">
+{%  endblock %}
+
 {% block body %}
     {% if admin %}
         <ul class="nav nat-tabs">

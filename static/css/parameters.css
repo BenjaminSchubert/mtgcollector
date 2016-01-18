@@ -1,0 +1,7 @@
+#change-info {
+    padding: 10px;
+}
+
+#change-info > .row > .form-group > div {
+    margin-bottom: 10px;
+}
