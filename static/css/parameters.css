@@ -21,3 +21,7 @@
 #import-export div:first-child {
     margin-bottom: 10px;
 }
+
+#import-modal .text-right {
+    margin-top: 10px;
+}
