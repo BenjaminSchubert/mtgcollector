@@ -8,6 +8,7 @@ $(document).ready(function () {
     loadAllImages();
 });
 
+// Loads all the card images on the page.
 function loadAllImages() {
     $('.card').each(function() {
         var curDiv = $(this);

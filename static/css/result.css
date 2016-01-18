@@ -6,3 +6,15 @@
     margin-top: 5px;
     margin-bottom: 30px;
 }
+
+.popover-main-container {
+    width: 200px;
+}
+
+#add-to-side {
+    margin-left: 10px;
+}
+
+.popover-main-container label:not(:first-child) {
+    margin-top: 5px;
+}

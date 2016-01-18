@@ -9,12 +9,14 @@ $(document).ready(function () {
     bindModalButton();
 });
 
+// Fetches the json containing all the decks and call the callback when the data is available.
 function fetchJson(callback) {
     $.get(decksGetPath, function (data) {
         callback(data);
     });
 }
 
+// Creates the list of the decks.
 function createDeckList(data) {
     var deckList = $('#deck-list').find('> tbody');
     //noinspection JSUnresolvedVariable
@@ -50,6 +52,7 @@ function createDeckList(data) {
     bindButtons();
 }
 
+// Create the name of the deck and the popover associated with it.
 function createName(parent, origDeckName) {
     var wrapper = $('<div class="popover-wrapper"></div>');
     var editable = $('<a class="editable">' + origDeckName + '</a>');
@@ -84,6 +87,7 @@ function createName(parent, origDeckName) {
     parent.append(wrapper);
 }
 
+// Creates the user index and the popover associated with it.
 function createUserIndex(parent, origUserIndex) {
     var wrapper = $('<div class="popover-wrapper"></div>');
     var editable = $('<a class="editable">' + origUserIndex + '</a>');
@@ -91,7 +95,7 @@ function createUserIndex(parent, origUserIndex) {
     editable.click(function () {
 
         var deckName = wrapper.parent().parent().attr('deck-name');
-        var userIndex = wrapper.parent().siblings('.deck-user-index').text();
+        var userIndex = wrapper.text();
 
         var content = $(
             '<label>Enter new value</label>' +
@@ -119,6 +123,7 @@ function createUserIndex(parent, origUserIndex) {
     parent.append(wrapper);
 }
 
+// Binds the buttons "Go to deck" and "Delete".
 function bindButtons() {
     $('.button-go-deck').click(function () {
         document.location = "decks/" + $(this).parent().parent().attr('deck-name');
@@ -141,6 +146,7 @@ function bindButtons() {
     });
 }
 
+// Binds the button for the modal.
 function bindModalButton() {
     $('#modal-submit-button').click(function () {
         var deckName = $('#deck-name').val();

@@ -18,3 +18,7 @@
 #create-deck-button {
     margin-left: 10px;
 }
+
+.popover-main-container {
+    width: 150px;
+}

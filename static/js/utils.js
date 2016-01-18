@@ -16,6 +16,7 @@ function formatTextToHTMLContent(text) {
     return text;
 }
 
+// Prepare token for POST requests.
 function setupPost() {
     // setup POST
     var csrftoken = $('meta[name=csrf-token]').attr('content');
