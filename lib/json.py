@@ -27,6 +27,6 @@ class CustomJSONEncoder(JSONEncoder):
         """
         if isinstance(obj, set):
             return list(obj)
-        if isinstance(obj, Decimal):  # TODO we should avoid this and return proper integers
+        if isinstance(obj, Decimal):
             return int(obj)
         return JSONEncoder.default(self, obj)

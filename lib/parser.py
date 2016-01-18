@@ -20,6 +20,10 @@ import typing
 from lib.models import Edition, Metacard, Card, Format
 from lib.models import LegalInFormat
 
+
+__author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
 CardList = typing.Dict[str, typing.Dict[str, typing.Union[str, typing.List]]]
 
 
@@ -74,9 +78,8 @@ class JSonCardParser:
         if latest_local_version < latest_remote_version:
             try:
                 self.__download_latest_version(latest_remote_version)
-            except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
-                # TODO : log this error
-                pass
+            except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
+                self.__app.logger.error("Could not download new version, got : {}".format(e))
             else:
                 return True
         return False

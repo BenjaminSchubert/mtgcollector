@@ -4,9 +4,13 @@
 """
 Various helpers to handle flask application configuration
 """
+
 import contextlib
 
 from mtgcollector import app
+
+
+__author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 
 
 def update_conf(**kwargs):

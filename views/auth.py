@@ -13,6 +13,9 @@ from lib.forms import LoginForm, RegisterForm
 from mtgcollector import app, lib
 
 
+__author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """ login for the user """

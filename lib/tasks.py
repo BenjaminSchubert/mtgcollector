@@ -1,4 +1,11 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Background tasks utilities
+"""
+
+
 import os
 import queue
 import tempfile
@@ -12,7 +19,13 @@ import lib.models
 import lib.db.maintenance
 
 
+__author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
 class Downloader(threading.Thread):
+    """
+    Card downloader, for caching and pre-caching
+    """
     def __init__(self, app: flask.Flask):
         super().__init__()
         app.downloader = self
@@ -23,24 +36,45 @@ class Downloader(threading.Thread):
         self.setDaemon(True)
         self.rename_lock = threading.Lock()
 
-    def get_image_path(self, card_id: int):
+    def get_image_path(self, card_id: int) -> str:
+        """
+        Get's the card's image's storage path
+
+        :param card_id:
+        :return: image's storage location
+        """
         if card_id == "default.png":
             return os.path.join(self.app.static_folder, "images", card_id)
         data_folder_path = [str(card_id)[n] if len(str(card_id)) > n else "0" for n in range(4)]
         data_folder_path.append(str(card_id) + ".jpg")
         return os.path.join(self.app.static_folder, "images", *data_folder_path)
 
-    def get_icon_path(self, icon: str):
+    def get_icon_path(self, icon: str) -> str:
+        """
+        Returns the icon path for the given name
+
+        :param icon: name of the icon
+        :return: icon's storage location
+        """
         return os.path.join(self.app.static_folder, "images", "icons", icon)
 
-    def run(self):
+    def run(self) -> None:
+        """
+        Download all items in its queue
+        """
         entry = self.queue.get()
-        with self.db.db_manager(self.app) as conn:
+        with self.db.DBManager(self.app) as conn:
             while True:
                 self.download_image(entry, conn)
                 entry = self.queue.get()
 
-    def download_item(self, url: str, file_path: str):
+    def download_item(self, url: str, file_path: str) -> None:
+        """
+        Downloads a file from the given url to the given file_path
+
+        :param url: where to fetch the resource
+        :param file_path: where to store the resource
+        """
         request = requests.get(url, stream=True)
 
         if request.status_code != requests.codes.ok:
@@ -60,7 +94,13 @@ class Downloader(threading.Thread):
             else:
                 os.remove(path_name)
 
-    def download_image(self, image, connection):
+    def download_image(self, image: int, connection) -> None:
+        """
+        Downloads the given image
+
+        :param image: card_id of the card to download
+        :param connection: database connection to obtain image information
+        """
         if image == "default.png":
             url = lib.models.Card.get_default_image_url()
         else:
@@ -68,7 +108,12 @@ class Downloader(threading.Thread):
         file_path = self.get_image_path(image)
         self.download_item(url, file_path)
 
-    def download_icon(self, icon):
+    def download_icon(self, icon: str) -> None:
+        """
+        Downloads the given icon
+
+        :param icon: icon name to download
+        """
         icon_name = icon.split(".")[0]
         if icon_name == "T":
             icon_name = "tap"
@@ -80,7 +125,12 @@ class Downloader(threading.Thread):
 
 
 class DBUpdater(threading.Thread):
-    def __init__(self, app):
+    """
+    Database updater. Waits for a signal and, on signal, tries to update the database
+
+    :param app: flask application to obtain database information
+    """
+    def __init__(self, app: flask.Flask):
         super().__init__()
         self.db = lib.db.maintenance.MaintenanceDB(app)
         self.event = threading.Event()
@@ -88,6 +138,7 @@ class DBUpdater(threading.Thread):
         self.setDaemon(True)
 
     def run(self):
+        """ Waits for a signal and updates the database when it gets it """
         while True:
             self.event.wait()
             self.event.clear()

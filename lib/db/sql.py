@@ -535,6 +535,7 @@ class Deck:
         """
 
 
+# noinspection SqlResolve
 class CardInDeckEntity(abc.ABCMeta):
     """
     Abstract helper for cardsInDeck and cardsInSide
@@ -559,6 +560,7 @@ class CardInDeckEntity(abc.ABCMeta):
             )
         """.format(table_name=mcs.table_name())
 
+    # noinspection SqlInsertValues
     @classmethod
     def add(mcs) -> str:
         """ add a card to a deck """
@@ -605,6 +607,7 @@ class CardInDeckEntity(abc.ABCMeta):
             WHERE deck.user_id = %(user_id)s AND deck.name = %(deck_name)s
         """.format(table_name=mcs.table_name())
 
+    # noinspection SqlInsertValues
     @classmethod
     def insert(mcs):
         """ insert a card in the object """
@@ -612,8 +615,10 @@ class CardInDeckEntity(abc.ABCMeta):
             INSERT INTO {table_name} (deck_id, card_id, number)
             SELECT deck_id, card_id, %(number)s
             FROM
-                (SELECT deck_id FROM deck WHERE user_id = %(user_id)s AND name = %(deck_name)s) AS deck,
-                (SELECT card_id FROM card WHERE name = %(name)s AND edition=%(edition)s AND number=%(ed_number)s) AS card
+                (SELECT deck_id FROM deck
+                    WHERE user_id = %(user_id)s AND name = %(deck_name)s) AS deck,
+                (SELECT card_id FROM card
+                    WHERE name = %(name)s AND edition=%(edition)s AND number=%(ed_number)s) AS card
         """.format(table_name=mcs.table_name())
 
 

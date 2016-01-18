@@ -21,6 +21,7 @@ import lib.models
 from lib.conf import update_conf
 from mtgcollector import app
 
+
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
 
@@ -28,7 +29,7 @@ def validate_conf(form: lib.forms.InstallationForm):
     """
     Checks that the parameters given by the client are correct and allow a successful connection to the database
 
-    :param form: form containing the informations
+    :param form: form containing the information
     """
     app.config.update({
         "DATABASE_USER": form.username.data,

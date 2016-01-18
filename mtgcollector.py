@@ -20,7 +20,15 @@ from lib.json import CustomJSONEncoder
 from lib.models import User
 
 
-def setup_app(_app):
+__author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
+def setup_app(_app: flask.Flask) -> None:
+    """
+    setups flask application
+
+    :param _app: application to configure
+    """
     app.config["CONFIG_PATH"] = os.environ.get("MTG_COLLECTOR_CONFIG", os.path.join(_app.root_path, "config.cfg"))
 
     try:
@@ -45,11 +53,18 @@ app = Flask(__name__)
 login_manager = flask_login.LoginManager()
 login_manager.login_view = 'login'
 
+# noinspection PyUnresolvedReferences
 csrf = flask_wtf.CsrfProtect()
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: int) -> User:
+    """
+    Loads the user from the database
+
+    :param user_id: id of the user to load
+    :return: a User instance
+    """
     return User.get_user_by_id(user_id)
 
 

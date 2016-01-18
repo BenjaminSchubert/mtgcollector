@@ -5,7 +5,7 @@
 Widgets to control the display of forms
 """
 
-from wtforms.widgets import html_params, HTMLString, Input, CheckboxInput
+from wtforms.widgets import html_params, HTMLString, Input
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
 

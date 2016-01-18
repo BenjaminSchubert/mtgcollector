@@ -4,6 +4,7 @@
 """
 RESTful API for mtgcollector
 """
+
 import io
 import json
 import os
@@ -16,6 +17,7 @@ import mtgcollector
 from lib import models
 from lib.exceptions import DataManipulationException
 from lib.forms import AddToCollectionForm, RenameDeck, ChangeDeckIndex, AddToDeckForm, ImportJSonForm
+
 
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 

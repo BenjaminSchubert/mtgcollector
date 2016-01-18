@@ -134,8 +134,8 @@ class SearchForm(Form):
         "Types", default="",
         choices=[
             (choice, choice) for choice in
-            ["", "Land", "Creature", "Sorcery", "Instant", "Artifact", "Planeswalker", "Enchantment", "Tribal", "Scheme",
-             "Enchant", "Vanguard", "Plane", "Conspiracy", "Phenomenon", "Token"]
+            ["", "Land", "Creature", "Sorcery", "Instant", "Artifact", "Planeswalker", "Enchantment", "Tribal",
+             "Scheme", "Enchant", "Vanguard", "Plane", "Conspiracy", "Phenomenon", "Token"]
         ]
     )
     in_collection = BooleanField('Only cards in collection')

@@ -1,5 +1,14 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Utilities for mtgcollector's application
+"""
+
 import inspect
+
+
+__author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
 
 def get_subclasses(base_class: callable) -> list:

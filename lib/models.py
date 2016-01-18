@@ -21,9 +21,9 @@ from lib.db import sql_commands as sql
 from lib.exceptions import DataManipulationException
 
 
-colors = OrderedDict()
-for color, code in ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("Blue", "{U}"), ("Black", "{B}"):
-    colors[color] = code
+color_list = OrderedDict()
+for color, color_code in ("Red", "{R}"), ("Green", "{G}"), ("White", "{W}"), ("Blue", "{U}"), ("Black", "{B}"):
+    color_list[color] = color_code
 
 
 class Model(metaclass=abc.ABCMeta):
@@ -760,7 +760,7 @@ class Deck(Model):
         for deck in decks:
             if deck["colors"]:
                 deck_colors = deck["colors"].split(",")
-                deck["colors"] = [colors[color] for color in colors if color in deck_colors]
+                deck["colors"] = [color_list[color] for color in color_list if color in deck_colors]
 
         return decks
 

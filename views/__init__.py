@@ -20,6 +20,7 @@ from lib.forms import SearchForm, ImportJSonForm
 from lib.models import Metacard, Card
 from mtgcollector import app, lib
 
+
 __author__ = "Benjamin Schubert, <ben.c.schubert@gmail.com>"
 
 
