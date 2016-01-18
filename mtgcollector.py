@@ -29,19 +29,19 @@ def setup_app(_app: Flask) -> None:
 
     :param _app: application to configure
     """
-    app.config["CONFIG_PATH"] = os.environ.get("MTG_COLLECTOR_CONFIG", os.path.join(_app.root_path, "config.cfg"))
+    _app.config["CONFIG_PATH"] = os.environ.get("MTG_COLLECTOR_CONFIG", os.path.join(_app.root_path, "config.cfg"))
 
     try:
         _app.config.from_pyfile(_app.config["CONFIG_PATH"])
-    except FileNotFoundError:
-        _app.secret_key = hashlib.sha512(str(random.randint(0, 2**64)).encode()).hexdigest()
-
-        with open(_app.config["CONFIG_PATH"], "w") as _file:
-            _file.write("SECRET_KEY = '{}'".format(_app.secret_key))
+    except FileNotFoundError:  # this is the first run
+        from lib import conf
+        conf.update_conf(
+            SECRET_KEY=hashlib.sha512(str(random.randint(0, 2**64)).encode()).hexdigest(),
+        )
 
     csrf.init_app(_app)
     login_manager.init_app(_app)
-    lib.tasks.Downloader(_app).start()
+    lib.tasks.ImageHandler(_app)
     lib.tasks.DBUpdater(_app).start()
 
     _app.json_encoder = CustomJSONEncoder

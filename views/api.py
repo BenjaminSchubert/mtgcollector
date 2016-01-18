@@ -30,9 +30,9 @@ def get_image(card_id: int):
     :param card_id: card for which to get the image
     :return: an http response for the image
     """
-    filename = mtgcollector.app.downloader.get_image_path(card_id)
+    filename = mtgcollector.app.image_handler.get_image_path(card_id)
     if not os.path.exists(os.path.join(mtgcollector.app.static_folder, filename)):
-        mtgcollector.app.downloader.download_image(card_id, getattr(flask.g, "db"))
+        mtgcollector.app.image_handler.download_image(card_id, getattr(flask.g, "db"))
 
     return send_from_directory(os.path.dirname(filename), os.path.split(filename)[1])
 
@@ -45,9 +45,9 @@ def get_icon(icon: str):
     :param icon: icon name to fetch
     :return: an http response for the icon
     """
-    filename = mtgcollector.app.downloader.get_icon_path(icon)
+    filename = mtgcollector.app.image_handler.get_icon_path(icon)
     if not os.path.exists(os.path.join(mtgcollector.app.static_folder, filename)):
-        mtgcollector.app.downloader.download_icon(icon)
+        mtgcollector.app.image_handler.download_icon(icon)
 
     return send_from_directory(os.path.dirname(filename), icon)
 
