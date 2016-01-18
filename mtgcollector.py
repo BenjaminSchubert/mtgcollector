@@ -8,6 +8,9 @@ MTGCollector : an application to easily handle your Magic The Gathering collecti
 import hashlib
 import os
 import random
+from argparse import ArgumentParser
+
+import sys
 
 import flask_login
 import flask_wtf.csrf
@@ -21,6 +24,14 @@ from lib.models import User
 
 
 __author__ = "Benjamin Schubert <ben.c.schubert@gmail.com>"
+
+
+def parse_args():
+    parser = ArgumentParser("Run mtgcollector server")
+    parser.add_argument("-p", "--port", type=int, help="port to use for the server", default=5000)
+    parser.add_argument("--host", type=str, help="address for the server to listen on", default="127.0.0.1")
+
+    return vars(parser.parse_args(sys.argv[1:]))
 
 
 def setup_app(_app: Flask) -> None:
@@ -72,5 +83,7 @@ def load_user(user_id: int) -> User:
 from views import *
 
 if __name__ == '__main__':
+    arguments = parse_args()
+
     setup_app(app)
-    app.run(threaded=True, debug=os.environ.get("MTG_COLLECTOR_DEBUG", False))
+    app.run(threaded=True, debug=os.environ.get("MTG_COLLECTOR_DEBUG", False), **arguments)
