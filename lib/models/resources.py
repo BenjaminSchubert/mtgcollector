@@ -246,8 +246,8 @@ class Metacard(Model):
             kwargs["name"] = add_wildcard(name)
 
         if subtypes:
-            query_parameters = add_to_parameters(query_parameters, "metacard.types LIKE %(type)s")
-            kwargs["type"] = add_wildcard(subtypes)
+            query_parameters = add_to_parameters(query_parameters, "metacard.subtypes LIKE %(subtypes)s")
+            kwargs["subtypes"] = add_wildcard(subtypes)
 
         if text:
             query_parameters = add_to_parameters(query_parameters, "metacard.orig_text LIKE %(card_text)s")
@@ -343,6 +343,7 @@ class Metacard(Model):
         query_parameters = treat_range(query_parameters, cmc, "cmc")
 
         query = command.format(selection=query_parameters, order=order_by, having=having)
+        print(query % kwargs)
         return cls._get(query, **kwargs)
 
     @classmethod
