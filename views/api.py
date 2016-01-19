@@ -160,7 +160,7 @@ def add_card_to_deck(name: str, card_id: int):
     """
     form = AddToDeckForm()
     if form.validate_on_submit():
-        current_user.decks.add_card(name, card_id, **form.data)
+        current_user.collection.decks.add_card(name, card_id, **form.data)
         return ('', 200)
     return (flask.jsonify(form.errors), 400)
 
