@@ -45,7 +45,8 @@ class CardInCollection(Model):
         self.__normal = normal  # type: int
         self.__foil = foil  # type: int
 
-    def insert(self, user_id: int, card_id: int, n_normal: int, n_foil: int) -> None:
+    @classmethod
+    def insert(cls, user_id: int, card_id: int, n_normal: int, n_foil: int) -> None:
         """
         adds a new card to the collection.
 
@@ -56,9 +57,9 @@ class CardInCollection(Model):
         :param n_foil: number of foil copy
         """
         if n_normal == n_foil == 0:
-            self._modify(sql.CardInCollection.delete(), user_id=user_id, card_id=card_id)
+            cls._modify(sql.CardInCollection.delete(), user_id=user_id, card_id=card_id)
         else:
-            self._modify(
+            cls._modify(
                     sql.CardInCollection.insert_by_id(), user_id=user_id, card_id=card_id, normal=n_normal, foil=n_foil
             )
 
@@ -198,6 +199,15 @@ class Collection:
         CardInCollection.bulk_insert(data.get("collection", []), user_id=self.user_id)
         for deck in data.get("decks", []):
             self.decks.load(deck)
+
+    def add(self, card_id: int, data: typing.Dict):
+        """
+        Add a card to the user's collection
+
+        :param card_id: id of the card to add
+        :param data: card information
+        """
+        CardInCollection.insert(user_id=self.user_id, card_id=card_id, **data)
 
 
 class Deck(Model):

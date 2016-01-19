@@ -77,7 +77,7 @@ def add_to_collection(card_id):
     form = AddToCollectionForm()
 
     if form.validate_on_submit():
-        current_user.collection.insert(card_id=card_id, **form.data)
+        current_user.collection.add(card_id=card_id, data=form.data)
         return ('', 200)
     else:
         return (flask.jsonify(form.errors), 400)
@@ -98,7 +98,7 @@ def create_deck(name: str):
 
     :param name: name of the deck to create
     """
-    current_user.decks.add(name)
+    current_user.collection.decks.add(name)
     return ('', 200)
 
 
