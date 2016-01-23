@@ -5,13 +5,14 @@ function insertImagesInText(text) {
     return text.replace(/{([^{}]+)}/g, '<img src="' + iconPath + '\$1.png">');
 }
 
-// Formats text to html content. \n become <br> and first values (+1 : ...) are in bold (<b>+1</b> : ...).
+// Formats text to html content (replace \u2212, \n, ...) and first values (+1 : ...) are in bold (<b>+1</b> : ...).
 function formatTextToHTMLContent(text) {
-    // replace \n
-    text = text.replace(/\n/g, '<br>');
+    // replace unicode -
+    text = text.replace(/\u2212/g, '-');
 
     // first values in bold
-    text = text.replace(/(^|<br>)([\+\-][^:]+:)/g, "\$1<b>\$2</b>");
+    text = text.replace(/(^|\n|\.)(([\+\-][^:]+|0):)/g, "\$1<br><b>\$2</b>");
+    text = text.replace(/^<br>/, "");
 
     return text;
 }
