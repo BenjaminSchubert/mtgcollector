@@ -276,12 +276,12 @@ function createDetails(id) {
     createDetailsLowerFunction(id);
 }
 
-// Create a string from a value (in json). Placeholders like {W} are replaced with the url to icons.
+// Create a string from a value (in json).
 function createStringFromValue(details, key) {
-    return insertImagesInText(("" + details[key]));
+    return "" + details[key];
 }
 
-// Create a string from a value (in json) which is an array. The resulting string has the \n replaced by <br>.
+// Create a string from a value (in json) which is an array.
 function createStringFromArrayValue(details, key) {
     var res = "";
     if (details[key].length > 0) {

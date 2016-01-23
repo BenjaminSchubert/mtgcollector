@@ -5,7 +5,10 @@ function insertImagesInText(text) {
     return text.replace(/{([^{}]+)}/g, '<img src="' + iconPath + '\$1.png">');
 }
 
-// Formats text to html content (replace \u2212, \n, ...) and first values (+1 : ...) are in bold (<b>+1</b> : ...).
+// Formats text to html content (replace \u2212, \n, ...),
+// first values (+1 : ...) are in bold (<b>+1</b> : ...),
+// adds a <br> as well when there must be one.
+// Finally, replaces the placeholders ({W}, for example) by their img tag.
 function formatTextToHTMLContent(text) {
     // replace unicode -
     text = text.replace(/\u2212/g, '-');
@@ -13,6 +16,18 @@ function formatTextToHTMLContent(text) {
     // first values in bold
     text = text.replace(/(^|\n|\.)(([\+\-][^:]+|0):)/g, "\$1<br><b>\$2</b>");
     text = text.replace(/^<br>/, "");
+
+    //replace \n isolated
+    text = text.replace(/\n/g, "<br>");
+
+    // adds a <br> where there is .{...}
+    text = text.replace(/(\.)({[^{}]+})/g, "$1<br>$2");
+
+    // remove a <br> if there is two following each other
+    text = text.replace(/<br>(<br>)/g, "$1");
+    
+    // replace placeholders
+    text = insertImagesInText(text);
 
     return text;
 }
@@ -30,6 +45,8 @@ function setupPost() {
     });
 }
 
+// Creates a popover with the desired content and two buttons : cancel and ok.
+// The content of the popover is passed as a node and what the button "ok" is doing is defined by the function buttonOkFunc.
 function createPopover(node, buttonOkFunc) {
 
     // close other popovers
@@ -80,4 +97,9 @@ function createPopover(node, buttonOkFunc) {
     });
 
     return container;
+}
+
+// Forbids inputting negative numbers in input which are of type "number".
+function noNegInputNum() {
+    $('input[type="number"]')
 }
