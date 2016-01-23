@@ -69,6 +69,10 @@
             rotate(45deg)
             translateX(28%)
             translateY(-10%);
+    -moz-transform:
+            rotate(45deg)
+            translateX(28%)
+            translateY(-10%);
     position: absolute;
     top: 0;
     right: 0;
